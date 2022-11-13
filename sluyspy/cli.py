@@ -14,18 +14,26 @@
 #  Union Public Licence along with this code.  If not, see <https://www.eupl.eu/1.2/en/>.
 
 
-"""sluyspy package
-
-Marc van der Sluys' personal Python modules.
-The code is being developed by `Marc van der Sluys <http://marc.vandersluys.nl>`_ of the department of
-Astrophysics at the Radboud University Nijmegen, the Institute of Nuclear and High-Energy Physics (Nikhef),
-and the Institute for Gravitational and Subatomic Physics (GRASP) at Utrecht University, all in The Netherlands.
-The sluyspy package can be used under the conditions of the EUPL 1.2 licence.  These pages contain the API
-documentation.  For more information on the Python package, licence and source code, see the
-`sluyspy GitHub page <https://github.com/MarcvdSluys/sluyspy>`_.
-"""
+"""Command-line interface functions for the sluyspy package"""
 
 
-name = 'sluyspy'
+def dialog(text):
+    """Present a dialog text and wait for a single-key answer.
 
-from . import cli
+    Parameters:
+      text (str):  The text to print.
+
+    Returns:
+      (str):  The single character typed by the user.
+    """
+    
+    import sys
+    import getch
+    
+    sys.stdout.write(text+' ')  # No newline
+    sys.stdout.flush()          # Show the previous line
+    
+    char = getch.getche()  # Ask for user input, displayed on the screen
+    print()                # Newline after input
+    
+    return char
