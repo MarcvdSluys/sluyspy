@@ -5,7 +5,7 @@
 
 
 # Package version:
-version='0.0.1'
+version='0.0.2'
 
 # Get long description from README.md:
 with open('README.md', 'r') as fh:
@@ -20,7 +20,7 @@ setup(
     url='https://github.com/MarcvdSluys/sluyspy',
     
     packages=['sluyspy'],
-    install_requires=['getch'],
+    install_requires=['getch','matplotlib'],
     long_description=long_description,
     long_description_content_type='text/markdown',
     

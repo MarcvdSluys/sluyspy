@@ -29,3 +29,9 @@ documentation.  For more information on the Python package, licence and source c
 name = 'sluyspy'
 
 from . import cli
+from . import plot
+
+
+# Avoid F401 "'module' imported but unused" warnings:
+if False:
+    print(cli, plot)
