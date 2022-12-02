@@ -29,3 +29,19 @@ def show_ctrlc():
         exit(0)
         
     return
+
+
+def pause_ctrlc(interval):
+    """Call pyplot.pause() and catch Ctrl-C to exit gently.
+    
+    Parameters:
+      interval (float):  pause time in seconds.
+    """
+    
+    try:
+        plt.pause(interval)
+    except KeyboardInterrupt:
+        print(' - Received keyboard interrupt, aborting.')  # " - " to create some space after "^C"
+        exit(0)
+        
+    return
