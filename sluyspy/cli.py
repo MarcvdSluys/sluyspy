@@ -16,24 +16,56 @@
 
 """Command-line interface functions for the sluyspy package"""
 
+import sys as _sys
+from termcolor import colored as _clr
+
 
 def dialog(text):
     """Present a dialog text and wait for a single-key answer.
-
+    
     Parameters:
       text (str):  The text to print.
-
+    
     Returns:
       (str):  The single character typed by the user.
     """
     
-    import sys
     import getch
     
-    sys.stdout.write(text+' ')  # No newline
-    sys.stdout.flush()          # Show the previous line
+    _sys.stdout.write(text+' ')  # No newline
+    _sys.stdout.flush()          # Show the previous line
     
     char = getch.getche()  # Ask for user input, displayed on the screen
     print()                # Newline after input
     
     return char
+
+
+def error(message, exit_program=True, exit_code=1):
+    """Print a coloured error message to stderr and exit.
+    
+    Parameters:
+      message (str):        Message to print.
+      exit_program (bool):  Exit the program or not, defaults to True.
+      exit_code (int):      Exit code to exit the program with, defaults to 1.
+    """
+    
+    _sys.stderr.write('\n'+_clr('ERROR: '+message, 'white', 'on_red', attrs=['bold'])+'\n\n')
+    
+    if exit_program: exit(exit_code)
+    return
+
+
+def warn(message, exit_program=False, exit_code=1):
+    """Print a coloured warn message to stderr and exit.
+    
+    Parameters:
+      message (str):        Message to print.
+      exit_program (bool):  Exit the program or not, defaults to False.
+      exit_code (int):      Exit code to exit the program with, defaults to 1.
+    """
+    
+    _sys.stderr.write('\n'+_clr('Warning: '+message, 'white', 'on_yellow', attrs=['bold'])+'\n\n')
+    
+    if exit_program: exit(exit_code)
+    return
