@@ -30,8 +30,9 @@ name = 'sluyspy'
 
 from . import cli
 from . import plot
+from . import text
 
 
 # Avoid F401 "'module' imported but unused" warnings:
 if False:
-    print(cli, plot)
+    print(cli, plot, text)
