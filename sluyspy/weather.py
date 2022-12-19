@@ -49,6 +49,6 @@ def wind_chill_temperature(temp, wind_vel):
 
     # Round off to nearest 0.1°C, since it is unlikely that the air temperature is known to better than 0.1°C
     # or that this simple model is more accurate than that:
-    wchil = round(wchil,1)
+    wchil = _np.round(wchil,1)
     
     return wchil
