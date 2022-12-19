@@ -1,3 +1,4 @@
 getch==1.0
 matplotlib==3.6.2
+numpy
 termcolor==2.1.1
