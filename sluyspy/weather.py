@@ -32,21 +32,19 @@ def wind_chill_temperature(temp, wind_vel):
       (float):  Wind-chill temperature (°C).
     
     Source:
-      - https://nl.wikipedia.org/wiki/Gevoelstemperatuur
+      - https://en.wikipedia.org/wiki/Wind_chill
       - note: the power 0.16 converts 10m wind velocity to 1.5m.
     """
     
     # Compute wind-chill ("real-feel") temperature:
-    wchil = 13.12 + 0.6215 * temp + (0.3965*temp - 13.96)*wind_vel**0.16
+    wchil = 13.12 + 0.6215 * temp + (0.4867*temp - 13.96)*wind_vel**0.16
     
     # Wind chill == air temperature for T>10°C:
     if(_np.ndim(wchil) == 0):  # Dimension: 0: scalar, >0: array-like
-        if temp > 10: wchil = temp
         if wind_vel < 1.3: wchil = min(wchil, temp)
     else:
-        wchil[temp > 10] = temp[temp > 10]
         wchil[wind_vel < 1.3] = _np.minimum( wchil[wind_vel < 1.3], temp[wind_vel < 1.3] )
-
+    
     # Round off to nearest 0.1°C, since it is unlikely that the air temperature is known to better than 0.1°C
     # or that this simple model is more accurate than that:
     wchil = _np.round(wchil,1)
