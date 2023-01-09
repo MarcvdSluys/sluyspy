@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: EUPL-1.2
 #  
-#  Copyright (c) 2022  Marc van der Sluys - marc.vandersluys.nl
+#  Copyright (c) 2022-2023  Marc van der Sluys - marc.vandersluys.nl
 #   
 #  This file is part of the sluyspy Python package:
 #  Marc van der Sluys' personal Python modules.
@@ -40,7 +40,7 @@ def wind_chill_temperature(temp, wind_vel):
     wchil = 13.12 + 0.6215 * temp + (0.4867*temp - 13.96)*wind_vel**0.16
     
     # Wind chill == air temperature for T>10°C:
-    if(_np.ndim(wchil) == 0):  # Dimension: 0: scalar, >0: array-like
+    if _np.ndim(wchil) == 0:  # Dimension: 0: scalar, >0: array-like
         if wind_vel < 1.3: wchil = min(wchil, temp)
     else:
         wchil[wind_vel < 1.3] = _np.minimum( wchil[wind_vel < 1.3], temp[wind_vel < 1.3] )
