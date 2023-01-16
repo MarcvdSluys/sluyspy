@@ -46,4 +46,4 @@ import sluyspy
 ## References ##
 
 
-<sub>Copyright (c) 2022 Marc van der Sluys</sub>
+<sub>Copyright (c) 2022-2023 Marc van der Sluys</sub>
