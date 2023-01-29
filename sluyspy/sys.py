@@ -72,3 +72,20 @@ def temp_file_name(dir_name=None, base_name='.tmpfile', ext='tmp'):
     
     return dt.datetime.now().strftime(dir_name+'/'+base_name+'_%Y%m%d-%H%M%S.%f.'+ext)  # Date and time with microseconds
     
+
+def tail_file(in_file, out_file, num_lines):
+    """Use the tail command in a shell to quickly save the last N lines of a file in a new file.
+    
+    Parameters:
+      in_file (str):    Name of the input file.
+      out_file (str):   Name of the output file.
+      num_lines (int):  Number of lines to save.
+      verbose (bool):   Print the result of the tail call in the shell.
+    """
+    
+    import subprocess
+    subprocess.run(['tail -'+str(num_lines)+' '+in_file+' > '+out_file], stdout=subprocess.PIPE,
+                   shell=True, check=True).stdout.decode('utf-8')
+    
+    return
+
