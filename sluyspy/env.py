@@ -41,10 +41,7 @@ def environment(cfg_file='.python_environment.cfg'):
       cfg_file (str):  Configuration file to read system environment from (relative to home directory).
     
     Returns:
-      (dataclass):  Dataclass containing:
-    
-      - (str):  The current host name.
-      - (str):  My home directory as a string without trailing slash.
+      (Environment):  Dataclass containing the environment settings.
     """
     
     env = Environment()
