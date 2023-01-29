@@ -50,3 +50,25 @@ def on_zotac():
     
     return host() == 'zotac'
 
+
+def temp_file_name(dir_name=None, base_name='.tmpfile', ext='tmp'):
+    """Return a temporary file name, using the system clock, like "dir/file_YYYYMMDD-HHMMSS.mmmmmm.ext".
+    
+    Parameters:
+      dir_name (str):   Name of the directory for the file to be in.  Use homedir if None.
+      base_name (str):  Base name of the file.
+      ext (str):        File extension.
+    
+    Returns:
+      (str):  A temporary file name.
+    
+    Note:
+      - microsecond accuracy should suffice; two subsequent calls on my laptop take ~15-20us.
+    """
+    
+    import datetime as dt
+    
+    if dir_name is None:  dir_name = homedir()
+    
+    return dt.datetime.now().strftime(dir_name+'/'+base_name+'_%Y%m%d-%H%M%S.%f.'+ext)  # Date and time with microseconds
+    
