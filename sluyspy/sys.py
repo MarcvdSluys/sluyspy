@@ -88,4 +88,3 @@ def tail_file(in_file, out_file, num_lines):
                    shell=True, check=True).stdout.decode('utf-8')
     
     return
-

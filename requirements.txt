@@ -1,4 +1,7 @@
 getch==1.0
 matplotlib==3.6.3
 numpy
+pandas
+pytz==2022.6
+solarenergy==0.1.6
 termcolor==2.2.0

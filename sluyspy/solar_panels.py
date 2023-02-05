@@ -156,9 +156,9 @@ def write_day_file(df, subdir='', prefix=sp.name, ext='csv', verbosity=0):
     
     for row in df.iterrows():
         ser = row[1]
-        if verbosity > 1:  print("%s;%s;%0.3f;%5.3f" % (ser.date, ser.time, ser.Etot, ser.Pac))
+        if verbosity > 1:  print('%s;%s;%0.3f;%5.3f' % (ser.date, ser.time, ser.Etot, ser.Pac))
         
-        out_file.write("%s;%s;%0.3f;%5.3f\n" % (ser.date, ser.time, ser.Etot, ser.Pac/1e3))  # Pac: W -> kW
+        out_file.write('%s;%s;%0.3f;%5.3f\n' % (ser.date, ser.time, ser.Etot, ser.Pac/1e3))  # Pac: W -> kW
         
     out_file.close()
     
