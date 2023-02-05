@@ -19,12 +19,17 @@
 
 import pandas as _pd
 import pytz as _tz
+import solarenergy as se
 from sluyspy import env as _env
 
-env = _env.environment()  # My computing environment
+# My computing environment:
+env = _env.environment()
+
+# My solar-panel specs:
+sp = se.read_solar_panel_specs()
 
 
-def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, header=None, sun_position=False, rem_cols=True, no_p0rows=False, no_elec=False):
+def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, header=None, sun_position=False, rem_cols=True, no_p0rows=False, no_elec=False, no_cond=True):
     """Read solar-panel detailed-log.csv and select the useful data.
     
     Parameters:
@@ -34,7 +39,8 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
       sun_position (bool):  Add (compute) Sun position to the data (slow! - optional; default: False).
       rem_cols (bool):      Remove default columns (constants, duplicates, uninteresting).
       no_p0rows (bool):     Remove rows without power (P=0; Relay=closed; Cond!=OK).
-      no_elec (bool):       Remove electricity data (P,V,I, f).
+      no_elec (bool):       Remove electricity details (some P,V,I, f).
+      no_cond (bool):       Remove condition/status columns (Cond, Relay, Tinv).
       
     Returns:
       (pandas.DataFrame):  DataFrame containing solar-panel data.
@@ -80,6 +86,9 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
         
         # No longer needed:
         del df['Relay'], df['Cond'], df['Tinv']
+        
+    elif no_cond:
+        del df['Cond'], df['Relay'], df['Tinv']
     
     # Slightly more accurate: ~3-4 significant digits -> 4-5:
     df['Pdc'] = df['Idc'] * df['Vdc']
@@ -87,14 +96,15 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
     
     if no_elec:
         del df['Pdc'], df['Idc'], df['Vdc'], df['Iac'], df['Vac'], df['Freq']
+
     
     
     # Combine date and time columns to a timezone-aware datetime:
-    df['date'] = _pd.DatetimeIndex(_pd.to_datetime(df['date']+' '+df['time']))  # , _tz=cet)
+    df['date'] = _pd.DatetimeIndex(_pd.to_datetime(df['date']+' '+df['time']))
     df = df.rename(columns={'date': 'dtm'})  # Rename column date -> dtm
     # df['dtm'] = df['dtm'].dt.round('min')
-    cet = _tz.timezone('Europe/Amsterdam')
-    df.dtm = df.dtm.dt.tz_localize(cet)  # Timezone naive -> timezone aware CET.  Indicate that the existing times are CET, without tz conversion.
+    mytz = _tz.timezone(sp.tz)
+    df.dtm = df.dtm.dt.tz_localize(mytz)  # Timezone naive -> timezone aware.  Indicate that the existing times are in mytz, without conversion.
     
     del df['time']  # Remove column 'time'
     
@@ -102,10 +112,6 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
     
     # Compute Sun position (uses SolTrack behind the scenes):
     if sun_position:
-        import solarenergy as se
-        
-        # Solar-panel data:
-        sp = se.read_solar_panel_specs()
         df['sunAz'],df['sunAlt'],df['sunDist'] = \
             se.sun_position_from_datetime(sp.geo_lon,sp.geo_lat, df['dtm'])
         
