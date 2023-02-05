@@ -25,6 +25,8 @@ from sluyspy import sys
 
 @_dataclass
 class Environment:
+    tz:        str = None;  """Time zone"""
+    
     host:     str  = None;  """Host name"""
     home:     str  = None;  """Home directory"""
     on_zotac: bool = None;  """Am I on Zotac?"""
@@ -56,6 +58,9 @@ def environment(cfg_file='.python_environment.cfg'):
     import configparser
     config = configparser.ConfigParser()
     config.read(env.home+'/'+cfg_file)
+    
+    # Section Localisation:
+    env.tz = config.get('Localisation', 'timezone')  # My timezone
     
     # Section SolarPanels:
     env.sp_dir = config.get('SolarPanels', 'basedir').replace('~', env.home)  # SP base dir
