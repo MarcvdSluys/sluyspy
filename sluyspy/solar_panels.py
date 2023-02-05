@@ -118,3 +118,50 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
     return df
 
 
+def write_day_file(df, subdir='', prefix=sp.name, ext='csv', verbosity=0):
+    """Write one day of (e.g.) minutely solar-panel data to daily file named 'subdir/prefix-yyyymmdd.ext'.
+    
+    Parameters:
+      df (pandas.DataFrame):  Pandas DataFrame with columns datetime, Pac and Etot.
+      subdir (str):           Subdirectory to save file in, with trailing slash.
+      prefix (str):           File name prefix (defaults to name of the plant, followed by a hyphen).
+      ext (str):              File extension to use.
+      verbosity (int):        Verbosity (0-2; defaults to 0).
+    """
+    
+    if len(df) < 1:
+        if verbosity > 0:  print('No data available, no file created.')
+        return
+    
+    
+    # Want separate date and time columns:
+    df['date'] = df.dtm.dt.date
+    df['time'] = df.dtm.dt.time
+    
+    date = df.loc[:, 'dtm'].dt.date.iloc[0].strftime('%Y%m%d')  # .loc[0, ''] doesn't work, since row 0 does not exist
+    out_file_name = env.sp_dir+subdir+prefix+'-'+date+'.'+ext
+    if verbosity > 0:  print('Saving data to '+out_file_name)
+        
+    # Open file and write header:
+    out_file = open(out_file_name, 'w')
+    out_file.write('sep=;\n')
+    out_file.write('Version CSV1|Tool SBFspot3.3.1 (Linux)|Linebreaks CR/LF|Delimiter semicolon|Decimalpoint dot|Precision 3\n')
+    out_file.write('\n')
+    out_file.write(';SN: '+sp.inv_sn+';SN: '+sp.inv_sn+'\n')
+    out_file.write(';'+sp.inv_model+';'+sp.inv_model+'\n')
+    out_file.write(';'+sp.inv_sn+';'+sp.inv_sn+'\n')
+    out_file.write(';Total yield;Power\n')
+    out_file.write(';Counter;Analog\n')
+    out_file.write('yyyy-MM-dd;HH:mm:ss;kWh;kW\n')
+    
+    for row in df.iterrows():
+        ser = row[1]
+        if verbosity > 1:  print("%s;%s;%0.3f;%5.3f" % (ser.date, ser.time, ser.Etot, ser.Pac))
+        
+        out_file.write("%s;%s;%0.3f;%5.3f\n" % (ser.date, ser.time, ser.Etot, ser.Pac/1e3))  # Pac: W -> kW
+        
+    out_file.close()
+    
+    return    
+
+    
