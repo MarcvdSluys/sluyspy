@@ -16,14 +16,14 @@
 
 """Plot functions for the sluyspy package."""
 
-import matplotlib.pyplot as plt         # Get matplotlib.pyplot
+import matplotlib.pyplot as _plt         # Get matplotlib.pyplot
 
 
 def show_ctrlc():
     """Call pyplot.show() and catch Ctrl-C to exit gently."""
     
     try:
-        plt.show()
+        _plt.show()
     except KeyboardInterrupt:
         print(' - Received keyboard interrupt, aborting.')  # " - " to create some space after "^C"
         exit(0)
@@ -39,7 +39,7 @@ def pause_ctrlc(interval):
     """
     
     try:
-        plt.pause(interval)
+        _plt.pause(interval)
     except KeyboardInterrupt:
         print(' - Received keyboard interrupt, aborting.')  # " - " to create some space after "^C"
         exit(0)
