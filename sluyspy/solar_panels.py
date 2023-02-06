@@ -60,7 +60,7 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
         ssys.tail_file(env.sp_dir+file_name, tmpfile, last_only)  # Copy last last_only lines to tmpfile
         df = _pd.read_csv(tmpfile, header=header, sep=r'\s*,\s*', engine='python', names=col_names)
         
-        Path.unlink(tmpfile)  # Remove temporary file
+        Path.unlink(Path(tmpfile))  # Remove temporary file
         
     else:
         df = _pd.read_csv(env.sp_dir+file_name, header=header, sep=r'\s*,\s*', engine='python', names=col_names)
