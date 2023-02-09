@@ -25,15 +25,15 @@ from sluyspy import sys as _sys
 
 @_dataclass
 class Environment:
-    tz:        str = None;  """Time zone"""
+    tz:       str  = '';     """Time zone"""
     
-    host:     str  = None;  """Host name"""
-    home:     str  = None;  """Home directory"""
-    on_zotac: bool = None;  """Am I on Zotac?"""
-    on_think: bool = None;  """Am I on Think?"""
+    host:     str  = '';     """Host name"""
+    home:     str  = '';     """Home directory"""
+    on_zotac: bool = False;  """Am I on Zotac?"""
+    on_think: bool = False;  """Am I on Think?"""
     
-    sp_dir: str = None;  """Solar-panel directory"""
-    el_dir: str = None;  """Electricity-meter directory"""
+    sp_dir:   str = '';      """Solar-panel directory"""
+    el_dir:   str = '';      """Electricity-meter directory"""
     
     
 def environment(cfg_file='.python_environment.cfg'):
