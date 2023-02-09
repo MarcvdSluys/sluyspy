@@ -27,4 +27,3 @@ documentation.  For more information on the Python package, licence and source c
 
 
 name = 'sluyspy'
-
