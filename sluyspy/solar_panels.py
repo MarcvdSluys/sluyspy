@@ -19,14 +19,14 @@
 
 import pandas as _pd
 import pytz as _tz
-import solarenergy as se
+import solarenergy as _se
 from sluyspy import env as _env
 
 # My computing environment:
-env = _env.environment()
+_env = _env.environment()
 
 # My solar-panel specs:
-sp = se.read_solar_panel_specs()
+specs = _se.read_solar_panel_specs()
 
 
 def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, header=None, sun_position=False, rem_cols=True, no_p0rows=False, no_elec=False, no_cond=True):
@@ -55,15 +55,15 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
         from pathlib import Path
         import sluyspy.sys as ssys
         
-        tmpfile = ssys.temp_file_name(env.sp_dir+'Current',  '.detailed-log-last', 'csv')
+        tmpfile = ssys.temp_file_name(_env.sp_dir+'Current',  '.detailed-log-last', 'csv')
         
-        ssys.tail_file(env.sp_dir+file_name, tmpfile, last_only)  # Copy last last_only lines to tmpfile
+        ssys.tail_file(_env.sp_dir+file_name, tmpfile, last_only)  # Copy last last_only lines to tmpfile
         df = _pd.read_csv(tmpfile, header=header, sep=r'\s*,\s*', engine='python', names=col_names)
         
         Path.unlink(Path(tmpfile))  # Remove temporary file
         
     else:
-        df = _pd.read_csv(env.sp_dir+file_name, header=header, sep=r'\s*,\s*', engine='python', names=col_names)
+        df = _pd.read_csv(_env.sp_dir+file_name, header=header, sep=r'\s*,\s*', engine='python', names=col_names)
     
     # Remove unwanted columns:
     if rem_cols:
@@ -103,7 +103,7 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
     df['date'] = _pd.DatetimeIndex(_pd.to_datetime(df['date']+' '+df['time']))
     df = df.rename(columns={'date': 'dtm'})  # Rename column date -> dtm
     # df['dtm'] = df['dtm'].dt.round('min')
-    mytz = _tz.timezone(sp.tz)
+    mytz = _tz.timezone(specs.tz)
     df.dtm = df.dtm.dt.tz_localize(mytz)  # Timezone naive -> timezone aware.  Indicate that the existing times are in mytz, without conversion.
     
     del df['time']  # Remove column 'time'
@@ -113,12 +113,12 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
     # Compute Sun position (uses SolTrack behind the scenes):
     if sun_position:
         df['sunAz'],df['sunAlt'],df['sunDist'] = \
-            se.sun_position_from_datetime(sp.geo_lon,sp.geo_lat, df['dtm'])
+            _se.sun_position_from_datetime(specs.geo_lon,specs.geo_lat, df['dtm'])
         
     return df
 
 
-def write_day_file(df, subdir='', prefix=sp.name, ext='csv', verbosity=0):
+def write_day_file(df, subdir='', prefix=specs.name, ext='csv', verbosity=0):
     """Write one day of (e.g.) minutely solar-panel data to daily file named 'subdir/prefix-yyyymmdd.ext'.
     
     Parameters:
@@ -139,7 +139,7 @@ def write_day_file(df, subdir='', prefix=sp.name, ext='csv', verbosity=0):
     df['time'] = df.dtm.dt.time
     
     date = df.loc[:, 'dtm'].dt.date.iloc[0].strftime('%Y%m%d')  # .loc[0, ''] doesn't work, since row 0 does not exist
-    out_file_name = env.sp_dir+subdir+prefix+'-'+date+'.'+ext
+    out_file_name = _env.sp_dir+subdir+prefix+'-'+date+'.'+ext
     if verbosity > 0:  print('Saving data to '+out_file_name)
         
     # Open file and write header:
@@ -147,9 +147,9 @@ def write_day_file(df, subdir='', prefix=sp.name, ext='csv', verbosity=0):
     out_file.write('sep=;\n')
     out_file.write('Version CSV1|Tool SBFspot3.3.1 (Linux)|Linebreaks CR/LF|Delimiter semicolon|Decimalpoint dot|Precision 3\n')
     out_file.write('\n')
-    out_file.write(';SN: '+sp.inv_sn+';SN: '+sp.inv_sn+'\n')
-    out_file.write(';'+sp.inv_model+';'+sp.inv_model+'\n')
-    out_file.write(';'+sp.inv_sn+';'+sp.inv_sn+'\n')
+    out_file.write(';SN: '+specs.inv_sn+';SN: '+specs.inv_sn+'\n')
+    out_file.write(';'+specs.inv_model+';'+specs.inv_model+'\n')
+    out_file.write(';'+specs.inv_sn+';'+specs.inv_sn+'\n')
     out_file.write(';Total yield;Power\n')
     out_file.write(';Counter;Analog\n')
     out_file.write('yyyy-MM-dd;HH:mm:ss;kWh;kW\n')

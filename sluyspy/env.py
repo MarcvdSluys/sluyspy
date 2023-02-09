@@ -20,7 +20,7 @@
 
 from dataclasses import dataclass as _dataclass
 
-from sluyspy import sys
+from sluyspy import sys as _sys
 
 
 @_dataclass
@@ -47,8 +47,8 @@ def environment(cfg_file='.python_environment.cfg'):
     """
     
     env = Environment()
-    env.host = sys.host()
-    env.home = sys.homedir()
+    env.host = _sys.host()
+    env.home = _sys.homedir()
     
     env.on_zotac = env.host == 'zotac'
     env.on_think = env.host == 'think'
