@@ -53,7 +53,7 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
     # days) to a shorter file and read that (currently saves a factor 17 on CPU time (2022-11-12)):
     if last_only is not None:
         from pathlib import Path
-        import sluyspy.sys as ssys
+        import sluyspy.system as ssys
         
         tmpfile = ssys.temp_file_name(_env.sp_dir+'Current',  '.detailed-log-last', 'csv')
         
