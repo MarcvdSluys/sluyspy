@@ -56,17 +56,17 @@ def environment(cfg_file='.python_environment.cfg'):
     
     # Read system config file:
     import configparser
-    config = configparser.ConfigParser()
+    config = configparser.ConfigParser(inline_comment_prefixes=('#'))
     config.read(env.home+'/'+cfg_file)
     
     # Section Localisation:
-    env.tz = config.get('Localisation', 'timezone')  # My timezone
+    env.tz = config.get('Localisation', 'timezone', fallback=env.tz)  # My timezone
     
     # Section SolarPanels:
-    env.sp_dir = config.get('SolarPanels', 'basedir').replace('~', env.home)  # SP base dir
+    env.sp_dir = config.get('SolarPanels', 'basedir', fallback=env.sp_dir).replace('~', env.home)  # SP base dir
     
     # Section ElectricityMeter:
-    env.el_dir = config.get('ElectricityMeter', 'basedir').replace('~', env.home)  # EM base dir
+    env.el_dir = config.get('ElectricityMeter', 'basedir', fallback=env.el_dir).replace('~', env.home)  # EM base dir
     
     return env
 
