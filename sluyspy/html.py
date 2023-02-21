@@ -141,5 +141,32 @@ def close_html_file(fd, sc_id=None, sc_secr=None, sc_name=None):
     return
 
 
+def table_td_tr(indent, td_width, td_extra_width):
+    """Define trtd, tdtd and tdtr elements for an html table.
+    
+    Parameters:
+      indent (int):          number of spaces for indentation.
+      td_width (str):        width of empty column between columns (e.g. '1%').
+      td_extra_width (str):  width of extra-wide empty column between columns (e.g. '10%').
+    
+    Returns:
+      (tuple):  tuple containing trtd, tdtd, tdtdw, tdtr:
+    
+      - trtd (str):    the <tr><td> element.
+      - tdtd (str):    the default </td><td> element.
+      - tdtdw (str):   the extra-wide </td><td> element.
+      - tdbrtd (str):  an empty </td><td> element for an empty row (<br>).
+      - tdtr (str):    the </td></tr> element.
+    """
+    
+    trtd    = ' '*indent + '<tr><td>'
+    tdtd    = ' '*indent + '</td><td width="' + td_width       + '"></td><td>'
+    tdtdw   = ' '*indent + '</td><td width="' + td_extra_width + '"></td><td>'
+    tdbrtd  = ' '*indent + '</td><td width="' + td_width       + '"><br></td><td>'
+    tdtr    = ' '*indent + '</td></tr>\n'
+    
+    return trtd, tdtd, tdtdw, tdbrtd, tdtr
+
+
 if __name__ == '__main__':
     pass
