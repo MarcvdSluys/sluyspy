@@ -33,31 +33,53 @@ def start_html_file(file_name='index.html', lang='en', title='Page title', icon=
       css (str):          Path to a css file.
       author (str):       Author name.
       copyr_start (int):  Starting year of copyright.
-      refresh (int):      Refresh period in seconds.
-      meta_prop (dict):   Dict of meta properties.
+      refresh (int):      Refresh period in minutes.
+      meta_prop (dict):   Dict of meta data with the keys containing properties and the values
+                          their content.
     
     Returns:
       (FILE):  File descriptor.
     """
     
+    # Create the HTML file:
     f = open(file_name, 'w')
     
     f.write('<!DOCTYPE HTML>\n')
     f.write('<html lang="'+lang+'">\n')
+    
+    # Write the <head> section:
     f.write('  <head>\n')
     f.write('    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">\n')
-    if refresh is not None: f.write('    <meta content="'+str(refresh)+'; URL=." http-equiv="Refresh">\n')
+    
+    # Add refresh data if desired:
+    if refresh is not None:
+        refresh_url = file_name
+        if refresh_url == 'index.html': refresh_url = '.'
+        f.write('    <meta content="'+str(refresh*60)+'; URL='+refresh_url+'" http-equiv="Refresh">\n')
+        
+    # Add an icon or css if desired:
     if icon is not None:    f.write('    <link rel="icon" href="'+icon+'">\n')
     if css is not None:     f.write('    <link rel="stylesheet" type="text/css" href="'+css+'">\n')
+    
+    # Add a title:
     f.write('    <title>'+title+'</title>\n')
+    
+    # Add an author and copyright if desired:
     if author != '':
         current_year = _dt.date.today().year
         if (copyr_start is None) or (copyr_start == current_year):
             f.write('    <meta name="author" content="(c) '+str(current_year)+' '+author+'">\n')
         else:
             f.write('    <meta name="author" content="(c) '+str(copyr_start)+'-'+str(current_year)+' '+author+'">\n')
-            
+    
+    # Add meta data if any:
+    if meta_prop is not None:
+        for key,value in meta_prop.items():
+            f.write('    <meta property="'+key+'" content="'+value+'">\n')
+    
+    # Close the <head> section and start the <body> section:
     f.write('  </head>\n')
+    f.write('  \n')
     f.write('  <body>\n')
     
     return f
