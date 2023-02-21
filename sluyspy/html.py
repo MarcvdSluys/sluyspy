@@ -38,7 +38,7 @@ def start_html_file(file_name='index.html', lang='en', title='Page title', icon=
                           their content.
     
     Returns:
-      (FILE):  File descriptor.
+      (io):  File descriptor.
     """
     
     # Create the HTML file:
@@ -83,6 +83,59 @@ def start_html_file(file_name='index.html', lang='en', title='Page title', icon=
     f.write('  <body>\n')
     
     return f
+
+
+def close_html_file(fd, sc_id=None, sc_secr=None, sc_name=None):
+    """Close an html file by writing StatCounter code if desired, and closing <body>, <html> and the file.
+    
+    Parameters:
+      fd (io):        File descriptor.
+      sc_id (int):    StatCounter project ID.
+      sc_secr (str):  StatCounter security secret.
+      sc_name (str):  Name for the StatCounter code block.
+    """
+    
+    # Create some space:
+    fd.write('    ')
+    fd.write('    ')
+    
+    
+    # Write a StatCounter code block if desired:
+    if (sc_id is not None) and (sc_secr is not None):
+        if sc_name is not None:
+            fd.write('    <!-- Start of StatCounter Code for '+sc_name+' -->\n')
+        else:
+            fd.write('    <!-- Start of StatCounter Code -->\n')
+        
+        fd.write('    <script type="text/javascript">\n')
+        fd.write('    var sc_project='+str(sc_id)+'; \n')
+        fd.write('    var sc_invisible=1; \n')
+        fd.write('    var sc_security="'+str(sc_secr)+'"; \n')
+        fd.write('    var scJsHost = (("https:" == document.location.protocol) ?\n')
+        fd.write('    "https://secure." : "http://www.");\n')
+        fd.write('    document.write("<sc"+"ript type=''text/javascript'' src=''" +\n')
+        fd.write('    scJsHost+\n')
+        fd.write('    "statcounter.com/counter/counter.js''></"+"script>");\n')
+        fd.write('    </script>\n')
+        fd.write('    <noscript><div class="statcounter"><a title="web analytics"\n')
+        fd.write('    href="http://statcounter.com/" target="_blank"><img\n')
+        fd.write('    class="statcounter"\n')
+        fd.write('    src="//c.statcounter.com/'+str(sc_id)+'/0/'+str(sc_secr)+'/1/" alt="web\n')
+        fd.write('    analytics"></a></div></noscript>\n')
+        if sc_name is not None:
+            fd.write('    <!-- End of StatCounter Code for '+sc_name+' -->\n')
+        else:
+            fd.write('    <!-- End of StatCounter Code -->\n')
+    
+    
+    # Close the <body> and <html> sections:
+    fd.write('  </body>\n')
+    fd.write('</html>\n')
+    
+    # Close the file:
+    fd.close()
+    
+    return
 
 
 if __name__ == '__main__':
