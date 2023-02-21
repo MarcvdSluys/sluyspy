@@ -96,8 +96,8 @@ def close_html_file(fd, sc_id=None, sc_secr=None, sc_name=None):
     """
     
     # Create some space:
-    fd.write('    ')
-    fd.write('    ')
+    fd.write('    \n')
+    fd.write('    \n')
     
     
     # Write a StatCounter code block if desired:
@@ -126,6 +126,9 @@ def close_html_file(fd, sc_id=None, sc_secr=None, sc_name=None):
             fd.write('    <!-- End of StatCounter Code for '+sc_name+' -->\n')
         else:
             fd.write('    <!-- End of StatCounter Code -->\n')
+        
+        fd.write('    \n')
+        fd.write('    \n')
     
     
     # Close the <body> and <html> sections:
