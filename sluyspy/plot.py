@@ -24,7 +24,7 @@ def start_plot(ptype='both', dark_bg=False, xkcd=False, title='Python plot'):
     """Start a matplotlib.pyplot plot with a choice of my favourite options.
     
     Parameters:
-      ptype (str):     Plot type: 'screen', 'file' or 'both' (a compromise).
+      ptype (str):     Plot type: 'screen', 'file', 'both' (a compromise) or 'square'.
       dark_bg (bool):  Use a dark background.
       xkcd (bool):     Use XKCD style.
       title (str):     Window title.
@@ -45,11 +45,14 @@ def start_plot(ptype='both', dark_bg=False, xkcd=False, title='Python plot'):
         matplotlib.rcParams.update({'font.size': 14})      # Set font size for all text, aimed at full screen display
         fig = _plt.figure(figsize=(19.2,10.8), num=title)  # Set to 1920x1080 to fill my screen
     elif ptype == 'file':
-        matplotlib.rcParams.update({'font.size': 12})   # Set font size for all text aimed at electonic file
-        fig = _plt.figure(figsize=(12.5,7), num=title)  # Set png size to 1250x700
+        matplotlib.rcParams.update({'font.size': 12})      # Set font size for all text aimed at electonic file
+        fig = _plt.figure(figsize=(12.5,7), num=title)     # Set png size to 1250x700
     elif ptype == 'both':
-        matplotlib.rcParams.update({'font.size': 16})   # Set font size for all text: compromise screen visibility and report readability
-        fig = _plt.figure(figsize=(15,8.5), num=title)  # 1500x850: fits in my qiv screen w/o scaling
+        matplotlib.rcParams.update({'font.size': 16})      # Set font size for all text: compromise screen visibility and report readability
+        fig = _plt.figure(figsize=(15,8.5), num=title)     # 1500x850: fits in my qiv screen w/o scaling
+    elif ptype == 'square':
+        matplotlib.rcParams.update({'font.size': 16})      # Set font size for all text: compromise screen visibility and report readability
+        fig = _plt.figure(figsize=(8.5,8.5), num=title)    # 850x850: fits in my qiv screen w/o scaling
     else:
         _error('Unknown plot type: '+ptype+', aborting.')
         
