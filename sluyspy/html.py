@@ -145,9 +145,9 @@ def table_td_tr(indent, td_width, td_extra_width):
     """Define trtd, tdtd and tdtr elements for an html table.
     
     Parameters:
-      indent (int):          number of spaces for indentation.
-      td_width (str):        width of empty column between columns (e.g. '1%').
-      td_extra_width (str):  width of extra-wide empty column between columns (e.g. '10%').
+      indent (int):          Number of spaces for indentation.
+      td_width (str):        Width of empty column between columns (e.g. '1%').
+      td_extra_width (str):  Width of extra-wide empty column between columns (e.g. '10%').
     
     Returns:
       (tuple):  tuple containing trtd, tdtd, tdtdw, tdtr:
@@ -166,6 +166,22 @@ def table_td_tr(indent, td_width, td_extra_width):
     tdtr    = ' '*indent + '</td></tr>\n'
     
     return trtd, tdtd, tdtdw, tdbrtd, tdtr
+
+
+def last_update(fd, indent):
+    """Add a 'Last update' line to an html file with the current system date and time.
+    
+    Parameters:
+      fd (io):       File descriptor.
+      indent (int):  Number of spaces for indentation.
+    """
+    
+    import time
+    time_str = _dt.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+    fd.write(' '*indent + '<br>\n')
+    fd.write(' '*indent + '<p style="font-size:65%; text-align:center; margin:0;">Last update: '+time_str+'</p>\n')
+    fd.write(' '*indent + '\n')
+    return
 
 
 if __name__ == '__main__':
