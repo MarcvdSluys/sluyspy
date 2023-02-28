@@ -168,18 +168,24 @@ def table_td_tr(indent, td_width, td_extra_width):
     return trtd, tdtd, tdtdw, tdbrtd, tdtr
 
 
-def last_update(fd, indent):
+def last_update(fd, indent, size='65%', seconds=False):
     """Add a 'Last update' line to an html file with the current system date and time.
     
     Parameters:
-      fd (io):       File descriptor.
-      indent (int):  Number of spaces for indentation.
+      fd (io):         File descriptor.
+      indent (int):    Number of spaces for indentation.
+      size (str):      String with font size, e.g. '100%'.
+      seconds (bool):  Print seconds in timestamp.
     """
     
     import time
-    time_str = _dt.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+    if seconds:
+        time_str = _dt.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        time_str = _dt.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M')
+        
     fd.write(' '*indent + '<br>\n')
-    fd.write(' '*indent + '<p style="font-size:65%; text-align:center; margin:0;">Last update: '+time_str+'</p>\n')
+    fd.write(' '*indent + '<p style="font-size:'+size+'; text-align:center; margin:0;">Last update: '+time_str+'</p>\n')
     fd.write(' '*indent + '\n')
     return
 
