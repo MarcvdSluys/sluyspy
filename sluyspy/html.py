@@ -53,9 +53,7 @@ def start_html_file(file_name='index.html', lang='en', title='Page title', icon=
     
     # Add refresh data if desired:
     if refresh is not None:
-        refresh_url = file_name
-        if refresh_url == 'index.html': refresh_url = '.'
-        f.write('    <meta content="'+str(refresh*60)+'; URL='+refresh_url+'" http-equiv="Refresh">\n')
+        f.write('    <meta http-equiv="Refresh" content="'+str(refresh*60)+'">\n')
         
     # Add an icon or css if desired:
     if icon is not None:    f.write('    <link rel="icon" href="'+icon+'">\n')
