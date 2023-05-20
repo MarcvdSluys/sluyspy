@@ -57,6 +57,23 @@ def wind_chill_temperature(temp, wind_vel):
 
 
 
+def wind_dir_str_from_az(az):
+    """Convert a wind direction (azimuth) in degrees to a three-character English abbreviation string.
+    
+    Parameters:
+      az (float):  Azimuth (degrees; 0=North, 90=East).
+    
+    Returns:
+      (str):  Three-character English wind-direction abbreviation.
+    """
+    
+    tmp_val = int((az/22.5)+0.5)
+    str_arr = ['N','NNE','NE','ENE','E','ESE', 'SE', 'SSE','S','SSW','SW','WSW','W','WNW','NW','NNW']
+    
+    return str_arr[(tmp_val % 16)]
+
+
+
 def sky_power_from_rain_means(rain):
     """Guestimate the fraction of light power coming from an overcast sky, from the amount of rain.
 
