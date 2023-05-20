@@ -20,7 +20,6 @@
 import numpy as _np
 
 
-
 def wind_chill_temperature(temp, wind_vel):
     """Compute wind-chill ("real-feel") temperature from the air temperature and wind velocity.
     
