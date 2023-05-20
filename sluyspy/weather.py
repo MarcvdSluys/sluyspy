@@ -54,3 +54,54 @@ def wind_chill_temperature(temp, wind_vel):
     wchil = _np.round(wchil,1)
     
     return wchil
+
+
+
+def sky_power_from_rain_means(rain):
+    """Guestimate the fraction of light power coming from an overcast sky, from the amount of rain.
+
+    Parameters:
+      rain (float):  Rain value(s), in mm/hr.
+
+    Returns:
+      (float):  P/Pclear; the fraction of clear-sky solar power coming from an overcast sky.
+    
+    Note:
+      - this is about as close to witchcraft as it is to science;
+      - this version uses a fit to the MEANS of the rain bins;
+      - see compare-selections.py.
+    """
+    
+    # ppclr = 20 * _np.square(rain) - 4 * rain + 0.395  # 0-0.1
+    # ppclr[rain>0.1] = 0.74 * _np.exp( -( rain[rain>0.1] + 2.97 ) / 2.3 )
+    
+    ppclr = 80 * _np.square(rain) - 8 * rain + 0.4 - 0.0009  # 0-0.05
+    ppclr[rain>0.05] = 0.74 * _np.exp( -( rain[rain>0.05] + 2.97 ) / 2.3 )
+    
+    return ppclr
+
+
+def sky_power_from_rain_medians(rain):
+    """Guestimate the fraction of light power coming from an overcast sky, from the amount of rain.
+
+    Parameters:
+      rain (float):  Rain value(s), in mm/hr.
+
+    Returns:
+      (float):  P/Pclear; the fraction of clear-sky solar power coming from an overcast sky.
+    
+    Note:
+      - this is about as close to witchcraft as it is to science;
+      - this version uses a fit to the MEDIANS of the rain bins;
+      - see compare-selections.py.
+    """
+    
+    # ppclr = 13 * _np.square(rain) - 2.6 * rain + 0.25  # 0-0.1
+    # ppclr[rain>0.1] = 2.06 * _np.exp( -( rain[rain>0.1] + 10.67 ) / 3.78 )
+    
+    ppclr = 52 * _np.square(rain) - 5.2 * rain + 0.25 + 0.00085  # 0-0.05
+    ppclr[rain>0.05] = 2.06 * _np.exp( -( rain[rain>0.05] + 10.67 ) / 3.78 )
+    
+    return ppclr
+
+
