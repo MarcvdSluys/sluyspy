@@ -21,13 +21,13 @@ import pandas as _pd
 import sluyspy.weather as _swtr
 
 
-def read_36h_forecast_data(args, wp_dir, loc):
+def read_36h_forecast_data(verbosity, wp_dir, loc):
     """Read WP 36h forecast files (full day today + latest) and combine them.
     
     Parameters:
-      args (struct):  Stuct containing cli arguments.
-      wp_dir (str):   Directory containing the WP data files.
-      loc (str):      Name of the town to read data for.
+      verbosity (int):  Verbosity (0-4).
+      wp_dir (str):     Directory containing the WP data files.
+      loc (str):        Name of the town to read data for.
     
     Returns:
       (pd.df):  Pandas.DataFrame containing time, clouds, rain, temp, press, RH, W.speed, W.dir.
@@ -40,12 +40,12 @@ def read_36h_forecast_data(args, wp_dir, loc):
     WP36File = wp_dir+'wp_weer_'+today.strftime('%Y-%m-%d')+'_36h.dat'
     
     # Read today's forecast:
-    if args.verbosity > 1: print('- '+WP36File)
-    df_today    = read_36h_forecast_file(args, loc, WP36File)
+    if verbosity > 1: print('- '+WP36File)
+    df_today    = read_36h_forecast_file(verbosity, loc, WP36File)
     
     # Read tomorrow's forecast:
-    if args.verbosity > 1: print('- '+wp_dir+'wp_weer_latest_36h.dat')
-    df_tomorrow = read_36h_forecast_file(args, loc, wp_dir+'wp_weer_latest_36h.dat')
+    if verbosity > 1: print('- '+wp_dir+'wp_weer_latest_36h.dat')
+    df_tomorrow = read_36h_forecast_file(verbosity, loc, wp_dir+'wp_weer_latest_36h.dat')
     
     # Combine the two datasets:
     if (df_today is None) and (df_tomorrow is None):
@@ -57,16 +57,16 @@ def read_36h_forecast_data(args, wp_dir, loc):
     else:
         df_combined  = df_tomorrow.combine_first(df_today)
     
-    if args.verbosity > 3: print('Combined WP data:\n', df_combined)
+    if verbosity > 3: print('Combined WP data:\n', df_combined)
     
     return df_combined
 
 
-def read_36h_forecast_file(args, loc, file_name):
+def read_36h_forecast_file(verbosity, loc, file_name):
     """Read the forecast for the given location from a single WP 36h data file.
     
     Parameters:
-      args (struct):    Stuct containing cli arguments.
+      verbosity (int):  Verbosity (0-4).
       loc (str):        Location to read data for.
       file_name (str):  Name of the input file.
     
@@ -110,16 +110,16 @@ def read_36h_forecast_file(args, loc, file_name):
     # Compute derived variables:
     df['wchil'] = _swtr.wind_chill_temperature(df.temp, df.ws)  # Wind chill
     
-    if args.verbosity > 4: print('Single-file WP data:\n', df)
+    if verbosity > 4: print('Single-file WP data:\n', df)
     
     return df
 
 
-def smoothen_36h_forecast_data(args, wpfc):
+def smoothen_36h_forecast_data(verbosity, wpfc):
     """Smoothen WP 36h forecast data.
     
     Parameters:
-      args (struct):  Stuct containing cli arguments.
+      verbosity (int):  Verbosity (0-4).
       wpfc (pd.df):   pandas.DataFrame containing WP forecast data.
     
     Returns:
@@ -129,7 +129,7 @@ def smoothen_36h_forecast_data(args, wpfc):
       - (pd.df): Pandas DataFrame containing interpolated WP rain forecast data.
     """
     
-    if args.verbosity > 0: print('Smoothening WP forecast...')
+    if verbosity > 0: print('Smoothening WP forecast...')
     if wpfc is None: return None,None  # Issue with WP data
     
     from scipy import interpolate as _ipol
@@ -165,9 +165,9 @@ def smoothen_36h_forecast_data(args, wpfc):
         wpfci['rain'] = _ipol.splev(wpfci.time, spl_coefs)  # Do the spline interpolation
         wpfci.rain[wpfci.rain<0] = 0                              # Rain shouldn't be negative
     
-    if args.verbosity > 2:
+    if verbosity > 2:
         print('Raw WP data:\n', wpfc)
-        if args.verbosity > 3: print('Interpolated WP rain data:\n', wpfci)
+        if verbosity > 3: print('Interpolated WP rain data:\n', wpfci)
     
     return wpfc, wpfci
 
