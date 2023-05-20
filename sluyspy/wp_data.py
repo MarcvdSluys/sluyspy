@@ -21,13 +21,13 @@ import pandas as _pd
 import sluyspy.weather as _swtr
 
 
-def read_36h_forecast_data(verbosity, wp_dir, loc):
+def read_36h_forecast_data(wp_dir, loc, verbosity=1):
     """Read WP 36h forecast files (full day today + latest) and combine them.
     
     Parameters:
-      verbosity (int):  Verbosity (0-4).
       wp_dir (str):     Directory containing the WP data files.
       loc (str):        Name of the town to read data for.
+      verbosity (int):  Verbosity (0-4 for silent to loud).
     
     Returns:
       (pd.df):  Pandas.DataFrame containing time, clouds, rain, temp, press, RH, W.speed, W.dir.
@@ -41,11 +41,11 @@ def read_36h_forecast_data(verbosity, wp_dir, loc):
     
     # Read today's forecast:
     if verbosity > 1: print('- '+WP36File)
-    df_today    = read_36h_forecast_file(verbosity, loc, WP36File)
+    df_today    = read_36h_forecast_file(WP36File, loc, verbosity)
     
     # Read tomorrow's forecast:
     if verbosity > 1: print('- '+wp_dir+'wp_weer_latest_36h.dat')
-    df_tomorrow = read_36h_forecast_file(verbosity, loc, wp_dir+'wp_weer_latest_36h.dat')
+    df_tomorrow = read_36h_forecast_file(wp_dir+'wp_weer_latest_36h.dat', loc, verbosity)
     
     # Combine the two datasets:
     if (df_today is None) and (df_tomorrow is None):
@@ -62,13 +62,13 @@ def read_36h_forecast_data(verbosity, wp_dir, loc):
     return df_combined
 
 
-def read_36h_forecast_file(verbosity, loc, file_name):
+def read_36h_forecast_file(file_name, loc, verbosity=1):
     """Read the forecast for the given location from a single WP 36h data file.
     
     Parameters:
-      verbosity (int):  Verbosity (0-4).
-      loc (str):        Location to read data for.
       file_name (str):  Name of the input file.
+      loc (str):        Location to read data for.
+      verbosity (int):  Verbosity (0-4 for silent to loud).
     
     Returns:
       (pandas.DataFrame):  Forecast data for the location provided.  None if no data were found.
@@ -115,12 +115,12 @@ def read_36h_forecast_file(verbosity, loc, file_name):
     return df
 
 
-def smoothen_36h_forecast_data(verbosity, wpfc):
+def smoothen_36h_forecast_data(wpfc, verbosity=1):
     """Smoothen WP 36h forecast data.
     
     Parameters:
-      verbosity (int):  Verbosity (0-4).
-      wpfc (pd.df):   pandas.DataFrame containing WP forecast data.
+      wpfc (pd.df):     pandas.DataFrame containing WP forecast data.
+      verbosity (int):  Verbosity (0-4 for silent to loud).
     
     Returns:
       (tuple):  tuple of three pd.dfs (wpfc,wpfci):
