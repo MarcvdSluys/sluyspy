@@ -18,16 +18,18 @@
 
 
 import numpy as _np
+import pandas.core as _pdc
 
 
-def np_polyfit_chi2(xvals, yvals, order, ysigmas=None):
+def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
     """Do a NumPy polyfit and return the fitting coefficients and reduced chi squared.
     
     Parameters:
       xvals (float):    X values.
       yvals (float):    Y values.
       order (int):      Polynomial order for fit.
-      ysigmas (float):  Uncertainties (errors, standard deviations) in the y values.
+      ysigmas (float):  Uncertainties (errors, standard deviations) in the y values; defaults to None -> all sigmas=1.
+      verbosity (int):  Verbosity:  0: quiet,  1: print red.chi2,  2: print more,  3: print table,  4: print all;  defaults to 0.
     
     Returns:
       (tuple):  Tuple consisting of (coefs, red_chi2):
@@ -36,18 +38,71 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None):
       - red_chi2 (float):  Reduced chi squared (chi^2 / (n-m)) for the fit.
     """
     
+    orig_sig = False
     if ysigmas is None:
-        coefs, resids, rank, sing_vals, rcond = _np.polyfit(xvals, yvals, order, full=True)  # Note, not 1/sigma**2!
+        if verbosity>0: print('ysigmas=None; assuming sigma=1 for all data points.')
+        coefs, resids, rank, sing_vals, rcond = _np.polyfit(xvals, yvals, order, full=True)
+        ysigmas = yvals*0 + 1  # This is implicitly assumed in the previous line; works for pd.Series and numpy arrays
+        orig_sig = True
     else:
         coefs, resids, rank, sing_vals, rcond = _np.polyfit(xvals, yvals, order, w=1/ysigmas, full=True)  # Note, not 1/sigma**2!
+        if min(ysigmas) == max(ysigmas) == 1: orig_sig = True
     
     chi2 = resids[0]                    # Chi^2
     red_chi2 = chi2/(len(xvals)-rank)   # Reduced chi^2 = chi^2 / (n-m)
+
     
+    if verbosity>0:
+        yfit      = _np.poly1d(coefs)(xvals)
+        ydiffs    = yfit - yvals
+        yresids   = ydiffs/ysigmas                            # Weighted residuals
+
+        
+        max_abs_dev_y  = max(abs(ydiffs))                                  # Maximum absolute deviation in y
+        max_rel_dev_y  = max(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0]))   # Maximum relative deviation in y
+        
+        if type(xvals) == _pdc.series.Series:
+            max_abs_dev_x  = xvals[abs(ydiffs) == max_abs_dev_y].to_numpy()[0]  # x value for maximum absolute deviation (Pandas)
+            max_rel_dev_x  = xvals[abs(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0])) == max_rel_dev_y].to_numpy()[0]  # x value for maximum relative deviation (Pandas)
+        else:
+            max_abs_dev_x  = xvals[abs(ydiffs) == max_abs_dev_y][0]             # x value for maximum absolute deviation (Numpy)
+            max_rel_dev_x  = xvals[abs(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0])) == max_rel_dev_y][0]             # x value for maximum relative deviation (Numpy)
+        
+        print('Reduced chi2:             ', red_chi2)
+        if orig_sig: print('Original sigma:           ', _np.sqrt(red_chi2))   # When sigma_y=1 was used for the fit, this is an estimate of the true sigma_y
+        print('Max. absolute deviation:  ', max_abs_dev_y, ' @ x =', max_abs_dev_x)
+        print('Max. relative deviation:  ', max_rel_dev_y, ' @ x =', max_rel_dev_x)
+        
+        if verbosity>1:
+            print('Chi2:                     ', chi2)
+            print('Coefficients (reversed):')
+            ncoefs = len(coefs)
+            for icoef in range(ncoefs):
+                print(' c%1i: %12.5e' % (icoef,coefs[ncoefs-icoef-1] ) )
+                
+            if verbosity>2:
+                print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
+                      ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
+                if type(xvals) == _pdc.series.Series:
+                    for ival in range(len(xvals)):
+                        print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
+                              (ival, xvals.iloc[ival],yvals.iloc[ival], ysigmas.iloc[ival], yfit[ival], ydiffs.iloc[ival], yresids.iloc[ival], abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
+                else:
+                    for ival in range(len(xvals)):
+                        print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
+                              (ival, xvals[ival],yvals[ival], ysigmas[ival], yfit[ival], ydiffs[ival], yresids[ival], abs(ydiffs[ival]/yvals[ival]) ) )
+                
+                if verbosity>3:
+                    print('coefs: ', coefs)
+                    print('resids: ', resids)
+                    print('rank: ', rank)
+                    print('sing_vals: ', sing_vals)
+                    print('rcond: ', rcond)
+                
     return coefs, red_chi2
 
 
-def scipy_curvefit(fit_fun, xvals, yvals, coefs0, sigmas=None, verbosity=1):
+def scipy_curvefit(fit_fun, xvals, yvals, coefs0, sigmas=None, verbosity=0):
     """Do a fit using SciPy's curve_fit, and print some auxilary parameters if desired.
     
     Parameters:
@@ -67,7 +122,6 @@ def scipy_curvefit(fit_fun, xvals, yvals, coefs0, sigmas=None, verbosity=1):
       - ier (int):         Return value, >0 if the fit succeeded.
     """
     
-    import pandas.core as _pdc
     from scipy.optimize import curve_fit as _curve_fit
     
     try:
