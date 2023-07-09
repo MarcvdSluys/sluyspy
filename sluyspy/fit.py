@@ -157,37 +157,53 @@ def scipy_curvefit(fit_fun, xvals, yvals, coefs0, sigmas=None, verbosity=0):
     
     
     # Compute some fit-quality parameters:
+    ncoefs   = len(coefs)
     dcoefs   = _np.sqrt(_np.diag(var_cov))              # Standard deviations on the coefficients
     yfit     = fit_fun(xvals, *coefs)                   # Fit values
     ydiffs   = yfit - yvals                             # Differences between data and fit
-    resids   = ydiffs/sigmas                            # Weighted residuals
+    yresids  = ydiffs/sigmas                            # Weighted residuals
     
-    chi2      = sum(resids**2)                          # Chi^2
-    red_chi2  = chi2/(len(xvals)-len(coefs))            # Reduced Chi^2 = Chi^2 / (n-m)
-    
+    chi2      = sum(yresids**2)                         # Chi^2
+    red_chi2  = chi2/(len(xvals)-ncoefs)                # Reduced Chi^2 = Chi^2 / (n-m)
     
     
     # Print some fit-quality parameters:
     if verbosity>1:
         orig_sig  = _np.sqrt(red_chi2)                      # When sigma_y=1 was used for the fit, this is an estimate of the true sigma_y
-        y_max_dev  = max(abs(ydiffs))                       # Maximum deviation in y
+        max_abs_dev_y  = max(abs(ydiffs))                                  # Maximum absolute deviation in y
+        max_rel_dev_y  = max(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0]))   # Maximum relative deviation in y
         
         if type(xvals) == _pdc.series.Series:
-            x_max_dev  = xvals[abs(ydiffs) == y_max_dev].values[0]  # x value for maximum deviation (Pandas)
+            max_abs_dev_x  = xvals[abs(ydiffs) == max_abs_dev_y].to_numpy()[0]  # x value for maximum absolute deviation (Pandas)
+            max_rel_dev_x  = xvals[abs(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0])) == max_rel_dev_y].to_numpy()[0]  # x value for maximum relative deviation (Pandas)
         else:
-            x_max_dev  = xvals[ydiffs == y_max_dev][0]              # x value for maximum deviation (Numpy)
+            max_abs_dev_x  = xvals[abs(ydiffs) == max_abs_dev_y][0]             # x value for maximum absolute deviation (Numpy)
+            max_rel_dev_x  = xvals[abs(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0])) == max_rel_dev_y][0]             # x value for maximum relative deviation (Numpy)
         
-        print('Chi2:      ', chi2)
-        print('Red. chi2: ', red_chi2)
-        print('Sigma:     ', orig_sig)
-        print('Max.dev:   ', y_max_dev, ' @ x =', x_max_dev)
+        print('Chi2:                     ', chi2)
+        print('Reduced chi2:             ', red_chi2)
+        print('Original sigma:           ', orig_sig)   # When sigma_y=1 was used for the fit, this is an estimate of the true sigma_y
+        print('Max. absolute deviation:  ', max_abs_dev_y, ' @ x =', max_abs_dev_x)
+        print('Max. relative deviation:  ', max_rel_dev_y, ' @ x =', max_rel_dev_x)
     
-    if verbosity>2:
-        print('Coefficients:')
-        for icoef in range(len(coefs)):
-            # print(' ', icoef+1,':', coefs[2-icoef], '±', dcoefs[2-icoef])  # Reverse order w.r.t. polyfit
-            # print(' ', icoef+1,':', coefs[icoef], '±', dcoefs[icoef])
-            print(' c%1i: %9.5f ± %9.5f (%9.2f%%)' % (icoef+1,coefs[icoef], dcoefs[icoef], abs(dcoefs[icoef]/coefs[icoef]*100) ) )  # Formatted
+        if verbosity>2:
+            print('Coefficients (reversed):')
+            for icoef in range(ncoefs):
+                jcoef = ncoefs-icoef-1
+                # print(' ', icoef,':', coefs[jcoef], '±', dcoefs[jcoef])
+                print(' c%1i: %12.5e ± %12.5e (%9.2f%%)' % (icoef,coefs[jcoef], dcoefs[jcoef], abs(dcoefs[jcoef]/coefs[jcoef]*100) ) )  # Formatted
     
+            if verbosity>3:
+                print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
+                      ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
+                if type(xvals) == _pdc.series.Series:
+                    for ival in range(len(xvals)):
+                        print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
+                              (ival, xvals.iloc[ival],yvals.iloc[ival], sigmas.iloc[ival], yfit[ival], ydiffs.iloc[ival], yresids.iloc[ival], abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
+                else:
+                    for ival in range(len(xvals)):
+                        print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
+                              (ival, xvals[ival],yvals[ival], sigmas[ival], yfit[ival], ydiffs[ival], yresids[ival], abs(ydiffs[ival]/yvals[ival]) ) )
+                
     return coefs, var_cov, red_chi2, ier
     
