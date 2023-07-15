@@ -34,10 +34,13 @@ class Environment:
     
     sp_dir:          str = '';  """Solar-panel directory"""
     el_dir:          str = '';  """Electricity-meter directory"""
+    
     knmi_10min_dir:  str = '';  """Directory for 10-min KNMI data"""
     knmi_hourly_dir: str = '';  """Directory for hourly KNMI data"""
     knmi_daily_dir:  str = '';  """Directory for daily KNMI data"""
     wpw_dir:         str = '';  """WP weather directory"""
+    
+    hwc_dir:         str = '';  """HWC main directory"""
     
     
 def environment(cfg_file='.python_environment.cfg'):
@@ -77,6 +80,9 @@ def environment(cfg_file='.python_environment.cfg'):
     env.knmi_hourly_dir = config.get('Weather', 'knmi_hourly_dir', fallback=env.knmi_hourly_dir).replace('~', env.home)  # KNMI hourly dir
     env.knmi_daily_dir  = config.get('Weather', 'knmi_daily_dir',  fallback=env.knmi_daily_dir).replace('~', env.home)   # KNMI daily dir
     env.wpw_dir         = config.get('Weather', 'wpw_dir',         fallback=env.wpw_dir).replace('~', env.home)          # WP weather dir
+    
+    # Section HWC:
+    env.hwc_dir         = config.get('HWC', 'hwc_dir',             fallback=env.hwc_dir).replace('~', env.home)              # HWC main dir
     
     return env
 
