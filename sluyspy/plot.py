@@ -134,3 +134,26 @@ def pause_ctrlc(interval):
         exit(0)
         
     return
+
+
+def arrow_head_between_points(ax, xx,yy, dx=0,dy=0, scale=1, **kwargs):
+    """Plot an arrow head between two 2D points.
+
+    Parameters:
+      ax (axes):      Axes object to plot on.
+      xx (float):     Array with two x values, for arrow-head position and direction.
+      yy (float):     Array with two y values, for arrow-head position and direction.
+      dx (float):     Shift arrow head in x direction.
+      dy (float):     Shift arrow head in y direction.
+      scale (float):  Scale arrow head.
+    """
+    
+    # Local scaling parameter: undo arrow-head scaling with length:
+    lscale = 0.1 * scale / _np.sqrt((xx[1]-xx[0])**2 + (yy[1]-yy[0])**2)
+    
+    ax.quiver(xx[0]+dx, yy[0]+dy, xx[1]-xx[0], yy[1]-yy[0],
+              angles='xy', scale_units='width', pivot='mid',
+              scale=3/lscale, width=5e-3*lscale,
+              headwidth=10*lscale, headlength=15*lscale, headaxislength=10*lscale,
+              **kwargs)
+    return
