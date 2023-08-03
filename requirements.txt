@@ -3,6 +3,6 @@ matplotlib==3.7.1
 numpy
 pandas
 pytz==2023.3
-scipy==1.10.1
+scipy==1.11.1
 solarenergy==0.1.7
 termcolor==2.3.0
