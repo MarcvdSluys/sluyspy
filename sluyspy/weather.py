@@ -18,6 +18,9 @@
 
 
 import numpy as _np
+import pandas as _pd
+import datetime as _dt
+
 
 
 def wind_chill_temperature(temp, wind_vel):
@@ -119,5 +122,103 @@ def sky_power_from_rain_medians(rain):
     ppclr[rain>0.05] = 2.06 * _np.exp( -( rain[rain>0.05] + 10.67 ) / 3.78 )
     
     return ppclr
+
+
+def knmi_read_hourly_weather(filename, start_date=None, end_date=None, tidy=True):
+    """Reads a KNMI file containing hourly weather measurement data from a particular station.
+    
+    Reads the CSV files provided on the KNMI website for the weather data over the last decade from a chosen
+    station. This function reads the weather data from a chosen start date to the chosen end date, which is
+    NOT included.  For example, for the whole of the year 2020, specify 2020,1,1, 2021,1,1.
+    
+    Parameters:
+      filename (str): filename to select the specific station, this is "uurgeg_260_2011-2020_Bilt.csv" for De Bilt
+    
+      start_date (datetime):  start date:  date of the first data entry to be returned (timezone aware; optional).
+      end_date   (datetime):  end date:    date of the first data entry NOT to be returned (timezone aware; optional).
+    
+      tidy       (bool):      tidy up: remove station column, convert silly date and time to datetime,
+                              temperature to °C and sunshine to a fraction (optional).
+    
+    Returns:
+      pandas.DataFrame:  Table containing ~23-25 columns with weather data.
+    
+      - yyyymmdd (int):  Date (YYYY=year,MM=month,DD=day).
+      - hh (int):        Time in hours (note: 1-24!), the hourly division 05 runs from 04.00 UT to 5.00 UT.
+      - dtm (datetime):  Date and time of the entry (UT), replacing yyyymmdd and hh.
+    
+      - t (float):       Temperature at 1.50 m at the time of observation (°C).
+      - sq (float):      Fraction of the hour with sunshine (0-1).
+      - q (float):       Global horizontal radiation (W/m^2 (or J/cm^2/h)).
+    """
+    
+    # Read the data file into a Pandas DataFrame.  Use lower-case column names:
+    col_names = ['stn','yyyymmdd','hh','dd','fh','ff','fx','t','t10n','td','sq','q','dr','rh','p','vv','n','u','ww','ix','m','r','s','o','y']
+    try:
+        knmi_data = _pd.read_csv(filename, header=28, names=col_names, sep=r'\s*,\s*', engine='python')
+    except Exception as e:
+        print(e)
+        exit(1)
+    
+    # Select the data for the desired date range.  Add one hour, since datetime contains the time at which the hour ENDS!
+    if start_date and end_date:
+        knmi_data = knmi_data[knmi_data['datetime'] >= start_date + _dt.timedelta(hours=1)]  # Date must be >= start_date
+        knmi_data = knmi_data[knmi_data['datetime'] <    end_date + _dt.timedelta(hours=1)]  # Date must be < end_date
+        knmi_data = knmi_data.reset_index(drop=True)  # Reset the index so that it starts at 0 again.  Don't keep the original index as a column.
+    
+    # Tidy up if desired:
+    if tidy:
+        del knmi_data['stn']
+        # Convert the yyyymmdd and hh columns into a datetime-object column with hours in [0,23] rather than in [1,24]:
+        knmi_data = knmi_datetime_from_datehour(knmi_data)
+        
+        knmi_data.loc[:, 't']  /= 10                              # Convert the temperature at 1.50 m from 0.1°C -> °C.
+        knmi_data.loc[knmi_data.loc[:, 'sq'] == -1, 'sq'] = 0.25  # Sunshine time == -1 indicates 0 - 0.05 hours, so assume 0.025 hours, expressed in [0.1 hours]
+        knmi_data.loc[:, 'sq'] /= 10                              # Convert the sunshine time from [0.1 hours] to a fraction (0-1)
+        knmi_data.loc[:, 'q']  /= 0.36                            # Convert the global horizontal radiation from [J/cm^2/h] to [W/m^2]
+    
+    return knmi_data
+
+
+def knmi_datetime_from_datehour(knmi_data):
+    """Return a datetime column named 'dtm' for given KNMI date and hour columns.
+    
+    The KNMI date is expressed as an integer formatted as YYYYMMDD, while the hours run from 1-24 rather than
+    from 0-23.  This causes problems when converting to Python or Pandas datetime objects.
+    
+    Parameters:
+      knmi_data (Pandas df):  KNMI weather dataframe.
+    
+    Returns:
+      (Pandas df):  KNMI weather dataframe.
+    """
+    
+    from astrotool.date_time import fix_date_time
+    
+    # Split the yyyymmdd column into separate numpy arrays:
+    ymd     = knmi_data['yyyymmdd'].values  # Numpy array
+    years   = _np.floor(ymd/1e4).astype(int)
+    months  = _np.floor((ymd - years*1e4)/100).astype(int)
+    days    = _np.floor(ymd - years*1e4 - months*100).astype(int)
+    
+    # Create numpy arrays for the time variables:
+    hours   = knmi_data['hh'].values  # Numpy array
+    minutes = _np.zeros(hours.size)
+    seconds = _np.zeros(hours.size) + 0.001  # 1 ms past the hour, to ensure no negative round-off values occur (e.g. 2021,1,1, 0,0,-1e-5 -> 2020,12,31, 23,59,59.99999)
+    
+    # Fix the dates, e.g. turning 2020-12-31 24:00:00 to 2021-01-01 00:00:00:
+    years,months,days, hours,minutes,seconds = fix_date_time(years,months,days, hours,minutes,seconds)
+    
+    # Combine the 1D numpy arrays into a single 2D array with the original arrays as COLUMNS, and convert it to a Pandas df:
+    dts = _pd.DataFrame(_np.vstack([years,months,days,hours]).transpose(), columns=['year','month','day','hour'])
+    dts = _pd.to_datetime(dts, utc=True)    # Turn the columns in the df into a single datetime64[ns] column
+    
+    # Add the datetime column to the KNMI weather dataframe:
+    knmi_data['dtm'] = dts
+    knmi_data = knmi_data[['dtm'] + [x for x in knmi_data.columns if x != 'dtm']]  # Move dtm column to front
+    
+    del knmi_data['yyyymmdd'], knmi_data['hh']
+    
+    return knmi_data
 
 
