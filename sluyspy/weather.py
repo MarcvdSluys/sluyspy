@@ -124,6 +124,58 @@ def sky_power_from_rain_medians(rain):
     return ppclr
 
 
+def dew_point_from_tempc_rh(temp_c, rh):
+    """Compute the dew point from the temperature and relative humidity.
+    
+    Parameters:
+      temp_c (float):  Air temperature (degrees Celsius).
+      rh (float):      Relative humidity (fraction).
+    
+    Returns:
+      (float):  Dew point (degrees Celsius).
+    
+    See:
+      https://en.wikipedia.org/wiki/Dew_point
+    """
+    
+    temp_c0  = 273.7
+    tempfac  = 17.27
+    gam = tempfac * temp_c/(temp_c0+temp_c) + _np.log(rh)
+    
+    return temp_c0 * gam/(tempfac-gam)
+
+
+def water_vapor_saturated_density_from_tempc(temp_c):
+    """Compute the saturated water-vapor density in air for a given temperature.
+    
+    Parameters:
+      temp_c (float):  Air temperature (degrees Celsius).
+    
+    Returns:
+      (float):  Saturated water-vapor density (g/m^3).
+    
+    See:
+      http://hyperphysics.phy-astr.gsu.edu/hbase/kinetic/relhum.html#c3
+    """
+    
+    return 5.018 + 0.32321*temp_c + 8.1847e-3*temp_c**2 + 3.1243e-4*temp_c**3
+
+
+
+def absolute_humidity_from_tempc_rh(temp_c, rh):
+    """Compute the absolute humidity (water-vapor density) from the temperature and relative humidity.
+    
+    Parameters:
+      temp_c (float):  Air temperature (degrees Celsius).
+      rh (float):      Relative humidity (fraction).
+    
+    Returns:
+      (float):  Absolute humidity (water-vapor density;  g/m^3).
+    """
+    
+    return water_vapor_saturated_density_from_tempc(temp_c) * rh
+
+
 def knmi_read_hourly_weather(filename, start_date=None, end_date=None, tidy=True):
     """Reads a KNMI file containing hourly weather measurement data from a particular station.
     

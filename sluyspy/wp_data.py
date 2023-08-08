@@ -108,7 +108,9 @@ def read_36h_forecast_file(file_name, loc, verbosity=1):
     df.ws = 0.836 * _np.power(df.ws, 3/2)  # v = 0.836 B^(3/2) m/s - https://en.wikipedia.org/wiki/Beaufort_scale#History
     
     # Compute derived variables:
-    df['wchil'] = _swtr.wind_chill_temperature(df.temp, df.ws)  # Wind chill
+    df['wchil'] = _swtr.wind_chill_temperature(df.temp, df.ws)              # Wind chill (deg C)
+    df['dp'] = _swtr.dew_point_from_tempc_rh(df.temp, df.rh/100)            # Dew point (deg C)
+    df['ah'] = _swtr.absolute_humidity_from_tempc_rh(df.temp, df.rh/100)    # Absolute humidity (g/m^3)
     
     if verbosity > 4: print('Single-file WP data:\n', df)
     
