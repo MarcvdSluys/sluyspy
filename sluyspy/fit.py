@@ -38,25 +38,25 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
       - red_chi2 (float):  Reduced chi squared (chi^2 / (n-m)) for the fit.
     """
     
-    orig_sig = False
+    ysigmasareone = False  # Sigmas in y are not equal to 1
     if ysigmas is None:
         if verbosity>0: print('ysigmas=None; assuming sigma=1 for all data points.')
         coefs, resids, rank, sing_vals, rcond = _np.polyfit(xvals, yvals, order, full=True)
         ysigmas = yvals*0 + 1  # This is implicitly assumed in the previous line; works for pd.Series and numpy arrays
-        orig_sig = True
+        ysigmasareone = True  # Sigmas in y are equal to 1
     else:
         coefs, resids, rank, sing_vals, rcond = _np.polyfit(xvals, yvals, order, w=1/ysigmas, full=True)  # Note, not 1/sigma**2!
-        if min(ysigmas) == max(ysigmas) == 1: orig_sig = True
+        if min(ysigmas) == max(ysigmas) == 1: ysigmasareone = True  # Sigmas in y are equal to 1
     
     chi2 = resids[0]                    # Chi^2
     red_chi2 = chi2/(len(xvals)-rank)   # Reduced chi^2 = chi^2 / (n-m)
-
+    
     
     if verbosity>0:
         yfit      = _np.poly1d(coefs)(xvals)
         ydiffs    = yfit - yvals
         yresids   = ydiffs/ysigmas                            # Weighted residuals
-
+        
         
         max_abs_dev_y  = max(abs(ydiffs))                                  # Maximum absolute deviation in y
         max_rel_dev_y  = max(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0]))   # Maximum relative deviation in y
@@ -69,7 +69,7 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
             max_rel_dev_x  = xvals[abs(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0])) == max_rel_dev_y][0]             # x value for maximum relative deviation (Numpy)
         
         print('Reduced chi2:             ', red_chi2)
-        if orig_sig: print('Original sigma:           ', _np.sqrt(red_chi2))   # When sigma_y=1 was used for the fit, this is an estimate of the true sigma_y
+        if ysigmasareone: print('Original sigma:           ', _np.sqrt(red_chi2))   # When sigma_y=1 was used for the fit, this is an estimate of the true sigma_y
         print('Max. absolute deviation:  ', max_abs_dev_y, ' @ x =', max_abs_dev_x)
         print('Max. relative deviation:  ', max_rel_dev_y, ' @ x =', max_rel_dev_x)
         
@@ -102,15 +102,15 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
     return coefs, red_chi2
 
 
-def scipy_curvefit(fit_fun, xvals, yvals, coefs0, sigmas=None, verbosity=0):
+def scipy_curvefit(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0):
     """Do a fit using SciPy's curve_fit, and print some auxilary parameters if desired.
     
     Parameters:
-      fit_fun (function):  Fitting function.
+      fit_fun (function):  Fitting function, should look like  def fit_fun(x, a,b,c):  and return y=f(x, a,b,c).
       xvals (float):       Array containing x values to fit.
       yvals (float):       Array containing y values to fit.
       coefs0 (float):      Array with initial guess for fitting coefficients.
-      sigmas (float):      Array containing y sigmas/uncertainties.
+      ysigmas (float):     Array containing y sigmas/uncertainties.
       verbosity (int):     Verbosity to stdout (0-4).
     
     Returns:
@@ -126,7 +126,7 @@ def scipy_curvefit(fit_fun, xvals, yvals, coefs0, sigmas=None, verbosity=0):
     
     try:
         # Do the fit:
-        coefs, var_cov, infodict, mesg, ier = _curve_fit(fit_fun, xvals, yvals, p0=coefs0, sigma=sigmas,
+        coefs, var_cov, infodict, mesg, ier = _curve_fit(fit_fun, xvals, yvals, p0=coefs0, sigma=ysigmas,
                                                          method='lm', full_output=True)
     
     # If call failed:
@@ -135,7 +135,6 @@ def scipy_curvefit(fit_fun, xvals, yvals, coefs0, sigmas=None, verbosity=0):
             print(__name__+': fit failed: ', end='')
             print(e)
         ier = -1
-    
     
     # If call failed or fit did not converge:
     if ier<=0:
@@ -157,11 +156,20 @@ def scipy_curvefit(fit_fun, xvals, yvals, coefs0, sigmas=None, verbosity=0):
     
     
     # Compute some fit-quality parameters:
+    if ysigmas is None:
+        ysigmas = yvals*0 + 1  # This is implicitly assumed in the previous line; works for pd.Series and numpy arrays
+        ysigmasareone = True   # Sigmas are equal to 1
+    else:
+        if min(ysigmas) == max(ysigmas) == 1:
+            ysigmasareone = True  # Sigmas in y are equal to 1
+        else:
+            ysigmasareone = False  # Sigmas are not equal to 1
+
     ncoefs   = len(coefs)
     dcoefs   = _np.sqrt(_np.diag(var_cov))              # Standard deviations on the coefficients
     yfit     = fit_fun(xvals, *coefs)                   # Fit values
     ydiffs   = yfit - yvals                             # Differences between data and fit
-    yresids  = ydiffs/sigmas                            # Weighted residuals
+    yresids  = ydiffs/ysigmas                           # Weighted residuals
     
     chi2      = sum(yresids**2)                         # Chi^2
     red_chi2  = chi2/(len(xvals)-ncoefs)                # Reduced Chi^2 = Chi^2 / (n-m)
@@ -169,7 +177,6 @@ def scipy_curvefit(fit_fun, xvals, yvals, coefs0, sigmas=None, verbosity=0):
     
     # Print some fit-quality parameters:
     if verbosity>1:
-        orig_sig  = _np.sqrt(red_chi2)                      # When sigma_y=1 was used for the fit, this is an estimate of the true sigma_y
         max_abs_dev_y  = max(abs(ydiffs))                                  # Maximum absolute deviation in y
         max_rel_dev_y  = max(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0]))   # Maximum relative deviation in y
         
@@ -182,28 +189,29 @@ def scipy_curvefit(fit_fun, xvals, yvals, coefs0, sigmas=None, verbosity=0):
         
         print('Chi2:                     ', chi2)
         print('Reduced chi2:             ', red_chi2)
-        print('Original sigma:           ', orig_sig)   # When sigma_y=1 was used for the fit, this is an estimate of the true sigma_y
+        if ysigmasareone: print('Original sigma:           ', _np.sqrt(red_chi2))   # When sigma_y=1 was used for the fit, this is an estimate of the true sigma_y
         print('Max. absolute deviation:  ', max_abs_dev_y, ' @ x =', max_abs_dev_x)
         print('Max. relative deviation:  ', max_rel_dev_y, ' @ x =', max_rel_dev_x)
-    
+        
         if verbosity>2:
             print('Coefficients (reversed):')
             for icoef in range(ncoefs):
                 jcoef = ncoefs-icoef-1
                 # print(' ', icoef,':', coefs[jcoef], '±', dcoefs[jcoef])
                 print(' c%1i: %12.5e ± %12.5e (%9.2f%%)' % (icoef,coefs[jcoef], dcoefs[jcoef], abs(dcoefs[jcoef]/coefs[jcoef]*100) ) )  # Formatted
-    
+            
             if verbosity>3:
                 print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                       ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
+                    
                 if type(xvals) == _pdc.series.Series:
                     for ival in range(len(xvals)):
                         print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
-                              (ival, xvals.iloc[ival],yvals.iloc[ival], sigmas.iloc[ival], yfit[ival], ydiffs.iloc[ival], yresids.iloc[ival], abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
+                              (ival, xvals.iloc[ival],yvals.iloc[ival], ysigmas.iloc[ival], yfit.iloc[ival], ydiffs.iloc[ival], yresids.iloc[ival], abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
                 else:
                     for ival in range(len(xvals)):
                         print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
-                              (ival, xvals[ival],yvals[ival], sigmas[ival], yfit[ival], ydiffs[ival], yresids[ival], abs(ydiffs[ival]/yvals[ival]) ) )
-                
+                              (ival, xvals[ival],yvals[ival], ysigmas[ival], yfit[ival], ydiffs[ival], yresids[ival], abs(ydiffs[ival]/yvals[ival]) ) )
+    
     return coefs, var_cov, red_chi2, ier
     
