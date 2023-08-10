@@ -162,8 +162,6 @@ def water_vapor_saturated_density_from_tempc(temp_c):
     
     return _np.maximum(4.85684 + 3.32664e-01 * temp_c + 1.00885e-02 * temp_c**2 + 1.89345e-04 * temp_c**3
                        + 1.09606e-06 * temp_c**4 + 1.83396e-08 * temp_c**5, 0)
-    # return 5.018 + 0.32321*temp_c + 8.1847e-3*temp_c**2 + 3.1243e-4*temp_c**3
-
 
 
 

@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: EUPL-1.2
 #  
 #  Copyright (c) 2022-2023  Marc van der Sluys - marc.vandersluys.nl
-#   
+#  
 #  This file is part of the sluyspy Python package:
 #  Marc van der Sluys' personal Python modules.
 #  See: https://github.com/MarcvdSluys/sluyspy
-#   
+#  
 #  This is free software: you can redistribute it and/or modify it under the terms of the European Union
 #  Public Licence 1.2 (EUPL 1.2).  This software is distributed in the hope that it will be useful, but
 #  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -187,13 +187,14 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
             max_rel_dev_x  = xvals[abs(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0])) == max_rel_dev_y][0]             # x value for maximum relative deviation (Numpy)
         
         # Print details:
+        if verbosity>1:
+            print('Chi2:                     ', chi2)
         print('Reduced chi2:             ', red_chi2)
         if ysigmasareone: print('Original sigma:           ', _np.sqrt(red_chi2))   # When sigma_y=1 was used for the fit, this is an estimate of the true sigma_y
         print('Max. absolute deviation:  ', max_abs_dev_y, ' @ x =', max_abs_dev_x)
         print('Max. relative deviation:  ', max_rel_dev_y, ' @ x =', max_rel_dev_x)
         
         if verbosity>1:
-            print('Chi2:                     ', chi2)
             print('Coefficients (reversed):')
             ncoefs = len(coefs)
             if fittype=='np_polyfit':
