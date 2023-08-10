@@ -39,15 +39,12 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
       - red_chi2 (float):  Reduced chi squared (chi^2 / (n-m)) for the fit.
     """
     
-    ysigmasareone = False  # Sigmas in y are not equal to 1
     if ysigmas is None:
         if verbosity>0: print('ysigmas=None; assuming sigma=1 for all data points.')
         coefs, resids, rank, sing_vals, rcond = _np.polyfit(xvals, yvals, order, full=True)
         ysigmas = yvals*0 + 1  # This is implicitly assumed in the previous line; works for pd.Series and numpy arrays
-        ysigmasareone = True  # Sigmas in y are equal to 1
     else:
         coefs, resids, rank, sing_vals, rcond = _np.polyfit(xvals, yvals, order, w=1/ysigmas, full=True)  # Note, not 1/sigma**2!
-        if min(ysigmas) == max(ysigmas) == 1: ysigmasareone = True  # Sigmas in y are equal to 1
     
     
     # Print polyfit-specific details:
@@ -59,7 +56,7 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
         print('rcond:      ', rcond)
     
     # Compute reduced chi^2 and print general fit details:
-    red_chi2 = print_fit_details('polyfit', coefs, xvals,yvals,ysigmas, verbosity,ysigmasareone)
+    red_chi2 = print_fit_details('polyfit', coefs, xvals,yvals,ysigmas, verbosity)
         
     
     return coefs, red_chi2
@@ -120,24 +117,17 @@ def scipy_curvefit(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0):
     
     
     # Compute some fit-quality parameters:
-    if ysigmas is None:
-        ysigmas = yvals*0 + 1  # This is implicitly assumed in the previous line; works for pd.Series and numpy arrays
-        ysigmasareone = True   # Sigmas are equal to 1
-    else:
-        if min(ysigmas) == max(ysigmas) == 1:
-            ysigmasareone = True  # Sigmas in y are equal to 1
-        else:
-            ysigmasareone = False  # Sigmas are not equal to 1
+    if ysigmas is None: ysigmas = yvals*0 + 1  # This is implicitly assumed in the previous line; works for pd.Series and numpy arrays
     
     dcoefs   = _np.sqrt(_np.diag(var_cov))              # Standard deviations on the coefficients
     
     # Compute reduced chi^2 and print general fit details:
-    red_chi2 = print_fit_details('scipy_curvefit', coefs, xvals,yvals,ysigmas, verbosity,ysigmasareone, fit_fun=fit_fun, dcoefs=dcoefs)
+    red_chi2 = print_fit_details('scipy_curvefit', coefs, xvals,yvals,ysigmas, verbosity, fit_fun=fit_fun, dcoefs=dcoefs)
     
     return coefs, var_cov, red_chi2, ier
 
 
-def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity,ysigmasareone, fit_fun=None, dcoefs=None):
+def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity, fit_fun=None, dcoefs=None):
     """Compute and return the reduced chi^2, and print fit details if desired.
     
     Parameters:
@@ -148,7 +138,6 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity,ysigmasareon
       ysigmas (float):       Array with y sigmas.
     
       verbosity (int):       Verbosity.
-      ysigmasareone (bool):  True if all ysigmas are equal to one (or not specified).
     
       chi2 (float):          Chi^2, optional.
       fit_fun (fun):         Fit function used for scipy_curvefit, optional.
@@ -168,6 +157,13 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity,ysigmasareon
     
     yfit = xvals*0 + yfit  # Ensure yfit has same type as xvals (np.array/pd.Series)
     
+    ysigmasareone = False  # Sigmas in y are not equal to 1
+    if ysigmas is None:
+        if verbosity>0: print('ysigmas=None; assuming sigma=1 for all data points.')
+        ysigmas = yvals*0 + 1  # Set ysigmas to 1 - works for pd.Series and np.arrays
+        ysigmasareone = True   # Sigmas in y are equal to 1
+    else:
+        if min(ysigmas) == max(ysigmas) == 1: ysigmasareone = True  # Sigmas in y are equal to 1
     
     # Compute reduced chi^2:
     ydiffs    = yfit - yvals                            # Differences/residuals
