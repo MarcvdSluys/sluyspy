@@ -56,7 +56,7 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
         print('rcond:      ', rcond)
     
     # Compute reduced chi^2 and print general fit details:
-    red_chi2 = print_fit_details('polyfit', coefs, xvals,yvals,ysigmas, verbosity=verbosity)
+    red_chi2 = print_fit_details('np_polyfit', coefs, xvals,yvals,ysigmas, verbosity=verbosity)
         
     
     return coefs, red_chi2
@@ -131,7 +131,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
     """Compute and return the reduced chi^2, and print fit details if desired.
     
     Parameters:
-      fittype (str):         Type of fit: 'polyfit' or 'scipy_curvefit'.
+      fittype (str):         Type of fit: 'np_polyfit' or 'scipy_curvefit'.
       coefs (float):         Array with fit coefficients.
       xvals (float):         Array with x values.
       yvals (float):         Array with y values.
@@ -145,7 +145,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
       (float):               Reduced Chi^2.
     """
     
-    if fittype=='polyfit':
+    if fittype=='np_polyfit':
         yfit      = _np.poly1d(coefs)(xvals)
     elif fittype=='scipy_curvefit':
         if fit_fun is None: scli.error('A fit function must be specified for fittype '+fittype)
@@ -194,7 +194,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
             print('Chi2:                     ', chi2)
             print('Coefficients (reversed):')
             ncoefs = len(coefs)
-            if fittype=='polyfit':
+            if fittype=='np_polyfit':
                 for icoef in range(ncoefs):
                     print(' c%1i: %12.5e' % (icoef,coefs[ncoefs-icoef-1] ) )
             elif fittype=='scipy_curvefit':
