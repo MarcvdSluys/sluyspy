@@ -63,7 +63,7 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
 
 
 
-def scipy_curvefit(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0):
+def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0):
     """Do a fit using SciPy's curve_fit, and print some auxilary parameters if desired.
     
     Parameters:
