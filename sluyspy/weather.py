@@ -154,11 +154,16 @@ def water_vapor_saturated_density_from_tempc(temp_c):
     Returns:
       (float):  Saturated water-vapor density (g/m^3).
     
-    See:
-      http://hyperphysics.phy-astr.gsu.edu/hbase/kinetic/relhum.html#c3
+    Note:
+      - uses data from http://hyperphysics.phy-astr.gsu.edu/hbase/kinetic/relhum.html#c3;
+      - drops to 0 below T~-25°C;
+      - significantly better results than original fit for T<~-15°C and T>~45°C.
     """
     
-    return 5.018 + 0.32321*temp_c + 8.1847e-3*temp_c**2 + 3.1243e-4*temp_c**3
+    return _np.maximum(4.85684 + 3.32664e-01 * temp_c + 1.00885e-02 * temp_c**2 + 1.89345e-04 * temp_c**3
+                       + 1.09606e-06 * temp_c**4 + 1.83396e-08 * temp_c**5, 0)
+    # return 5.018 + 0.32321*temp_c + 8.1847e-3*temp_c**2 + 3.1243e-4*temp_c**3
+
 
 
 

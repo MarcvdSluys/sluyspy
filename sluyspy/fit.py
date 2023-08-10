@@ -23,7 +23,10 @@ import sluyspy.cli as scli
 
 
 def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
-    """Do a NumPy polyfit and return the fitting coefficients and reduced chi squared.
+    """Wrapper for NumPy polyfit, that returns the fitting coefficients and reduced chi squared.
+       Print details if desired.
+    
+    Note: does not compute the uncertainties in the coefficients; use scipy_curvefit_chi2() for that.
     
     Parameters:
       xvals (float):    X values.
@@ -64,7 +67,8 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
 
 
 def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0):
-    """Do a fit using SciPy's curve_fit, and print some auxilary parameters if desired.
+    """Wrapper for SciPy's curve_fit, that returns the fitting coefficients and reduced chi^2.
+       Print details if desired.
     
     Parameters:
       fit_fun (function):  Fitting function, should look like  def fit_fun(x, a,b,c):  and return y=f(x, a,b,c).
@@ -110,10 +114,8 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
         if verbosity>4:
             print('Info dict:\n', infodict, '\n')
         print('Initial coefficients:  ', coefs0)
-    if verbosity>2:
         print('Final coefficients:    ', coefs)
-        if verbosity>3:
-            print('Variance/covariance matrix: \n', var_cov)
+        print('Variance/covariance matrix: \n', var_cov)
     
     
     # Compute some fit-quality parameters:
@@ -201,7 +203,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
                 for icoef in range(ncoefs):
                     jcoef = ncoefs-icoef-1
                     print(' c%1i: %12.5e ± %12.5e (%9.2f%%)' % (icoef,coefs[jcoef], dcoefs[jcoef], abs(dcoefs[jcoef]/coefs[jcoef]*100) ) )  # Formatted
-                
+            
             if verbosity>2:
                 print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                       ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
