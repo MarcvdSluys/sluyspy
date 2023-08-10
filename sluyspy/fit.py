@@ -104,15 +104,15 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     
     
     # Print specific curve_fit output:
-    if verbosity>2:
+    if verbosity>3:
         print('Fit success: ', ier)
         print('Message: ', mesg)
-        if verbosity>3:
+        if verbosity>4:
             print('Info dict:\n', infodict, '\n')
         print('Initial coefficients:  ', coefs0)
-    if verbosity>1:
+    if verbosity>2:
         print('Final coefficients:    ', coefs)
-        if verbosity>2:
+        if verbosity>3:
             print('Variance/covariance matrix: \n', var_cov)
     
     
@@ -171,7 +171,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
     
     
     # Compute and print details:
-    if verbosity > 0:
+    if verbosity>0:
         
         # Find maximum deviations:
         max_abs_dev_y  = max(abs(ydiffs))                                  # Maximum absolute deviation in y
