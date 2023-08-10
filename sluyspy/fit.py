@@ -56,7 +56,7 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
         print('rcond:      ', rcond)
     
     # Compute reduced chi^2 and print general fit details:
-    red_chi2 = print_fit_details('polyfit', coefs, xvals,yvals,ysigmas, verbosity)
+    red_chi2 = print_fit_details('polyfit', coefs, xvals,yvals,ysigmas, verbosity=verbosity)
         
     
     return coefs, red_chi2
@@ -122,12 +122,12 @@ def scipy_curvefit(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0):
     dcoefs   = _np.sqrt(_np.diag(var_cov))              # Standard deviations on the coefficients
     
     # Compute reduced chi^2 and print general fit details:
-    red_chi2 = print_fit_details('scipy_curvefit', coefs, xvals,yvals,ysigmas, verbosity, fit_fun=fit_fun, dcoefs=dcoefs)
+    red_chi2 = print_fit_details('scipy_curvefit', coefs, xvals,yvals,ysigmas, verbosity=verbosity, fit_fun=fit_fun, dcoefs=dcoefs)
     
     return coefs, var_cov, red_chi2, ier
 
 
-def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity, fit_fun=None, dcoefs=None):
+def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=None, dcoefs=None):
     """Compute and return the reduced chi^2, and print fit details if desired.
     
     Parameters:
@@ -137,11 +137,9 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity, fit_fun=Non
       yvals (float):         Array with y values.
       ysigmas (float):       Array with y sigmas.
     
-      verbosity (int):       Verbosity.
-    
-      chi2 (float):          Chi^2, optional.
-      fit_fun (fun):         Fit function used for scipy_curvefit, optional.
-      dcoefs (float):        Uncertainties in coefficients from scipy_curvefit, optional.
+      verbosity (int):       Verbosity (0-3); optional - defaults to 2.
+      fit_fun (fun):         Fit function used for scipy_curvefit; optional.
+      dcoefs (float):        Uncertainties in coefficients from scipy_curvefit; optional.
     
     Returns:
       (float):               Reduced Chi^2.
