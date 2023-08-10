@@ -5,7 +5,7 @@
 
 
 # Package version:
-version='0.0.26'
+version='0.0.27'
 
 # Get long description from README.md:
 with open('README.md', 'r') as fh:
@@ -20,7 +20,7 @@ setup(
     url='https://github.com/MarcvdSluys/sluyspy',
     
     packages=['sluyspy'],
-    install_requires=['getch','matplotlib','numpy','pandas','pytz','scipy','solarenergy','termcolor'],
+    install_requires=['astrotool','getch','matplotlib','numpy','pandas','pytz','scipy','solarenergy','termcolor'],
     long_description=long_description,
     long_description_content_type='text/markdown',
     

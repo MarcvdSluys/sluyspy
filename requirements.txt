@@ -1,3 +1,4 @@
+astrotool==0.0.10
 getch==1.0
 matplotlib==3.7.1
 numpy
