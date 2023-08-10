@@ -78,8 +78,8 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
       (tuple):  Tuple containing (coefs, var_cov, red_chi2, ier):
     
       - coefs (float):     Array containing final fitting coefficients.
-      - var_cov (float):   2D array containing the variance-covariance matrix.
       - red_chi2 (float):  Reduced chi squared (chi2/(n-m)).
+      - var_cov (float):   2D array containing the variance-covariance matrix.
       - ier (int):         Return value, >0 if the fit succeeded.
     """
     
@@ -124,7 +124,7 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     # Compute reduced chi^2 and print general fit details:
     red_chi2 = print_fit_details('scipy_curvefit', coefs, xvals,yvals,ysigmas, verbosity=verbosity, fit_fun=fit_fun, dcoefs=dcoefs)
     
-    return coefs, var_cov, red_chi2, ier
+    return coefs, red_chi2, var_cov, ier
 
 
 def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=None, dcoefs=None):
