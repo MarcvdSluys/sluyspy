@@ -77,51 +77,15 @@ def wind_dir_str_from_az(az):
 
 
 def sky_power_from_rain_means(rain):
-    """Guestimate the fraction of light power coming from an overcast sky, from the amount of rain.
-
-    Parameters:
-      rain (float):  Rain value(s), in mm/hr.
-
-    Returns:
-      (float):  P/Pclear; the fraction of clear-sky solar power coming from an overcast sky.
-    
-    Note:
-      - this is about as close to witchcraft as it is to science;
-      - this version uses a fit to the MEANS of the rain bins;
-      - see compare-selections.py.
-    """
-    
-    # ppclr = 20 * _np.square(rain) - 4 * rain + 0.395  # 0-0.1
-    # ppclr[rain>0.1] = 0.74 * _np.exp( -( rain[rain>0.1] + 2.97 ) / 2.3 )
-    
-    ppclr = 80 * _np.square(rain) - 8 * rain + 0.4 - 0.0009  # 0-0.05
-    ppclr[rain>0.05] = 0.74 * _np.exp( -( rain[rain>0.05] + 2.97 ) / 2.3 )
-    
-    return ppclr
+    print('Sorry, this function moved to solar_energy.cloud_power_from_rain_means()')
+    exit(1)
+    return
 
 
 def sky_power_from_rain_medians(rain):
-    """Guestimate the fraction of light power coming from an overcast sky, from the amount of rain.
-
-    Parameters:
-      rain (float):  Rain value(s), in mm/hr.
-
-    Returns:
-      (float):  P/Pclear; the fraction of clear-sky solar power coming from an overcast sky.
-    
-    Note:
-      - this is about as close to witchcraft as it is to science;
-      - this version uses a fit to the MEDIANS of the rain bins;
-      - see compare-selections.py.
-    """
-    
-    # ppclr = 13 * _np.square(rain) - 2.6 * rain + 0.25  # 0-0.1
-    # ppclr[rain>0.1] = 2.06 * _np.exp( -( rain[rain>0.1] + 10.67 ) / 3.78 )
-    
-    ppclr = 52 * _np.square(rain) - 5.2 * rain + 0.25 + 0.00085  # 0-0.05
-    ppclr[rain>0.05] = 2.06 * _np.exp( -( rain[rain>0.05] + 10.67 ) / 3.78 )
-    
-    return ppclr
+    print('Sorry, this function moved to solar_energy.cloud_power_from_rain_medians()')
+    exit(1)
+    return
 
 
 def dew_point_from_tempc_rh(temp_c, rh):
@@ -155,14 +119,19 @@ def water_vapor_saturated_density_from_tempc(temp_c):
       (float):  Saturated water-vapor density (g/m^3).
     
     Note:
-      - uses data from http://hyperphysics.phy-astr.gsu.edu/hbase/kinetic/relhum.html#c3;
+      - uses data from http://hyperphysics.phy-astr.gsu.edu/hbase/kinetic/relhum.html#c3:
+        - for T= -10 - +60°C.
       - drops to 0 below T~-25°C;
-      - significantly better results than original fit for T<~-15°C and T>~45°C.
+      - significantly better results than original fit (3rd order polynomial):
+        - for T<~-15°C and T>~45°C: by eye;
+        - for -10°C < T < 60°C (range original fit -0°C < T < 40°C):
+          - typical sigma 0.116 (T=0-40°C) -> 0.030 g/m^3 (T=-10-60°C);
+          - max. abs. deviation: 0.168 g/m^3 (T=0-40°C; @T=0°C)  ->  0.0445 g/m^3 (T=-10-60°C; @T=25°C)
+          - max. rel. deviation: 3.46  %     (T=0-40°C; @T=0°C)  ->  0.194  %     (T=-10-60°C; @T=25°C)
     """
     
     return _np.maximum(4.85684 + 3.32664e-01 * temp_c + 1.00885e-02 * temp_c**2 + 1.89345e-04 * temp_c**3
                        + 1.09606e-06 * temp_c**4 + 1.83396e-08 * temp_c**5, 0)
-
 
 
 def absolute_humidity_from_tempc_rh(temp_c, rh):
