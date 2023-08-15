@@ -129,7 +129,8 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     return coefs, red_chi2, var_cov, ier
 
 
-def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=None, dcoefs=None, yfit=None):
+def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=None, dcoefs=None, yfit=None,
+                      coef_names=None, coef_facs=None):
     """Compute and return the reduced chi^2, and print fit details if desired.
     
     Calculations are done without fitting, so that this function can be called after a fit.  The fit values
@@ -149,6 +150,10 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
       fit_fun (fun):         Fit function used for scipy_curvefit; optional.
       dcoefs (float):        Uncertainties in coefficients from scipy_curvefit; optional.
       yfit (float):          "Fit" values for Y for fittype=None; optional.
+    
+      coef_names (str):      Array of coefficient names for printing (optional).
+      coef_facs (float):     Array of coefficient multiplication factors for printing (optional; defaults to 1).
+                             Useful for e.g. printing degrees when radians are fitted.
     
     Returns:
       (float):               Reduced Chi^2.
@@ -183,7 +188,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
     if coefs is None:
         ncoefs = 0                                      # Number of coefficients
     else:
-        ncoefs    = len(coefs)                          # Number of coefficients
+        ncoefs = len(coefs)                             # Number of coefficients
         
     ydiffs    = yfit - yvals                            # Differences/residuals
     yresids   = ydiffs/ysigmas                          # Weighted residuals
@@ -217,32 +222,50 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         print('Max. absolute deviation:  ', max_abs_dev_y, ' @ x =', max_abs_dev_x)
         print('Max. relative deviation:  ', max_rel_dev_y, ' @ x =', max_rel_dev_x)
         
+        
+        # Print fit coefficents:
         if (verbosity>1) and (coefs is not None):
-            print('Coefficients (reversed):')
-            if dcoefs is None:
-                for icoef in range(ncoefs):
-                    print(' c%1i: %12.5e' % (icoef,coefs[ncoefs-icoef-1] ) )
-            else:
-                for icoef in range(ncoefs):
-                    jcoef = ncoefs-icoef-1
-                    print(' c%1i: %12.5e ± %12.5e (%9.2f%%)' % (icoef,coefs[jcoef], dcoefs[jcoef],
-                                                                abs(dcoefs[jcoef]/coefs[jcoef]*100) ) )  # Formatted
+            if coef_facs is None:  coef_facs = coefs*0+1  # Coefficient print factor is 1 by default:
             
+            print('Coefficients (reversed):')
+            for icoef in range(ncoefs):
+                jcoef = ncoefs-icoef-1
+                
+                print(' c%1i:' % (icoef), end='')  # Nr
+                
+                if coef_names is not None:
+                    strlen = len(max(coef_names, key=len))  # Length of the longest string in the list
+                    fmt = ' %'+str(strlen)+'s: '
+                    print(fmt % (coef_names[jcoef]), end='')  # Name
+                
+                print(' %12.5e' % (coefs[jcoef] * coef_facs[jcoef]), end='')  # Value
+                
+                if dcoefs is not None:
+                    print(' ± %12.5e (%9.2f%%)' % (dcoefs[jcoef] * coef_facs[jcoef],
+                                                   abs(dcoefs[jcoef]/coefs[jcoef]*100) ), end='')
+                
+                print('')
+        
+        
+        # Print fit data:
         if verbosity>2:
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
+            
             if type(yvals) == _pdc.series.Series:
                 for ival in range(len(yvals)):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
                           (ival, xvals.iloc[ival],yvals.iloc[ival], ysigmas.iloc[ival], yfit.iloc[ival],
                            ydiffs.iloc[ival], yresids.iloc[ival], abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
-            else:
+                
+            else:  # Probably Numpy:
                 for ival in range(len(yvals)):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
                           (ival, xvals[ival],yvals[ival], ysigmas[ival], yfit[ival], ydiffs[ival],
                            yresids[ival], abs(ydiffs[ival]/yvals[ival]) ) )
+                
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
-    
+            
     
     return red_chi2
