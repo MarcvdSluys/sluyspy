@@ -177,13 +177,14 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         if yfit is None: scli.error('yfit values must be specified for fittype '+fittype)
         if rev_coefs is None: rev_coefs = False
     else:
-        scli.error('Unknown fittype: '+fittype)
+        scli.error('Unknown fittype: '+fittype+'; must be one of "np_polyfit", "scipy_curvefit" or None.')
     
     yfit = yvals*0 + yfit  # Ensure yfit has same type as xvals (np.array/pd.Series)
     
     ysigmasareone = False  # Sigmas in y are not equal to 1
     if ysigmas is None:
-        if verbosity>0: print('ysigmas=None; assuming sigma=1 for all data points.')
+        if verbosity>0: print('\nysigmas=None; assuming sigma=1 for all data points.')
+        if verbosity>1: print('')
         ysigmas = yvals*0 + 1  # Set ysigmas to 1 - works for pd.Series and np.arrays
         ysigmasareone = True   # Sigmas in y are equal to 1
     else:
@@ -194,11 +195,12 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         ncoefs = 0                                      # Number of coefficients
     else:
         ncoefs = len(coefs)                             # Number of coefficients
-        
+    
+    ndat      = len(yvals)                              # Number of data points
     ydiffs    = yfit - yvals                            # Differences/residuals
     yresids   = ydiffs/ysigmas                          # Weighted residuals
     chi2      = sum(yresids**2)                         # Chi^2
-    red_chi2  = chi2/(len(yvals)-ncoefs)                # Reduced chi^2
+    red_chi2  = chi2/(ndat-ncoefs)                      # Reduced chi^2
     
     
     # Compute and print details:
@@ -222,6 +224,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         # Print details:
         print('Fit quality:')
         if verbosity>1:
+            print('Number of data points:    ', ndat)
             print('Chi2:                     ', chi2)
         print('Reduced chi2:             ', red_chi2)
         if ysigmasareone: print('Original sigma:           ', _np.sqrt(red_chi2))   # When sigma_y=1 was used for the fit, this is an estimate of the true sigma_y
@@ -263,13 +266,13 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
             
             if type(yvals) == _pdc.series.Series:
-                for ival in range(len(yvals)):
+                for ival in range(ndat):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
                           (ival, xvals.iloc[ival],yvals.iloc[ival], ysigmas.iloc[ival], yfit.iloc[ival],
                            ydiffs.iloc[ival], yresids.iloc[ival], abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
                 
             else:  # Probably Numpy:
-                for ival in range(len(yvals)):
+                for ival in range(ndat):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
                           (ival, xvals[ival],yvals[ival], ysigmas[ival], yfit[ival], ydiffs[ival],
                            yresids[ival], abs(ydiffs[ival]/yvals[ival]) ) )
