@@ -181,14 +181,12 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
     
     yfit = yvals*0 + yfit  # Ensure yfit has same type as xvals (np.array/pd.Series)
     
-    ysigmasareone = False  # Sigmas in y are not equal to 1
     if ysigmas is None:
         if verbosity>0: print('\nysigmas=None; assuming sigma=1 for all data points.')
         if verbosity>1: print('')
         ysigmas = yvals*0 + 1  # Set ysigmas to 1 - works for pd.Series and np.arrays
-        ysigmasareone = True   # Sigmas in y are equal to 1
-    else:
-        if min(ysigmas) == max(ysigmas) == 1: ysigmasareone = True  # Sigmas in y are equal to 1
+    
+    ysigma_mean = ysigmas.mean()
     
     # Compute reduced chi^2:
     if coefs is None:
@@ -199,7 +197,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
     ndat      = len(yvals)                              # Number of data points
     ydiffs    = yfit - yvals                            # Differences/residuals
     yresids   = ydiffs/ysigmas                          # Weighted residuals
-    chi2      = sum(yresids**2)                         # Chi^2
+    chi2      = _np.sum(yresids**2)                     # Chi^2 - NumPy needed for large numbers
     red_chi2  = chi2/(ndat-ncoefs)                      # Reduced chi^2
     
     
@@ -207,27 +205,29 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
     if verbosity>0:
         
         # Find maximum deviations:
-        max_abs_dev_y  = max(abs(ydiffs))                                  # Maximum absolute deviation in y
-        max_rel_dev_y  = max(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0]))   # Maximum relative deviation in y
+        max_abs_dev_y  = max(abs(ydiffs))                             # Maximum absolute deviation in y
+        rel_dev_ys     = abs(ydiffs[yvals!=0]/yvals[yvals!=0])        # Relative deviations in y
+        max_rel_dev_y  = max(rel_dev_ys)                              # Maximum relative deviation in y
         
         if type(xvals) == _pdc.series.Series:
             max_abs_dev_x  = xvals[abs(ydiffs) == max_abs_dev_y].to_numpy()[0]  # x value for maximum absolute deviation (Pandas)
-            max_rel_dev_x  = xvals[abs(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0])) == max_rel_dev_y].to_numpy()[0]  # x value for maximum relative deviation (Pandas)
+            max_rel_dev_x  = xvals[ _np.logical_and(yvals!=0, rel_dev_ys == max_rel_dev_y)].to_numpy()[0]  # x value for maximum relative deviation (Pandas)
         elif xvals is None:
             max_abs_dev_x  = None
             max_rel_dev_x  = None
             xvals = yvals*0 + _np.nan  # Fill with NaNs
         else:
             max_abs_dev_x  = xvals[abs(ydiffs) == max_abs_dev_y][0]             # x value for maximum absolute deviation (Numpy)
-            max_rel_dev_x  = xvals[abs(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0])) == max_rel_dev_y][0]             # x value for maximum relative deviation (Numpy)
+            max_rel_dev_x  = xvals[ _np.logical_and(yvals!=0, rel_dev_ys == max_rel_dev_y)][0]  # x value for maximum relative deviation (Numpy)
         
         # Print details:
-        print('Fit quality:')
         if verbosity>1:
+            print('Fit quality:')
             print('Number of data points:    ', ndat)
             print('Chi2:                     ', chi2)
+            
         print('Reduced chi2:             ', red_chi2)
-        if ysigmasareone: print('Original sigma:           ', _np.sqrt(red_chi2))   # When sigma_y=1 was used for the fit, this is an estimate of the true sigma_y
+        print('Original mean sigma:      ', _np.sqrt(red_chi2) * ysigma_mean)   # Estimate of the true sigma_y
         print('Max. absolute deviation:  ', max_abs_dev_y, ' @ x =', max_abs_dev_x)
         print('Max. relative deviation:  ', max_rel_dev_y, ' @ x =', max_rel_dev_x)
         
@@ -237,7 +237,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
             if coef_facs is None:  coef_facs = coefs*0+1  # Coefficient print factor is 1 by default:
             
             print('\nFit coefficients', end='')
-            if rev_coefs: print(' (reversed):', end='')
+            if rev_coefs: print(' (reversed)', end='')
             print(':')
             for icoef in range(ncoefs):
                 jcoef = icoef
