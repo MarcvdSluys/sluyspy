@@ -129,11 +129,17 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     return coefs, red_chi2, var_cov, ier
 
 
-def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=None, dcoefs=None):
+def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=None, dcoefs=None, yfit=None):
     """Compute and return the reduced chi^2, and print fit details if desired.
     
+    Calculations are done without fitting, so that this function can be called after a fit.  The fit values
+    will be computed from coefs, xvals using fit_fun if specified.  In fact, two series of yvals ('true' and
+    'fit') can be specified without any fitting ever, by setting fittype=coefs=xvals=None and specifying yfit.
+    This will print statistics on the comparison of the two data sets, similar to those after a fit.  If xvals
+    is specified, a bit more detail can be printed.
+    
     Parameters:
-      fittype (str):         Type of fit: 'np_polyfit' or 'scipy_curvefit'.
+      fittype (str):         Type of fit: 'np_polyfit', 'scipy_curvefit' or None.
       coefs (float):         Array with fit coefficients.
       xvals (float):         Array with x values.
       yvals (float):         Array with y values.
@@ -142,9 +148,15 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
       verbosity (int):       Verbosity (0-3); optional - defaults to 2.
       fit_fun (fun):         Fit function used for scipy_curvefit; optional.
       dcoefs (float):        Uncertainties in coefficients from scipy_curvefit; optional.
+      yfit (float):          "Fit" values for Y for fittype=None; optional.
     
     Returns:
       (float):               Reduced Chi^2.
+    
+    Note:
+      - If fittype = 'scipy_curvefit', fit_fun must be specified.
+      - If fittype is None, yfit values must be specified, since they will not be computed from xvals
+        and coefs.  In that case, coefs=xvals=None can be specified.
     """
     
     if fittype=='np_polyfit':
@@ -152,10 +164,12 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
     elif fittype=='scipy_curvefit':
         if fit_fun is None: scli.error('A fit function must be specified for fittype '+fittype)
         yfit      = fit_fun(xvals, *coefs)
+    elif fittype is None:
+        if yfit is None: scli.error('yfit values must be specified for fittype '+fittype)
     else:
         scli.error('Unknown fittype: '+fittype)
     
-    yfit = xvals*0 + yfit  # Ensure yfit has same type as xvals (np.array/pd.Series)
+    yfit = yvals*0 + yfit  # Ensure yfit has same type as xvals (np.array/pd.Series)
     
     ysigmasareone = False  # Sigmas in y are not equal to 1
     if ysigmas is None:
@@ -166,10 +180,15 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         if min(ysigmas) == max(ysigmas) == 1: ysigmasareone = True  # Sigmas in y are equal to 1
     
     # Compute reduced chi^2:
+    if coefs is None:
+        ncoefs = 0                                      # Number of coefficients
+    else:
+        ncoefs    = len(coefs)                          # Number of coefficients
+        
     ydiffs    = yfit - yvals                            # Differences/residuals
     yresids   = ydiffs/ysigmas                          # Weighted residuals
     chi2      = sum(yresids**2)                         # Chi^2
-    red_chi2  = chi2/(len(xvals)-len(coefs))            # Reduced chi^2
+    red_chi2  = chi2/(len(yvals)-ncoefs)                # Reduced chi^2
     
     
     # Compute and print details:
@@ -182,6 +201,10 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         if type(xvals) == _pdc.series.Series:
             max_abs_dev_x  = xvals[abs(ydiffs) == max_abs_dev_y].to_numpy()[0]  # x value for maximum absolute deviation (Pandas)
             max_rel_dev_x  = xvals[abs(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0])) == max_rel_dev_y].to_numpy()[0]  # x value for maximum relative deviation (Pandas)
+        elif xvals is None:
+            max_abs_dev_x  = None
+            max_rel_dev_x  = None
+            xvals = yvals*0 + _np.nan  # Fill with NaNs
         else:
             max_abs_dev_x  = xvals[abs(ydiffs) == max_abs_dev_y][0]             # x value for maximum absolute deviation (Numpy)
             max_rel_dev_x  = xvals[abs(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0])) == max_rel_dev_y][0]             # x value for maximum relative deviation (Numpy)
@@ -194,9 +217,8 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         print('Max. absolute deviation:  ', max_abs_dev_y, ' @ x =', max_abs_dev_x)
         print('Max. relative deviation:  ', max_rel_dev_y, ' @ x =', max_rel_dev_x)
         
-        if verbosity>1:
+        if (verbosity>1) and (fittype is not None):
             print('Coefficients (reversed):')
-            ncoefs = len(coefs)
             if fittype=='np_polyfit':
                 for icoef in range(ncoefs):
                     print(' c%1i: %12.5e' % (icoef,coefs[ncoefs-icoef-1] ) )
@@ -205,17 +227,19 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
                     jcoef = ncoefs-icoef-1
                     print(' c%1i: %12.5e ± %12.5e (%9.2f%%)' % (icoef,coefs[jcoef], dcoefs[jcoef], abs(dcoefs[jcoef]/coefs[jcoef]*100) ) )  # Formatted
             
-            if verbosity>2:
-                print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
-                      ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
-                if type(xvals) == _pdc.series.Series:
-                    for ival in range(len(xvals)):
-                        print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
-                              (ival, xvals.iloc[ival],yvals.iloc[ival], ysigmas.iloc[ival], yfit.iloc[ival], ydiffs.iloc[ival], yresids.iloc[ival], abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
-                else:
-                    for ival in range(len(xvals)):
-                        print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
-                              (ival, xvals[ival],yvals[ival], ysigmas[ival], yfit[ival], ydiffs[ival], yresids[ival], abs(ydiffs[ival]/yvals[ival]) ) )
+        if verbosity>2:
+            print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
+                  ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
+            if type(yvals) == _pdc.series.Series:
+                for ival in range(len(yvals)):
+                    print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
+                          (ival, xvals.iloc[ival],yvals.iloc[ival], ysigmas.iloc[ival], yfit.iloc[ival], ydiffs.iloc[ival], yresids.iloc[ival], abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
+            else:
+                for ival in range(len(yvals)):
+                    print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
+                          (ival, xvals[ival],yvals[ival], ysigmas[ival], yfit[ival], ydiffs[ival], yresids[ival], abs(ydiffs[ival]/yvals[ival]) ) )
+            print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
+                  ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
     
     
     return red_chi2
