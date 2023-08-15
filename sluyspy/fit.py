@@ -60,7 +60,6 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
     
     # Compute reduced chi^2 and print general fit details:
     red_chi2 = print_fit_details('np_polyfit', coefs, xvals,yvals,ysigmas, verbosity=verbosity)
-        
     
     return coefs, red_chi2
 
@@ -124,13 +123,14 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     dcoefs   = _np.sqrt(_np.diag(var_cov))              # Standard deviations on the coefficients
     
     # Compute reduced chi^2 and print general fit details:
-    red_chi2 = print_fit_details('scipy_curvefit', coefs, xvals,yvals,ysigmas, verbosity=verbosity, fit_fun=fit_fun, dcoefs=dcoefs)
+    red_chi2 = print_fit_details('scipy_curvefit', coefs, xvals,yvals,ysigmas, verbosity=verbosity,
+                                 fit_fun=fit_fun, dcoefs=dcoefs)
     
     return coefs, red_chi2, var_cov, ier
 
 
 def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=None, dcoefs=None, yfit=None,
-                      coef_names=None, coef_facs=None):
+                      coef_names=None, coef_facs=None, rev_coefs=None):
     """Compute and return the reduced chi^2, and print fit details if desired.
     
     Calculations are done without fitting, so that this function can be called after a fit.  The fit values
@@ -154,6 +154,8 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
       coef_names (str):      Array of coefficient names for printing (optional).
       coef_facs (float):     Array of coefficient multiplication factors for printing (optional; defaults to 1).
                              Useful for e.g. printing degrees when radians are fitted.
+      rev_coefs (bool):      Reverse printing order in coefficient table: last coefficient at top.
+                             Optional, defaults to True for fittype np_polyfit, to False otherwise.
     
     Returns:
       (float):               Reduced Chi^2.
@@ -166,11 +168,14 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
     
     if fittype=='np_polyfit':
         yfit      = _np.poly1d(coefs)(xvals)
+        if rev_coefs is None: rev_coefs = True
     elif fittype=='scipy_curvefit':
         if fit_fun is None: scli.error('A fit function must be specified for fittype '+fittype)
         yfit      = fit_fun(xvals, *coefs)
+        if rev_coefs is None: rev_coefs = False
     elif fittype is None:
         if yfit is None: scli.error('yfit values must be specified for fittype '+fittype)
+        if rev_coefs is None: rev_coefs = False
     else:
         scli.error('Unknown fittype: '+fittype)
     
@@ -215,6 +220,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
             max_rel_dev_x  = xvals[abs(abs(ydiffs[yvals!=0])/abs(yvals[yvals!=0])) == max_rel_dev_y][0]             # x value for maximum relative deviation (Numpy)
         
         # Print details:
+        print('Fit quality:')
         if verbosity>1:
             print('Chi2:                     ', chi2)
         print('Reduced chi2:             ', red_chi2)
@@ -227,9 +233,12 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         if (verbosity>1) and (coefs is not None):
             if coef_facs is None:  coef_facs = coefs*0+1  # Coefficient print factor is 1 by default:
             
-            print('Coefficients (reversed):')
+            print('\nFit coefficients', end='')
+            if rev_coefs: print(' (reversed):', end='')
+            print(':')
             for icoef in range(ncoefs):
-                jcoef = ncoefs-icoef-1
+                jcoef = icoef
+                if rev_coefs: jcoef = ncoefs-icoef-1
                 
                 print(' c%1i:' % (icoef), end='')  # Nr
                 
@@ -249,6 +258,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         
         # Print fit data:
         if verbosity>2:
+            print('\nFit data:')
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
             
