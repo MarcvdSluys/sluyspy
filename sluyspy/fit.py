@@ -217,15 +217,16 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         print('Max. absolute deviation:  ', max_abs_dev_y, ' @ x =', max_abs_dev_x)
         print('Max. relative deviation:  ', max_rel_dev_y, ' @ x =', max_rel_dev_x)
         
-        if (verbosity>1) and (fittype is not None):
+        if (verbosity>1) and (coefs is not None):
             print('Coefficients (reversed):')
-            if fittype=='np_polyfit':
+            if dcoefs is None:
                 for icoef in range(ncoefs):
                     print(' c%1i: %12.5e' % (icoef,coefs[ncoefs-icoef-1] ) )
-            elif fittype=='scipy_curvefit':
+            else:
                 for icoef in range(ncoefs):
                     jcoef = ncoefs-icoef-1
-                    print(' c%1i: %12.5e ± %12.5e (%9.2f%%)' % (icoef,coefs[jcoef], dcoefs[jcoef], abs(dcoefs[jcoef]/coefs[jcoef]*100) ) )  # Formatted
+                    print(' c%1i: %12.5e ± %12.5e (%9.2f%%)' % (icoef,coefs[jcoef], dcoefs[jcoef],
+                                                                abs(dcoefs[jcoef]/coefs[jcoef]*100) ) )  # Formatted
             
         if verbosity>2:
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
@@ -233,11 +234,13 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
             if type(yvals) == _pdc.series.Series:
                 for ival in range(len(yvals)):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
-                          (ival, xvals.iloc[ival],yvals.iloc[ival], ysigmas.iloc[ival], yfit.iloc[ival], ydiffs.iloc[ival], yresids.iloc[ival], abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
+                          (ival, xvals.iloc[ival],yvals.iloc[ival], ysigmas.iloc[ival], yfit.iloc[ival],
+                           ydiffs.iloc[ival], yresids.iloc[ival], abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
             else:
                 for ival in range(len(yvals)):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
-                          (ival, xvals[ival],yvals[ival], ysigmas[ival], yfit[ival], ydiffs[ival], yresids[ival], abs(ydiffs[ival]/yvals[ival]) ) )
+                          (ival, xvals[ival],yvals[ival], ysigmas[ival], yfit[ival], ydiffs[ival],
+                           yresids[ival], abs(ydiffs[ival]/yvals[ival]) ) )
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
     
