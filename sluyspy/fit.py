@@ -80,7 +80,8 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     Returns:
       (tuple):  Tuple containing (coefs, var_cov, red_chi2, ier):
     
-      - coefs (float):     Array containing final fitting coefficients.
+      - coefs (float):     Array containing the final fitting coefficients.
+      - dcoefs (float):    Array containing uncertainties on the fitting coefficients.
       - red_chi2 (float):  Reduced chi squared (chi2/(n-m)).
       - var_cov (float):   2D array containing the variance-covariance matrix.
       - ier (int):         Return value, >0 if the fit succeeded.
@@ -120,13 +121,13 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     # Compute some fit-quality parameters:
     if ysigmas is None: ysigmas = yvals*0 + 1  # This is implicitly assumed in the previous line; works for pd.Series and numpy arrays
     
-    dcoefs   = _np.sqrt(_np.diag(var_cov))              # Standard deviations on the coefficients
+    dcoefs = _np.sqrt(_np.diag(var_cov))              # Standard deviations on the coefficients
     
     # Compute reduced chi^2 and print general fit details:
     red_chi2 = print_fit_details('scipy_curvefit', coefs, xvals,yvals,ysigmas, verbosity=verbosity,
                                  fit_fun=fit_fun, dcoefs=dcoefs)
     
-    return coefs, red_chi2, var_cov, ier
+    return coefs, dcoefs, red_chi2, var_cov, ier
 
 
 def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=None, dcoefs=None, yfit=None,
