@@ -206,19 +206,19 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
     if verbosity>0:
         
         # Find maximum deviations:
-        max_abs_dev_y  = max(abs(ydiffs))                             # Maximum absolute deviation in y
-        rel_dev_ys     = abs(ydiffs[yvals!=0]/yvals[yvals!=0])        # Relative deviations in y
-        max_rel_dev_y  = max(rel_dev_ys)                              # Maximum relative deviation in y
+        max_abs_dev_y  = _np.max(_np.abs(ydiffs))                     # Maximum absolute deviation in y
+        rel_dev_ys     = _np.abs(ydiffs[yvals!=0]/yvals[yvals!=0])    # Relative deviations in y
+        max_rel_dev_y  = _np.max(rel_dev_ys)                          # Maximum relative deviation in y
         
         if type(xvals) == _pdc.series.Series:
-            max_abs_dev_x  = xvals[abs(ydiffs) == max_abs_dev_y].to_numpy()[0]  # x value for maximum absolute deviation (Pandas)
+            max_abs_dev_x  = xvals[_np.abs(ydiffs) == max_abs_dev_y].to_numpy()[0]  # x value for maximum absolute deviation (Pandas)
             max_rel_dev_x  = xvals[ _np.logical_and(yvals!=0, rel_dev_ys == max_rel_dev_y)].to_numpy()[0]  # x value for maximum relative deviation (Pandas)
         elif xvals is None:
             max_abs_dev_x  = None
             max_rel_dev_x  = None
             xvals = yvals*0 + _np.nan  # Fill with NaNs
         else:
-            max_abs_dev_x  = xvals[abs(ydiffs) == max_abs_dev_y][0]             # x value for maximum absolute deviation (Numpy)
+            max_abs_dev_x  = xvals[_np.abs(ydiffs) == max_abs_dev_y][0]             # x value for maximum absolute deviation (Numpy)
             max_rel_dev_x  = xvals[ _np.logical_and(yvals!=0, rel_dev_ys == max_rel_dev_y)][0]  # x value for maximum relative deviation (Numpy)
         
         # Print details:
@@ -228,7 +228,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
             print('Chi2:                     ', chi2)
             
         print('Reduced chi2:             ', red_chi2)
-        print('Original mean sigma:      ', _np.sqrt(red_chi2) * ysigma_mean)   # Estimate of the true sigma_y
+        print('Typical original sigma:   ', _np.sqrt(red_chi2) * ysigma_mean)   # Estimate of the true sigma_y
         print('Max. absolute deviation:  ', max_abs_dev_y, ' @ x =', max_abs_dev_x)
         print('Max. relative deviation:  ', max_rel_dev_y, ' @ x =', max_rel_dev_x)
         
@@ -247,7 +247,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
                 print(' c%1i:' % (icoef), end='')  # Nr
                 
                 if coef_names is not None:
-                    strlen = len(max(coef_names, key=len))  # Length of the longest string in the list
+                    strlen = len(_np.max(coef_names, key=len))  # Length of the longest string in the list
                     fmt = ' %'+str(strlen)+'s: '
                     print(fmt % (coef_names[jcoef]), end='')  # Name
                 
@@ -255,7 +255,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
                 
                 if dcoefs is not None:
                     print(' ± %12.5e (%9.2f%%)' % (dcoefs[jcoef] * coef_facs[jcoef],
-                                                   abs(dcoefs[jcoef]/coefs[jcoef]*100) ), end='')
+                                                   _np.abs(dcoefs[jcoef]/coefs[jcoef]*100) ), end='')
                 
                 print('')
         
@@ -270,13 +270,13 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
                 for ival in range(ndat):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
                           (ival, xvals.iloc[ival],yvals.iloc[ival], ysigmas.iloc[ival], yfit.iloc[ival],
-                           ydiffs.iloc[ival], yresids.iloc[ival], abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
+                           ydiffs.iloc[ival], yresids.iloc[ival], _np.abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
                 
             else:  # Probably Numpy:
                 for ival in range(ndat):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
                           (ival, xvals[ival],yvals[ival], ysigmas[ival], yfit[ival], ydiffs[ival],
-                           yresids[ival], abs(ydiffs[ival]/yvals[ival]) ) )
+                           yresids[ival], _np.abs(ydiffs[ival]/yvals[ival]) ) )
                 
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
