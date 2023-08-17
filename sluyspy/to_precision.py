@@ -14,6 +14,12 @@
 #  - William Rusnack github.com/BebeSparkelSparkel linkedin.com/in/williamrusnack williamrusnack@gmail.com
 #  - Eric Moyer github.com/epmoyer eric@lemoncrab.com
 #  - Thomas Hladish https://github.com/tjhladish tjhladish@utexas.edu
+#
+#  References for notation:
+#  - https://www.mathsisfun.com/numbers/scientific-notation.html
+#  - https://www.mathsisfun.com/definitions/engineering-notation.html
+#  - https://www.mathsisfun.com/definitions/standard-notation.html
+
 
 
 """Return a value as a formatted string with the desired precision."""
@@ -28,78 +34,77 @@ from math import floor, log10
 
 
 def std_notation(value, precision):
-    """standard notation (US version)
-    ref: http://www.mathsisfun.com/definitions/standard-notation.html
+    """Return a value as a formatted string with the desired precision in standard notation.
     
-    returns a string of value with the proper precision
+    Parameters:
+      value (float):    Value to print.
+      precision (int):  Number of significant digits to use.
     
-    ex:
+    Examples:
       std_notation(5, 2) => '5.0'
       std_notation(5.36, 2) => '5.4'
       std_notation(5360, 2) => '5400'
       std_notation(0.05363, 3) => '0.0536'
     
-      created by William Rusnack
-        github.com/BebeSparkelSparkel
-        linkedin.com/in/williamrusnack/
-        williamrusnack@gmail.com
+    Note: Created by William Rusnack.
     """
     
     return to_precision(value, precision, notation='std')
 
 
 def sci_notation(value, precision, delimiter='e'):
-    """scientific notation
-    ref: https://www.mathsisfun.com/numbers/scientific-notation.html
+    """Return a value as a formatted string with the desired precision in scientific notation.
     
     returns a string of value with the proper precision and 10s exponent
     delimiter is placed between the decimal value and 10s exponent
     
-    ex:
+    Parameters:
+      value (float):    Value to print.
+      precision (int):  Number of significant digits to use.
+      delimiter (str):  Delimiter between value and exponent (optional, defaults to 'e').
+    
+    Examples:
       sci_notation(123, 1, 'E') => '1E2'
       sci_notation(123, 3, 'E') => '1.23E2'
       sci_notation(.126, 2, 'E') => '1.3E-1'
     
-      created by William Rusnack
-        github.com/BebeSparkelSparkel
-        linkedin.com/in/williamrusnack/
-        williamrusnack@gmail.com
+    Note: created by William Rusnack.
     """
     
     return to_precision(value, precision, notation='sci', delimiter=delimiter)
 
 
 def eng_notation(value, precision, delimiter='e'):
-    """engineering notation
-    ref: http://www.mathsisfun.com/definitions/engineering-notation.html
+    """Return a value as a formatted string with the desired precision in engineering notation.
     
-    returns a string of value with the proper precision and 10s exponent that is divisible by 3
-    delimiter is placed between the decimal value and 10s exponent
+    The exponent will be divisible by three.
     
-    ex:
+    Parameters:
+      value (float):    Value to print.
+      precision (int):  Number of significant digits to use.
+      delimiter (str):  Delimiter between value and exponent (optional, defaults to 'e').
+    
+    Examples:
       sci_notation(123, 1, 'E') => '100E0'
       sci_notation(1230, 3, 'E') => '1.23E3'
       sci_notation(.126, 2, 'E') => '120E-3'
     
-    created by William Rusnack
-      github.com/BebeSparkelSparkel
-      linkedin.com/in/williamrusnack/
-      williamrusnack@gmail.com
+    Note: created by William Rusnack.
     """
     
     return to_precision(value, precision, notation='eng', delimiter=delimiter)
 
 
 def auto_notation(value, precision, delimiter='e'):
-    """Automatically selects between standard notation (US version) and scientific notation.
-    Values in the range 0.001 < abs(value) < 1000 return standard notation.
+    """Automatically selects between standard and scientific notation.
+    Values in the range 0.001 < abs(value) < 1000 are returned in standard notation.
     
-    http://www.mathsisfun.com/definitions/standard-notation.html
-    https://www.mathsisfun.com/numbers/scientific-notation.html
+    Parameters:
+      value (float):    Value to print.
+      precision (int):  Number of significant digits to use.
+      delimiter (str):  Delimiter between value and exponent (optional, defaults to 'e').
     
-    returns a string of value with the proper precision
-    
-    ex:
+    Examples:
       auto_notation(123, 4) => '123.4'
       std_notation(1234, 4) => '1.234e3'
     """
@@ -107,33 +112,28 @@ def auto_notation(value, precision, delimiter='e'):
     return to_precision(value, precision, notation='auto', delimiter=delimiter)
 
 
-def to_precision(
-        value,
-        precision,
-        notation='auto',
-        delimiter='e',
-        auto_limit=3,
-        strip_zeros=False,
-        preserve_integer=False):
+def to_precision(value, precision, notation='auto', delimiter='e', auto_limit=3, strip_zeros=False,
+                 preserve_int=False):
+    """Return a value as a formatted string with the desired precision.
     
-    """converts a value to the specified notation and precision
-    value - any type that can be converted to a float
-    precision - integer that is greater than zero
-    notation - string
-      'auto' - selects standard notation when abs(power) < auto_limit else
-        returns scientific notation.
-      'sci' or 'scientific' - returns scientific notation
+    Parameters:
+      value (float):    Value to print.
+      precision (int):  Number of significant digits to use.
+      notation (str):   Notation to use:
+                        - 'auto': use standard notation when abs(power) < auto_limit, scientific notation otherwise;
+                        - 'sci' or 'scientific': use scientific notation;
+                        - 'eng' or 'engineering': use engineering notation;
+                        - 'std' or 'standard': use standard notation.
+    
+      delimiter (str):      Delimiter between value and exponent (optional, defaults to 'e').
+      auto_limit (int):     When abs(power) exceeds this limit, 'auto' mode will return scientific notation (optional, defaults to 3).
+      strip_zeros (bool):   Remove trailing decimal zeros (optional, defaults to False).
+      preserve_int (bool):  Preserve all digits when returning values that have no decimal component for 'std' (optional, defaults to False).
+    
+    References:
+        ref: https://www.mathsisfun.com/definitions/standard-notation.html
         ref: https://www.mathsisfun.com/numbers/scientific-notation.html
-      'eng' or 'engineering' - returns engineering notation
-        ref: http://www.mathsisfun.com/definitions/engineering-notation.html
-      'std' or 'standard' - returns standard notation
-        ref: http://www.mathsisfun.com/definitions/standard-notation.html
-    delimiter - is placed between the decimal value and 10s exponent
-    auto_limit - integer. When abs(power) exceeds this limit, 'auto'
-      mode will return scientific notation.
-    strip_zeros - if true, trailing decimal zeros will be removed.
-    preserve_integer - if true, 'std' will preserve all digits when returning
-      values that have no decimal component.
+        ref: https://www.mathsisfun.com/definitions/engineering-notation.html
     """
     
     is_neg, sig_digits, dot_power, ten_power = _sci_decompose(value, precision)
@@ -156,24 +156,24 @@ def to_precision(
     else:
         raise ValueError('Unknown notation: ' + str(notation))
     
-    return converter(value, precision, delimiter, strip_zeros, preserve_integer)
+    return converter(value, precision, delimiter, strip_zeros, preserve_int)
 
 
-def _std_notation(value, precision, _, strip_zeros, preserve_integer):
-    """standard notation (US version)
-    ref: http://www.mathsisfun.com/definitions/standard-notation.html
+def _std_notation(value, precision, _, strip_zeros, preserve_int):
+    """Return standard notation.
+    ref: https://www.mathsisfun.com/definitions/standard-notation.html
     
-    returns a string of value with the proper precision
-    
-    strip_zeros - if true, trailing decimal zeros will be removed.
-    preserve_integer - if true, 'std' will preserve all digits when returning
-      values that have no decimal component.
+    Parameters:
+      value (float):        Value to print.
+      precision (int):      Number of significant digits to use.
+      strip_zeros (bool):   Remove trailing decimal zeros (optional, defaults to False).
+      preserve_int (bool):  Preserve all digits when returning values that have no decimal component for 'std' (optional, defaults to False).
     """
     
     sig_digits, power, is_neg = _number_profile(value, precision)
     result = ('-' if is_neg else '') + _place_dot(sig_digits, power, strip_zeros)
     
-    if preserve_integer and not '.' in result:
+    if preserve_int and not '.' in result:
         # Result was an integer, preserve all digits
         result = '{:0.0f}'.format(value)
     
@@ -181,13 +181,14 @@ def _std_notation(value, precision, _, strip_zeros, preserve_integer):
 
 
 def _sci_notation(value, precision, delimiter, strip_zeros, _):
-    """scientific notation
+    """Return scientific notation.
     ref: https://www.mathsisfun.com/numbers/scientific-notation.html
     
-    returns a string of value with the proper precision and 10s exponent
-    delimiter is placed between the decimal value and 10s exponent
-    
-    strip_zeros - if true, trailing decimal zeros will be removed.
+    Parameters:
+      value (float):    Value to print.
+      precision (int):  Number of significant digits to use.
+      delimiter (str):  Delimiter between value and exponent (optional, defaults to 'e').
+      strip_zeros (bool):   Remove trailing decimal zeros (optional, defaults to False).
     """
     
     is_neg, sig_digits, dot_power, ten_power = _sci_decompose(value, precision)
@@ -196,13 +197,14 @@ def _sci_notation(value, precision, delimiter, strip_zeros, _):
 
 
 def _eng_notation(value, precision, delimiter, strip_zeros, _):
-    """engineering notation
-    ref: http://www.mathsisfun.com/definitions/engineering-notation.html
+    """Return engineering notation.
+    ref: https://www.mathsisfun.com/definitions/engineering-notation.html
     
-    returns a string of value with the proper precision and 10s exponent that is divisible by 3
-    delimiter is placed between the decimal value and 10s exponent
-    
-    strip_zeros - if true, trailing decimal zeros will be removed.
+    Parameters:
+      value (float):    Value to print.
+      precision (int):  Number of significant digits to use.
+      delimiter (str):  Delimiter between value and exponent (optional, defaults to 'e').
+      strip_zeros (bool):   Remove trailing decimal zeros (optional, defaults to False).
     """
     
     is_neg, sig_digits, dot_power, ten_power = _sci_decompose(value, precision)
@@ -214,13 +216,13 @@ def _eng_notation(value, precision, delimiter, strip_zeros, _):
 
 
 def _sci_decompose(value, precision):
-    """returns the properties for to construct a scientific notation number
-    used in sci_notation and eng_notation
+    """Return the properties to construct a scientific/engineering notation number.
     
-    created by William Rusnack
-      github.com/BebeSparkelSparkel
-      linkedin.com/in/williamrusnack/
-      williamrusnack@gmail.com
+    Parameters:
+      value (float):    Value to print.
+      precision (int):  Number of significant digits to use.
+    
+    Note: created by William Rusnack.
     """
     
     value = float(value)
@@ -233,11 +235,10 @@ def _sci_decompose(value, precision):
 
 
 def _place_dot(digits, power, strip_zeros=False):
-    """places the dot in the correct spot in the digits
-    if the dot is outside the range of the digits zeros will be added
-    if strip_zeros is set, trailing decimal zeros will be removed
+    """Place the dot in the correct spot in the digits/  If the dot is outside the range of the digits, zeros
+    will be added.  If strip_zeros is set, trailing decimal zeros will be removed.
     
-    ex:
+    Examples:
       _place_dot('123',   2, False) => '12300'
       _place_dot('123',  -2, False) => '1.23'
       _place_dot('123',   3, False) => '0.123'
@@ -248,10 +249,7 @@ def _place_dot(digits, power, strip_zeros=False):
       _place_dot('1200', -1, False) => '120.0'
       _place_dot('1200', -1, True ) => '120'
     
-      created by William Rusnack
-        github.com/BebeSparkelSparkel
-        linkedin.com/in/williamrusnack/
-        williamrusnack@gmail.com
+    Note: created by William Rusnack.
     """
     
     if power > 0:
@@ -277,18 +275,21 @@ def _place_dot(digits, power, strip_zeros=False):
 
 
 def _number_profile(value, precision):
-    """returns:
-      string of significant digits
-      10s exponent to get the dot to the proper location in the significant digits
-      bool that's true if value is less than zero else false
+    """
+    Parameters:
+      value (float):    Value to print.
+      precision (int):  Number of significant digits to use.
     
-      created by William Rusnack
-        github.com/BebeSparkelSparkel
-        linkedin.com/in/williamrusnack/
-        williamrusnack@gmail.com
-      contributions by Thomas Hladish
-        github.com/tjhladish
-        Issue: github.com/BebeSparkelSparkel/to-precision/issues/5
+    Returns:
+      (tuple):  Tuple containing (sig_digits, int(-power), is_neg):
+    
+      - (str):   string of significant digits.
+      - (int):   10s exponent to get the dot to the proper location in the significant digits.
+      - (bool):  True if value is less than zero.
+
+    Note:
+    - created by William Rusnack;
+    - contributions by Thomas Hladish - Issue: github.com/BebeSparkelSparkel/to-precision/issues/5.
     """
     
     value = float(value)
@@ -302,8 +303,6 @@ def _number_profile(value, precision):
     else:
         power = -1 * floor(log10(value)) + precision - 1
         
-        # issue soved by Thomas Haladish
-        # github.com/BebeSparkelSparkel/to-precision/issues/5
         value_power = value * 10.0**power
         if value < 1 and \
            floor(log10(int(round(value_power)))) > \
