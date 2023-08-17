@@ -19,7 +19,7 @@
 
 import numpy as _np
 import pandas.core as _pdc
-import sluyspy.cli as scli
+import sluyspy.cli as _scli
 
 
 def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
@@ -131,7 +131,7 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
 
 
 def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=None, dcoefs=None, yfit=None,
-                      coef_names=None, coef_facs=None, rev_coefs=None):
+                      abs_diff=True,rel_diff=False, coef_names=None, coef_facs=None, rev_coefs=None):
     """Compute and return the reduced chi^2, and print fit details if desired.
     
     Calculations are done without fitting, so that this function can be called after a fit.  The fit values
@@ -151,6 +151,9 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
       fit_fun (fun):         Fit function used for scipy_curvefit; optional.
       dcoefs (float):        Uncertainties in coefficients from scipy_curvefit; optional.
       yfit (float):          "Fit" values for Y for fittype=None; optional.
+
+      abs_diff (bool):       Print absolute differences (optional; defaults to True).
+      rel_diff (bool):       Print relative differences (optional; defaults to False, unless verbosity>2).
     
       coef_names (str):      Array of coefficient names for printing (optional).
       coef_facs (float):     Array of coefficient multiplication factors for printing (optional; defaults to 1).
@@ -171,66 +174,89 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         yfit      = _np.poly1d(coefs)(xvals)
         if rev_coefs is None: rev_coefs = True
     elif fittype=='scipy_curvefit':
-        if fit_fun is None: scli.error('A fit function must be specified for fittype '+fittype)
+        if fit_fun is None: _scli.error('A fit function must be specified for fittype '+fittype)
         yfit      = fit_fun(xvals, *coefs)
         if rev_coefs is None: rev_coefs = False
     elif fittype is None:
-        if yfit is None: scli.error('yfit values must be specified for fittype '+fittype)
+        if yfit is None: _scli.error('yfit values must be specified for fittype '+fittype)
         if rev_coefs is None: rev_coefs = False
     else:
-        scli.error('Unknown fittype: '+fittype+'; must be one of "np_polyfit", "scipy_curvefit" or None.')
+        _scli.error('Unknown fittype: '+fittype+'; must be one of "np_polyfit", "scipy_curvefit" or None.')
     
     yfit = yvals*0 + yfit  # Ensure yfit has same type as xvals (np.array/pd.Series)
     
     if ysigmas is None:
-        if verbosity>0: print('\nysigmas=None; assuming sigma=1 for all data points.')
-        if verbosity>1: print('')
+        if verbosity>1: print('\nysigmas=None; assuming sigma=1 for all data points.\n')
         ysigmas = yvals*0 + 1  # Set ysigmas to 1 - works for pd.Series and np.arrays
     
-    ysigma_mean = ysigmas.mean()
     
     # Compute reduced chi^2:
     if coefs is None:
-        ncoefs = 0                                      # Number of coefficients
+        ncoefs = 0                                # Number of coefficients
     else:
-        ncoefs = len(coefs)                             # Number of coefficients
+        ncoefs = len(coefs)                       # Number of coefficients
     
-    ndat      = len(yvals)                              # Number of data points
-    ydiffs    = yfit - yvals                            # Differences/residuals
-    yresids   = ydiffs/ysigmas                          # Weighted residuals
-    chi2      = _np.sum(yresids**2)                     # Chi^2 - NumPy needed for large numbers
-    red_chi2  = chi2/(ndat-ncoefs)                      # Reduced chi^2
+    ndat           = len(yvals)                   # Number of data points
+    ydiffs         = yfit - yvals                 # Differences/residuals
+    yresids        = ydiffs/ysigmas               # Weighted residuals
+    chi2           = _np.sum(yresids**2)          # Chi^2 - NumPy needed for large numbers
+    red_chi2       = chi2/(ndat-ncoefs)           # Reduced chi^2
+    
+    mean_abs_ydiff = _np.nanmean(_np.abs(ydiffs))    # The mean absolute difference between data and fit values
+    med_abs_ydiff  = _np.nanmedian(_np.abs(ydiffs))  # The median absolute difference between data and fit values
+    
+    rel_diff_ys    = _np.abs(ydiffs[yvals!=0]/yvals[yvals!=0])    # Relative differences in y
+    mean_rel_ydiff = _np.nanmean(rel_diff_ys)        # The mean absolute difference between data and fit values
+    med_rel_ydiff  = _np.nanmedian(rel_diff_ys)      # The median absolute difference between data and fit values
     
     
     # Compute and print details:
     if verbosity>0:
         
-        # Find maximum deviations:
-        max_abs_dev_y  = _np.max(_np.abs(ydiffs))                     # Maximum absolute deviation in y
-        rel_dev_ys     = _np.abs(ydiffs[yvals!=0]/yvals[yvals!=0])    # Relative deviations in y
-        max_rel_dev_y  = _np.max(rel_dev_ys)                          # Maximum relative deviation in y
-        
-        if type(xvals) == _pdc.series.Series:
-            max_abs_dev_x  = xvals[_np.abs(ydiffs) == max_abs_dev_y].to_numpy()[0]  # x value for maximum absolute deviation (Pandas)
-            max_rel_dev_x  = xvals[ _np.logical_and(yvals!=0, rel_dev_ys == max_rel_dev_y)].to_numpy()[0]  # x value for maximum relative deviation (Pandas)
-        elif xvals is None:
-            max_abs_dev_x  = None
-            max_rel_dev_x  = None
-            xvals = yvals*0 + _np.nan  # Fill with NaNs
-        else:
-            max_abs_dev_x  = xvals[_np.abs(ydiffs) == max_abs_dev_y][0]             # x value for maximum absolute deviation (Numpy)
-            max_rel_dev_x  = xvals[ _np.logical_and(yvals!=0, rel_dev_ys == max_rel_dev_y)][0]  # x value for maximum relative deviation (Numpy)
+        # Find maximum differences:
+        if verbosity>2:
+            max_abs_diff_y  = _np.max(_np.abs(ydiffs))                     # Maximum absolute difference in y
+            max_rel_diff_y  = _np.max(rel_diff_ys)                          # Maximum relative difference in y
+            
+            if type(xvals) == _pdc.series.Series:
+                max_abs_diff_x  = xvals[_np.abs(ydiffs) == max_abs_diff_y].to_numpy()[0]  # x value for maximum absolute difference (Pandas)
+                max_rel_diff_x  = xvals[ _np.logical_and(yvals!=0, rel_diff_ys == max_rel_diff_y)].to_numpy()[0]  # x value for maximum relative difference (Pandas)
+            elif xvals is None:
+                max_abs_diff_x  = None
+                max_rel_diff_x  = None
+                xvals = yvals*0 + _np.nan  # Fill with NaNs
+            else:
+                max_abs_diff_x  = xvals[_np.abs(ydiffs) == max_abs_diff_y][0]             # x value for maximum absolute difference (Numpy)
+                max_rel_diff_x  = xvals[ _np.logical_and(yvals!=0, rel_diff_ys == max_rel_diff_y)][0]  # x value for maximum relative difference (Numpy)
         
         # Print details:
         if verbosity>1:
             print('Fit quality:')
-            print('Number of data points:    ', ndat)
-            print('Chi2:                     ', chi2)
+            print('Number of data points:     ', ndat)
+            if verbosity>2:
+                if ncoefs>0:
+                    print('Number of coefficents:     ', ncoefs)
+                    print('Degrees of freedom:        ', ndat - ncoefs)
+                    print()
+                print('Chi2:                      ', chi2)
             
-        print('Reduced chi2:             ', red_chi2)
-        print('Typical original sigma:   ', _np.sqrt(red_chi2) * ysigma_mean)   # Estimate of the true sigma_y
-        print('Max. absolute deviation:  ', max_abs_dev_y, ' @ x =', max_abs_dev_x)
-        print('Max. relative deviation:  ', max_rel_dev_y, ' @ x =', max_rel_dev_x)
+        print('Reduced chi2:              ', red_chi2)
+        
+        # print('Estimated original sigma:  ', _np.sqrt(red_chi2) * ysigma_mean)   # Rough estimate of the true sigma_y
+        
+        if abs_diff:
+            if verbosity>1: print()
+            print('Mean absolute difference:  ', mean_abs_ydiff)
+            print('Med. absolute difference:  ', med_abs_ydiff)
+            if verbosity>2: print('Max. absolute difference:  ', max_abs_diff_y,
+                                  ' @ x =', max_abs_diff_x)
+            
+        if rel_diff or (verbosity>2):
+            if verbosity>1: print()
+            print('Mean relative difference:  ', mean_rel_ydiff)
+            print('Med. relative difference:  ', med_rel_ydiff)
+            if verbosity>2: print('Max. relative difference:  ', max_rel_diff_y,
+                                  ' @ x =', max_rel_diff_x)
         
         
         # Print fit coefficents:
@@ -260,8 +286,8 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
                 print('')
         
         
-        # Print fit data:
-        if verbosity>2:
+        # Print all fit data points:
+        if verbosity>3:
             print('\nFit data:')
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
@@ -271,13 +297,13 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
                           (ival, xvals.iloc[ival],yvals.iloc[ival], ysigmas.iloc[ival], yfit.iloc[ival],
                            ydiffs.iloc[ival], yresids.iloc[ival], _np.abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
-                
+            
             else:  # Probably Numpy:
                 for ival in range(ndat):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
                           (ival, xvals[ival],yvals[ival], ysigmas[ival], yfit[ival], ydiffs[ival],
                            yresids[ival], _np.abs(ydiffs[ival]/yvals[ival]) ) )
-                
+            
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
             
