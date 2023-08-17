@@ -170,6 +170,8 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         and coefs.  In that case, coefs=xvals=None can be specified.
     """
     
+    from sluyspy.numerics import sigdig
+    
     if fittype=='np_polyfit':
         yfit      = _np.poly1d(coefs)(xvals)
         if rev_coefs is None: rev_coefs = True
@@ -238,25 +240,25 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
                     print('Number of coefficents:     ', ncoefs)
                     print('Degrees of freedom:        ', ndat - ncoefs)
                     print()
-                print('Chi2:                      ', chi2)
+                print('Chi2:                      ', sigdig(chi2))
             
-        print('Reduced chi2:              ', red_chi2)
+        print('Reduced chi2:              ', sigdig(red_chi2))
         
         # print('Estimated original sigma:  ', _np.sqrt(red_chi2) * ysigma_mean)   # Rough estimate of the true sigma_y
         
         if abs_diff:
             if verbosity>1: print()
-            print('Mean absolute difference:  ', mean_abs_ydiff)
-            print('Med. absolute difference:  ', med_abs_ydiff)
-            if verbosity>2: print('Max. absolute difference:  ', max_abs_diff_y,
-                                  ' @ x =', max_abs_diff_x)
+            print('Mean absolute difference:  ', sigdig(mean_abs_ydiff))
+            print('Med. absolute difference:  ', sigdig(med_abs_ydiff))
+            if verbosity>2: print('Max. absolute difference:  ', sigdig(max_abs_diff_y),
+                                  ' @ x =', sigdig(max_abs_diff_x))
             
         if rel_diff or (verbosity>2):
             if verbosity>1: print()
-            print('Mean relative difference:  ', mean_rel_ydiff)
-            print('Med. relative difference:  ', med_rel_ydiff)
-            if verbosity>2: print('Max. relative difference:  ', max_rel_diff_y,
-                                  ' @ x =', max_rel_diff_x)
+            print('Mean relative difference:  ', sigdig(mean_rel_ydiff))
+            print('Med. relative difference:  ', sigdig(med_rel_ydiff))
+            if verbosity>2: print('Max. relative difference:  ', sigdig(max_rel_diff_y),
+                                  ' @ x =', sigdig(max_rel_diff_x))
         
         
         # Print fit coefficents:
@@ -283,7 +285,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
                     print(' ± %12.5e (%9.2f%%)' % (dcoefs[jcoef] * coef_facs[jcoef],
                                                    _np.abs(dcoefs[jcoef]/coefs[jcoef]*100) ), end='')
                 
-                print('')
+                print()
         
         
         # Print all fit data points:
