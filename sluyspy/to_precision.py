@@ -46,7 +46,7 @@ def std_notation(value, precision):
       std_notation(5360, 2) => '5400'
       std_notation(0.05363, 3) => '0.0536'
     
-    Note: Created by William Rusnack.
+    Note: created by William Rusnack.
     """
     
     return to_precision(value, precision, notation='std')
@@ -173,7 +173,7 @@ def _std_notation(value, precision, _, strip_zeros, preserve_int):
     sig_digits, power, is_neg = _number_profile(value, precision)
     result = ('-' if is_neg else '') + _place_dot(sig_digits, power, strip_zeros)
     
-    if preserve_int and not '.' in result:
+    if preserve_int and ('.' not in result):
         # Result was an integer, preserve all digits
         result = '{:0.0f}'.format(value)
     
