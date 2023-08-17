@@ -17,7 +17,6 @@
 #
 #  References for notation:
 #  - https://www.mathsisfun.com/numbers/scientific-notation.html
-#  - https://www.mathsisfun.com/definitions/engineering-notation.html
 #  - https://www.mathsisfun.com/definitions/standard-notation.html
 
 
@@ -33,85 +32,6 @@ Thomas Hladish https://github.com/tjhladish tjhladish@utexas.edu
 from math import floor, log10
 
 
-def std_notation(value, precision):
-    """Return a value as a formatted string with the desired precision in standard notation.
-    
-    Parameters:
-      value (float):    Value to print.
-      precision (int):  Number of significant digits to use.
-    
-    Examples:
-      std_notation(5, 2) => '5.0'
-      std_notation(5.36, 2) => '5.4'
-      std_notation(5360, 2) => '5400'
-      std_notation(0.05363, 3) => '0.0536'
-    
-    Note: created by William Rusnack.
-    """
-    
-    return to_precision(value, precision, notation='std')
-
-
-def sci_notation(value, precision, delimiter='e'):
-    """Return a value as a formatted string with the desired precision in scientific notation.
-    
-    returns a string of value with the proper precision and 10s exponent
-    delimiter is placed between the decimal value and 10s exponent
-    
-    Parameters:
-      value (float):    Value to print.
-      precision (int):  Number of significant digits to use.
-      delimiter (str):  Delimiter between value and exponent (optional, defaults to 'e').
-    
-    Examples:
-      sci_notation(123, 1, 'E') => '1E2'
-      sci_notation(123, 3, 'E') => '1.23E2'
-      sci_notation(.126, 2, 'E') => '1.3E-1'
-    
-    Note: created by William Rusnack.
-    """
-    
-    return to_precision(value, precision, notation='sci', delimiter=delimiter)
-
-
-def eng_notation(value, precision, delimiter='e'):
-    """Return a value as a formatted string with the desired precision in engineering notation.
-    
-    The exponent will be divisible by three.
-    
-    Parameters:
-      value (float):    Value to print.
-      precision (int):  Number of significant digits to use.
-      delimiter (str):  Delimiter between value and exponent (optional, defaults to 'e').
-    
-    Examples:
-      sci_notation(123, 1, 'E') => '100E0'
-      sci_notation(1230, 3, 'E') => '1.23E3'
-      sci_notation(.126, 2, 'E') => '120E-3'
-    
-    Note: created by William Rusnack.
-    """
-    
-    return to_precision(value, precision, notation='eng', delimiter=delimiter)
-
-
-def auto_notation(value, precision, delimiter='e'):
-    """Automatically selects between standard and scientific notation.
-    Values in the range 0.001 < abs(value) < 1000 are returned in standard notation.
-    
-    Parameters:
-      value (float):    Value to print.
-      precision (int):  Number of significant digits to use.
-      delimiter (str):  Delimiter between value and exponent (optional, defaults to 'e').
-    
-    Examples:
-      auto_notation(123, 4) => '123.4'
-      std_notation(1234, 4) => '1.234e3'
-    """
-    
-    return to_precision(value, precision, notation='auto', delimiter=delimiter)
-
-
 def to_precision(value, precision, notation='auto', delimiter='e', auto_limit=3, strip_zeros=False,
                  preserve_int=False):
     """Return a value as a formatted string with the desired precision.
@@ -122,7 +42,6 @@ def to_precision(value, precision, notation='auto', delimiter='e', auto_limit=3,
       notation (str):   Notation to use:
                         - 'auto': use standard notation when abs(power) < auto_limit, scientific notation otherwise;
                         - 'sci' or 'scientific': use scientific notation;
-                        - 'eng' or 'engineering': use engineering notation;
                         - 'std' or 'standard': use standard notation.
     
       delimiter (str):      Delimiter between value and exponent (optional, defaults to 'e').
@@ -133,7 +52,6 @@ def to_precision(value, precision, notation='auto', delimiter='e', auto_limit=3,
     References:
         ref: https://www.mathsisfun.com/definitions/standard-notation.html
         ref: https://www.mathsisfun.com/numbers/scientific-notation.html
-        ref: https://www.mathsisfun.com/definitions/engineering-notation.html
     """
     
     is_neg, sig_digits, dot_power, ten_power = _sci_decompose(value, precision)
@@ -146,9 +64,6 @@ def to_precision(value, precision, notation='auto', delimiter='e', auto_limit=3,
     
     elif notation in ('sci', 'scientific'):
         converter = _sci_notation
-    
-    elif notation in ('eng', 'engineering'):
-        converter = _eng_notation
     
     elif notation in ('std', 'standard'):
         converter = _std_notation
@@ -196,27 +111,8 @@ def _sci_notation(value, precision, delimiter, strip_zeros, _):
     return ('-' if is_neg else '') + _place_dot(sig_digits, dot_power, strip_zeros) + delimiter + str(ten_power)
 
 
-def _eng_notation(value, precision, delimiter, strip_zeros, _):
-    """Return engineering notation.
-    ref: https://www.mathsisfun.com/definitions/engineering-notation.html
-    
-    Parameters:
-      value (float):    Value to print.
-      precision (int):  Number of significant digits to use.
-      delimiter (str):  Delimiter between value and exponent (optional, defaults to 'e').
-      strip_zeros (bool):   Remove trailing decimal zeros (optional, defaults to False).
-    """
-    
-    is_neg, sig_digits, dot_power, ten_power = _sci_decompose(value, precision)
-    
-    eng_power = int(3 * floor(ten_power / 3))
-    eng_dot = dot_power + ten_power - eng_power
-    
-    return ('-' if is_neg else '') + _place_dot(sig_digits, eng_dot, strip_zeros) + delimiter + str(eng_power)
-
-
 def _sci_decompose(value, precision):
-    """Return the properties to construct a scientific/engineering notation number.
+    """Return the properties to construct a scientific notation number.
     
     Parameters:
       value (float):    Value to print.
