@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: EUPL-1.2
 #  
-#  Copyright (c) 2022-2023  Marc van der Sluys - marc.vandersluys.nl
+#  Copyright (c) 2022-2023  Marc van der Sluys - Nikhef/Utrecht University - marc.vandersluys.nl
 #  
 #  This file is part of the sluyspy Python package:
 #  Marc van der Sluys' personal Python modules.
