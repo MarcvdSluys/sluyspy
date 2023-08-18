@@ -23,12 +23,12 @@ import pandas as _pd
 # import solarenergy as _se
 
 
-def cloud_power_from_rain_means(rain):
+def _cloud_power_from_rain_means(rain):
     """Guestimate the fraction of light power coming from an overcast sky, from the amount of rain.
-
+    
     Parameters:
       rain (float):  Rain value(s), in mm/hr.
-
+    
     Returns:
       (float):  P/Pclear; the fraction of clear-sky solar power coming from an overcast sky.
     
@@ -47,12 +47,12 @@ def cloud_power_from_rain_means(rain):
     return ppclr
 
 
-def cloud_power_from_rain_medians(rain):
+def _cloud_power_from_rain_medians(rain):
     """Guestimate the fraction of light power coming from an overcast sky, from the amount of rain.
-
+    
     Parameters:
       rain (float):  Rain value(s), in mm/hr.
-
+    
     Returns:
       (float):  P/Pclear; the fraction of clear-sky solar power coming from an overcast sky.
     
@@ -71,7 +71,7 @@ def cloud_power_from_rain_medians(rain):
     return ppclr
 
 
-def solar_power_from_true_sky(Pclear, cloud_cover, rain):
+def solar_power_from_true_sky_rain(Pclear, cloud_cover, rain):
     """Compute solar power coming from a realistic (non-clear) sky, as a function of the power from the clear sky, the cloud cover and rain.
     
     Parameters:
@@ -83,21 +83,72 @@ def solar_power_from_true_sky(Pclear, cloud_cover, rain):
       (float):  (Electrical) solar power coming from a realistic sky (clear + clouded; same unit as Pclear).
     """
     
-    # Rain intensity *if* it rains := rain this hour / cloud cover (assumption: no clouds, no rain):
+    # Set up df:
     df = _pd.DataFrame()
     df['rain_int'] = rain
     df['clouds']   = cloud_cover
     df['Pclrsky']  = Pclear
     
+    # Rain intensity *if* it rains := rain this hour / cloud cover (assumption: no clouds, no rain):
     df.loc[df.clouds>0, 'rain_int'] = df.loc[df.clouds>0, 'rain_int'] / df.loc[df.clouds>0, 'clouds'] * 100
     
-    df['PPclr'] = cloud_power_from_rain_means(df.rain_int)  # P/P_clearsky, based on rain
-    # df['PPclr'] = sse.cloud_power_from_rain_medians(df.rain_int)  # P/P_clearsky, based on rain - not so good?
+    df['PPclr'] = _cloud_power_from_rain_means(df.rain_int)  # P/P_clearsky, based on rain
+    # df['PPclr'] = _cloud_power_from_rain_medians(df.rain_int)  # P/P_clearsky, based on rain - not so good?
     
-    df.PPclr = (df.PPclr * df.clouds  +  1 * (100-df.clouds))/100  # Weighted sum of sun and cloud contributions
+    df.PPclr = (df.PPclr * df.clouds  +  1 * (100-df.clouds))/100  # Weighted sum of cloud and sun contributions
     df['Pclouds'] = df.Pclrsky*df.PPclr  # Take into account clouds in predicted power
     
     # return df.rain_int, df.PPclr, df.Pclouds
     return df.Pclouds
 
     
+def solar_power_from_true_sky_rh(Pclrsky, cloud_cover, rh, fittype='means'):
+    """Compute solar power coming from a realistic (non-clear) sky, as a function of the power from
+       the clear sky, the cloud cover and relative humidity.
+    
+    Parameters:
+      Pclrsky (float):      (Electrical) solar power from clear sky (e.g. W or kW).
+      cloud_cover (float):  Cloud cover (%).
+      rh (float):           Relative humidity (%).
+      fittype (str):        Type of fit: 'orig_data' (worst), 'means' (best) or 'medians'.
+    
+    Returns:
+      (float):  (Electrical) solar power coming from a realistic sky (clear + clouded; same unit as Pclear).
+    """
+    
+    clouds = cloud_cover/100  # % -> fraction
+    
+    PPclr_cloud, PPclr_sun = _cloud_power_from_rh_means(rh, fittype)  # P/P_clearsky, based on rh
+    
+    PPclr = (PPclr_cloud * clouds  +  PPclr_sun * (1-clouds))  # Weighted sum of cloud and sun contributions
+    Pclouds = Pclrsky*PPclr  # Take into account clouds in predicted power
+    
+    return Pclouds
+
+
+def _cloud_power_from_rh_means(rh, fittype='means'):
+    """Guestimate the fraction of light power coming from an overcast sky, from the relative humidity.
+    
+    Parameters:
+      rh (float):     Relative humidity (%).
+      fittype (str):  Type of fit: 'orig_data' (worst), 'means' (best) or 'medians'.
+    
+    Returns:
+      (float):  P/Pclear; the fraction of clear-sky solar power coming from an overcast sky.
+    
+    Note:
+      - this is about as close to witchcraft as it is to science;
+      - see compare-selections.py.
+    """
+    
+    if fittype == 'orig_data':
+        ppclr_cloud = 0.525804 - 5.09361e-03*rh  # When clouded
+        ppclr_sun   = 0.977976 + 5.09722e-04*rh  # When sunny
+    if fittype == 'means':  # Looks best
+        ppclr_cloud = 0.973944 - 8.74388e-03*rh  # When clouded
+        ppclr_sun   = 0.908390 + 2.13867e-03*rh  # When sunny
+    if fittype == 'medians':
+        ppclr_cloud = 0.885572 - 8.40989e-03*rh  # When clouded
+        ppclr_sun   = 0.950993 + 1.31021e-03*rh  # When sunny
+    
+    return ppclr_cloud, ppclr_sun
