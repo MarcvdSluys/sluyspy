@@ -130,9 +130,10 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     return coefs, dcoefs, red_chi2, var_cov, ier
 
 
-def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=None, dcoefs=None, yfit=None,
-                      abs_diff=True,rel_diff=False, coef_names=None, coef_facs=None, rev_coefs=None):
-    """Compute and return the reduced chi^2, and print fit details if desired.
+def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, fit_fun=None, dcoefs=None, yfit=None, verbosity=2,
+                      abs_diff=True,rel_diff=False, sigdig=6, coef_names=None, coef_facs=None, rev_coefs=None):
+    
+    """Compute and return the reduced chi^2, and print other fit details if desired.
     
     Calculations are done without fitting, so that this function can be called after a fit.  The fit values
     will be computed from coefs, xvals using fit_fun if specified.  In fact, two series of yvals ('true' and
@@ -141,25 +142,26 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
     is specified, a bit more detail can be printed.
     
     Parameters:
-      fittype (str):         Type of fit: 'np_polyfit', 'scipy_curvefit' or None.
-      coefs (float):         Array with fit coefficients.
-      xvals (float):         Array with x values.
-      yvals (float):         Array with y values.
-      ysigmas (float):       Array with y sigmas.
+      fittype (str):      Type of fit: 'np_polyfit', 'scipy_curvefit' or None.
+      coefs (float):      Array with fit coefficients.
+      xvals (float):      Array with x values.
+      yvals (float):      Array with y values.
+      ysigmas (float):    Array with y sigmas.
     
-      verbosity (int):       Verbosity (0-3); optional - defaults to 2.
-      fit_fun (fun):         Fit function used for scipy_curvefit; optional.
-      dcoefs (float):        Uncertainties in coefficients from scipy_curvefit; optional.
-      yfit (float):          "Fit" values for Y for fittype=None; optional.
+      fit_fun (fun):      Fit function used for scipy_curvefit; optional.
+      dcoefs (float):     Uncertainties in coefficients from scipy_curvefit; optional.
+      yfit (float):       "Fit" values for Y for fittype=None; optional.
 
-      abs_diff (bool):       Print absolute differences (optional; defaults to True).
-      rel_diff (bool):       Print relative differences (optional; defaults to False, unless verbosity>2).
+      verbosity (int):    Verbosity (0-3); optional - defaults to 2.
+      abs_diff (bool):    Print absolute differences (optional; defaults to True).
+      rel_diff (bool):    Print relative differences (optional; defaults to False, unless verbosity>2).
+      sigdig (int):       Number of significant digits to print (optional, defaults to 6).
     
-      coef_names (str):      Array of coefficient names for printing (optional).
-      coef_facs (float):     Array of coefficient multiplication factors for printing (optional; defaults to 1).
-                             Useful for e.g. printing degrees when radians are fitted.
-      rev_coefs (bool):      Reverse printing order in coefficient table: last coefficient at top.
-                             Optional, defaults to True for fittype np_polyfit, to False otherwise.
+      coef_names (str):   Array of coefficient names for printing (optional).
+      coef_facs (float):  Array of coefficient multiplication factors for printing (optional; defaults to 1).
+                          Useful for e.g. printing degrees when radians are fitted.
+      rev_coefs (bool):   Reverse printing order in coefficient table: last coefficient at top.
+                          Optional, defaults to True for fittype np_polyfit, to False otherwise.
     
     Returns:
       (float):               Reduced Chi^2.
@@ -170,7 +172,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
         and coefs.  In that case, coefs=xvals=None can be specified.
     """
     
-    from sluyspy.numerics import sigdig
+    from sluyspy.numerics import sigdig as sd
     
     if fittype=='np_polyfit':
         yfit      = _np.poly1d(coefs)(xvals)
@@ -240,25 +242,25 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, verbosity=2, fit_fun=N
                     print('Number of coefficents:     ', ncoefs)
                     print('Degrees of freedom:        ', ndat - ncoefs)
                     print()
-                print('Chi2:                      ', sigdig(chi2))
+                print('Chi2:                      ', sd(chi2, sigdig))
             
-        print('Reduced chi2:              ', sigdig(red_chi2))
+        print('Reduced chi2:              ', sd(red_chi2, sigdig))
         
         # print('Estimated original sigma:  ', _np.sqrt(red_chi2) * ysigma_mean)   # Rough estimate of the true sigma_y
         
         if abs_diff:
             if verbosity>1: print()
-            print('Mean absolute difference:  ', sigdig(mean_abs_ydiff))
-            print('Med. absolute difference:  ', sigdig(med_abs_ydiff))
-            if verbosity>2: print('Max. absolute difference:  ', sigdig(max_abs_diff_y),
-                                  ' @ x =', sigdig(max_abs_diff_x))
+            print('Mean absolute difference:  ', sd(mean_abs_ydiff, sigdig))
+            print('Med. absolute difference:  ', sd(med_abs_ydiff, sigdig))
+            if verbosity>2: print('Max. absolute difference:  ', sd(max_abs_diff_y, sigdig),
+                                  ' @ x =', sd(max_abs_diff_x, sigdig))
             
         if rel_diff or (verbosity>2):
             if verbosity>1: print()
-            print('Mean relative difference:  ', sigdig(mean_rel_ydiff))
-            print('Med. relative difference:  ', sigdig(med_rel_ydiff))
-            if verbosity>2: print('Max. relative difference:  ', sigdig(max_rel_diff_y),
-                                  ' @ x =', sigdig(max_rel_diff_x))
+            print('Mean relative difference:  ', sd(mean_rel_ydiff, sigdig))
+            print('Med. relative difference:  ', sd(med_rel_ydiff, sigdig))
+            if verbosity>2: print('Max. relative difference:  ', sd(max_rel_diff_y, sigdig),
+                                  ' @ x =', sd(max_rel_diff_x, sigdig))
         
         
         # Print fit coefficents:
