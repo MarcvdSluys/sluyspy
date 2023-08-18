@@ -241,7 +241,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
             print('Number of data points:     ', ndat)
             if verbosity>2:
                 if ncoefs>0:
-                    print('Number of coefficents:     ', ncoefs)
+                    print('Number of coefficients:    ', ncoefs)
                     print('Degrees of freedom:        ', ndat - ncoefs)
                     print()
                 print('Chi2:                      ', sd(chi2, sigdig))
@@ -265,7 +265,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
                                   ' @ x =', sd(max_rel_diff_x, sigdig))
         
         
-        # Print fit coefficents:
+        # Print fit coefficients:
         if (verbosity>1) and (coefs is not None):
             if coef_facs is None:  coef_facs = coefs*0+1  # Coefficient print factor is 1 by default:
             
@@ -356,8 +356,8 @@ def polynomial(x, *coefs):
     
     Parameters:
       x (float):      X value(s).
-      coefs (float):  Array of polynomial coefficents.
-                      The polynomial order is defined by the number of coefficents in the array.
+      coefs (float):  Array of polynomial coefficients.
+                      The polynomial order is defined by the number of coefficients in the array.
     
     Returns:
       (float):  Polynomial value.
