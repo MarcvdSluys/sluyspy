@@ -164,7 +164,7 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, fit_fun=None, dcoefs=N
                           Optional, defaults to True for fittype np_polyfit, to False otherwise.
     
     Returns:
-      (float):               Reduced Chi^2.
+      (float):            Reduced Chi^2.
     
     Note:
       - If fittype = 'scipy_curvefit', fit_fun must be specified.
@@ -313,3 +313,27 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, fit_fun=None, dcoefs=N
             
     
     return red_chi2
+
+
+def polynomial(x, *coefs):
+    """Return a polynomial y = Sum_i=0^N-1 coef_i x^i.
+    
+    Parameters:
+      x (float):      X value(s).
+      coefs (float):  Array of polynomial coefficents.
+                      The polynomial order is defined by the number of coefficents in the array.
+    
+    Returns:
+      (float):  Polynomial value.
+    """
+    
+    y = 0
+    i = 0
+    
+    for coef in coefs:
+        y += coef * _np.power(x, i)
+        i += 1
+    
+    return y
+
+
