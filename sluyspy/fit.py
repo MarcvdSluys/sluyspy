@@ -269,6 +269,13 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         if (verbosity>1) and (coefs is not None):
             if coef_facs is None:  coef_facs = coefs*0+1  # Coefficient print factor is 1 by default:
             
+            # Give all coefficient names the same length:
+            if coef_names is not None:
+                strlen = len(max(coef_names, key=len))  # Length of the longest string in the list
+                fmt = ' %'+str(strlen)+'s: '
+                for icoef in range(ncoefs):
+                    coef_names[icoef] = fmt % (coef_names[icoef])
+            
             print('\nFit coefficients', end='')
             if rev_coefs: print(' (reversed)', end='')
             print(':')
@@ -279,9 +286,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
                 print(' c%1i:' % (icoef), end='')  # Nr
                 
                 if coef_names is not None:
-                    strlen = len(max(coef_names, key=len))  # Length of the longest string in the list
-                    fmt = ' %'+str(strlen)+'s: '
-                    print(fmt % (coef_names[jcoef]), end='')  # Name
+                    print(coef_names[jcoef], end='')  # Name
                 
                 print(' %12.5e' % (coefs[jcoef] * coef_facs[jcoef]), end='')  # Value
                 
