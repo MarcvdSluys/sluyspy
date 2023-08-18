@@ -279,7 +279,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
                 print(' c%1i:' % (icoef), end='')  # Nr
                 
                 if coef_names is not None:
-                    strlen = len(_np.max(coef_names, key=len))  # Length of the longest string in the list
+                    strlen = len(max(coef_names, key=len))  # Length of the longest string in the list
                     fmt = ' %'+str(strlen)+'s: '
                     print(fmt % (coef_names[jcoef]), end='')  # Name
                 
