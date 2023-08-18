@@ -124,14 +124,15 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     dcoefs = _np.sqrt(_np.diag(var_cov))              # Standard deviations on the coefficients
     
     # Compute reduced chi^2 and print general fit details:
-    red_chi2 = print_fit_details('scipy_curvefit', coefs, xvals,yvals,ysigmas, verbosity=verbosity,
-                                 fit_fun=fit_fun, dcoefs=dcoefs)
+    red_chi2 = print_fit_details('scipy_curvefit', coefs, xvals,yvals,ysigmas, dcoefs=dcoefs, var_cov=var_cov,
+                                 fit_fun=fit_fun, verbosity=verbosity)
     
     return coefs, dcoefs, red_chi2, var_cov, ier
 
 
-def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, fit_fun=None, dcoefs=None, yfit=None, verbosity=2,
-                      abs_diff=True,rel_diff=False, sigdig=6, coef_names=None, coef_facs=None, rev_coefs=None):
+def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=None, fit_fun=None, yfit=None,
+                      verbosity=2, abs_diff=True,rel_diff=False, sigdig=6, coef_names=None, coef_facs=None,
+                      rev_coefs=None):
     
     """Compute and return the reduced chi^2, and print other fit details if desired.
     
@@ -148,10 +149,11 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, fit_fun=None, dcoefs=N
       yvals (float):      Array with y values.
       ysigmas (float):    Array with y sigmas.
     
-      fit_fun (fun):      Fit function used for scipy_curvefit; optional.
       dcoefs (float):     Uncertainties in coefficients from scipy_curvefit; optional.
+      var_cov (float):    Variance-covariance matrix in 2D NumPy array; optional.
+      fit_fun (fun):      Fit function used for scipy_curvefit; optional.
       yfit (float):       "Fit" values for Y for fittype=None; optional.
-
+    
       verbosity (int):    Verbosity (0-3); optional - defaults to 2.
       abs_diff (bool):    Print absolute differences (optional; defaults to True).
       rel_diff (bool):    Print relative differences (optional; defaults to False, unless verbosity>2).
@@ -289,9 +291,17 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, fit_fun=None, dcoefs=N
                 
                 print()
         
+        # Print correlation and variance-covariance matrices:
+        if (verbosity>2) and (var_cov is not None):
+            print('\nCorrelation matrix:')
+            corr = correlation_matrix_from_variance_covariance_matrix(var_cov)
+            print(corr)
+            if verbosity>3:
+                print('\nVariance-covariance matrix:')
+                print(var_cov)
         
         # Print all fit data points:
-        if verbosity>3:
+        if verbosity>4:
             print('\nFit data:')
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
@@ -311,8 +321,29 @@ def print_fit_details(fittype, coefs,xvals,yvals,ysigmas, fit_fun=None, dcoefs=N
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
             
+    if verbosity>1: print()
     
     return red_chi2
+
+
+def correlation_matrix_from_variance_covariance_matrix(var_cov):
+    """Compute the normalised correlation matrix from a variance-covariance matrix.
+    
+    Parameters:
+      var_cov (float):  2D NumPy array containing the variance-covariance matrix.
+    
+    Returns:
+      (float): 2D NumPy array containing the normalised-correlation matrix.
+    """
+    
+    corr    = _np.zeros_like(var_cov)
+    matsize = _np.shape(corr)[0]
+    
+    for i in range(matsize):
+        for j in range(matsize):
+            corr[i][j] = var_cov[i,j] / _np.sqrt(var_cov[i,i] * var_cov[j,j])
+    
+    return corr
 
 
 def polynomial(x, *coefs):
