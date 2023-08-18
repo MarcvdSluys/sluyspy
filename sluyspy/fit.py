@@ -272,7 +272,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
             # Give all coefficient names the same length:
             if coef_names is not None:
                 strlen = len(max(coef_names, key=len))  # Length of the longest string in the list
-                fmt = ' %'+str(strlen)+'s: '
+                fmt = ' %'+str(strlen)+'s'
                 for icoef in range(ncoefs):
                     coef_names[icoef] = fmt % (coef_names[icoef])
             
@@ -286,7 +286,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
                 print(' c%1i:' % (icoef), end='')  # Nr
                 
                 if coef_names is not None:
-                    print(coef_names[jcoef], end='')  # Name
+                    print(coef_names[jcoef]+': ', end='')  # Name
                 
                 print(' %12.5e' % (coefs[jcoef] * coef_facs[jcoef]), end='')  # Value
                 
@@ -300,10 +300,11 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         if (verbosity>2) and (var_cov is not None):
             print('\nCorrelation matrix:')
             corr = correlation_matrix_from_variance_covariance_matrix(var_cov)
-            print(corr)
+            _print_matrix(corr, 'corr', coef_names)
+            
             if verbosity>3:
                 print('\nVariance-covariance matrix:')
-                print(var_cov)
+                _print_matrix(var_cov, 'var_cov', coef_names)
         
         # Print all fit data points:
         if verbosity>4:
@@ -372,4 +373,57 @@ def polynomial(x, *coefs):
     
     return y
 
+
+def _print_matrix(mat, mat_type, coef_names=None):
+    """Print the contents of a 2D (correlation or covariance) matrix.
+    
+    Parameters:
+      mat (float):  2D NumPy array containing the variance-covariance matrix.
+    """
+    
+    # Matrix size:
+    matsize = _np.shape(mat)[0]
+    
+    # Derive fomatting for names and numbers from matrix type:
+    if mat_type == 'corr':
+        namfmt = ' %7s'
+        maxnamlen = 7
+        numfmt = '%8.4f'   # ' -0.1238'
+    else:
+        namfmt = ' %12s'
+        maxnamlen = 12
+        numfmt = '%13.5e'  # ' -1.12345e-13'
+        
+    # Length of coefficient names:
+    if coef_names is None:
+        namlen = 0
+    else:
+        namlen = len(coef_names[0])
+    
+    # Print row of coefficient numbers:
+    print(' '*(3+namlen), end='')  # Spaces: c_i + name length
+    for i in range(matsize):
+        print(namfmt % ('c'+str(i)), end='')
+    print()
+        
+    # Print row of coefficient names:
+    if coef_names is not None:
+        print(' '*(3+namlen), end='')  # Spaces: c_i + name length
+        for i in range(matsize):
+            print(namfmt % (coef_names[i].strip()[:maxnamlen]), end='')  # Cut off name to preserve table formatting
+        print()
+    
+    # Print columns with coefficient numbers, coefficient names and values:
+    for i in range(matsize):
+        if matsize > 10:
+            print('c%2i' % (i), end='')
+        else:
+            print('c%1i ' % (i), end='')
+            
+        if coef_names is not None:  print(coef_names[i], end='')
+        for j in range(matsize):
+            print(numfmt % (mat[i,j]), end='')
+        print()
+        
+    return
 
