@@ -198,42 +198,44 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         if verbosity>1: print('\nysigmas=None; assuming sigma=1 for all data points.\n')
         ysigmas = yvals*0 + 1  # Set ysigmas to 1 - works for pd.Series and np.arrays
     
-        
+    if verbosity>1: mean_ysigma = _np.nanmean(ysigmas) * yprintfac  # Mean sigma in y
+    
+    
     rel_fac = 1  # Print fraction
     rel_str = ' '
     if rel_as_pct:
         rel_fac = 100  # Print percentage
         rel_str = '%'
         
-        
+    
     # Compute reduced chi^2:
     if coefs is None:
-        ncoefs = 0                                # Number of coefficients
+        ncoefs = 0                                          # Number of coefficients
     else:
-        ncoefs = len(coefs)                       # Number of coefficients
+        ncoefs = len(coefs)                                 # Number of coefficients
     
-    ndat           = len(yvals)                   # Number of data points
-    ydiffs         = yfit - yvals                 # Differences/residuals
-    yresids        = ydiffs/ysigmas               # Weighted residuals
-    chi2           = _np.sum(yresids**2)          # Chi^2 - NumPy needed for large numbers
-    red_chi2       = chi2/(ndat-ncoefs)           # Reduced chi^2
+    ndat                = len(yvals)                        # Number of data points
+    ydiffs              = yfit - yvals                      # Differences/residuals
+    yresids             = ydiffs/ysigmas                    # Weighted residuals
+    chi2                = _np.sum(yresids**2)               # Chi^2 - NumPy needed for large numbers
+    red_chi2            = chi2/(ndat-ncoefs)                # Reduced chi^2
 
-    abs_ydiffs     = ydiffs                                 # Absolute differences in y
-    mean_abs_ydiff = _np.nanmean(abs_ydiffs)                # The mean absolute difference between data and fit values
-    med_abs_ydiff  = _np.nanmedian(abs_ydiffs)              # The median absolute difference between data and fit values
+    abs_ydiffs          = ydiffs                            # Absolute differences in y
+    mean_abs_ydiff      = _np.nanmean(abs_ydiffs)           # The mean absolute difference between data and fit values
+    med_abs_ydiff       = _np.nanmedian(abs_ydiffs)         # The median absolute difference between data and fit values
     
-    abs_abs_ydiffs     = _np.abs(ydiffs)                    # Absolute values of absolute differences in y
-    mean_abs_abs_ydiff = _np.nanmean(abs_abs_ydiffs)        # The mean absolute difference between data and fit values
-    med_abs_abs_ydiff  = _np.nanmedian(abs_abs_ydiffs)      # The median absolute difference between data and fit values
+    abs_abs_ydiffs      = _np.abs(ydiffs)                   # Absolute values of absolute differences in y
+    mean_abs_abs_ydiff  = _np.nanmean(abs_abs_ydiffs)       # The mean absolute difference between data and fit values
+    med_abs_abs_ydiff   = _np.nanmedian(abs_abs_ydiffs)     # The median absolute difference between data and fit values
     
-    rel_ydiffs         = ydiffs[yvals!=0]/yvals[yvals!=0]   # Relative differences in y
-    rel_ydiffs        *= rel_fac                            # Fraction or percentage?
-    mean_rel_ydiff     = _np.nanmean(rel_ydiffs)            # The mean absolute difference between data and fit values
-    med_rel_ydiff      = _np.nanmedian(rel_ydiffs)          # The median absolute difference between data and fit values
+    rel_ydiffs          = ydiffs[yvals!=0]/yvals[yvals!=0]  # Relative differences in y
+    rel_ydiffs         *= rel_fac                           # Fraction or percentage?
+    mean_rel_ydiff      = _np.nanmean(rel_ydiffs)           # The mean absolute difference between data and fit values
+    med_rel_ydiff       = _np.nanmedian(rel_ydiffs)         # The median absolute difference between data and fit values
     
-    abs_rel_ydiffs     = _np.abs(rel_ydiffs)                # Absolute values of relative differences in y
-    mean_abs_rel_ydiff = _np.nanmean(abs_rel_ydiffs)        # The mean absolute difference between data and fit values
-    med_abs_rel_ydiff  = _np.nanmedian(abs_rel_ydiffs)      # The median absolute difference between data and fit values
+    abs_rel_ydiffs      = _np.abs(rel_ydiffs)               # Absolute values of relative differences in y
+    mean_abs_rel_ydiff  = _np.nanmean(abs_rel_ydiffs)       # The mean absolute difference between data and fit values
+    med_abs_rel_ydiff   = _np.nanmedian(abs_rel_ydiffs)     # The median absolute difference between data and fit values
     
     
     # Compute and print details:
@@ -267,6 +269,9 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
                 print('Chi2:                        ', sd(chi2, sigdig))
             
         print('Reduced chi2:                ', sd(red_chi2, sigdig))
+        if verbosity>1:
+            print('sqrt reduced chi2:           ', sd(_np.sqrt(red_chi2), sigdig))
+            if mean_ysigma != 1: print('sqrt red.chi2 * mean sigma:  ', sd(_np.sqrt(red_chi2)*mean_ysigma, sigdig))
         
         if abs_diff:
             if verbosity>1: print()
