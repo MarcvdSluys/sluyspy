@@ -208,12 +208,12 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
     chi2           = _np.sum(yresids**2)          # Chi^2 - NumPy needed for large numbers
     red_chi2       = chi2/(ndat-ncoefs)           # Reduced chi^2
 
-    # abs_ydiffs     = ydiffs                               # Absolute differences in y
-    abs_abs_ydiffs     = _np.abs(ydiffs)                  # Absolute values of absolute differences in y
-    mean_abs_abs_ydiff = _np.nanmean(abs_abs_ydiffs)      # The mean absolute difference between data and fit values
-    med_abs_abs_ydiff  = _np.nanmedian(abs_abs_ydiffs)    # The median absolute difference between data and fit values
+    # abs_ydiffs     = ydiffs                                 # Absolute differences in y
+    abs_abs_ydiffs     = _np.abs(ydiffs)                    # Absolute values of absolute differences in y
+    mean_abs_abs_ydiff = _np.nanmean(abs_abs_ydiffs)        # The mean absolute difference between data and fit values
+    med_abs_abs_ydiff  = _np.nanmedian(abs_abs_ydiffs)      # The median absolute difference between data and fit values
     
-    # rel_ydiffs    = ydiffs[yvals!=0]/yvals[yvals!=0]      # Relative differences in y
+    # rel_ydiffs         = ydiffs[yvals!=0]/yvals[yvals!=0]   # Relative differences in y
     abs_rel_ydiffs     = _np.abs(ydiffs[yvals!=0]/yvals[yvals!=0])  # Absolute values of relative differences in y
     mean_abs_rel_ydiff = _np.nanmean(abs_rel_ydiffs)        # The mean absolute difference between data and fit values
     med_abs_rel_ydiff  = _np.nanmedian(abs_rel_ydiffs)      # The median absolute difference between data and fit values
@@ -241,30 +241,28 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         # Print details:
         if verbosity>1:
             print('Fit quality:')
-            print('Number of data points:     ', ndat)
+            print('Number of data points:       ', ndat)
             if verbosity>2:
                 if ncoefs>0:
-                    print('Number of coefficients:    ', ncoefs)
-                    print('Degrees of freedom:        ', ndat - ncoefs)
+                    print('Number of coefficients:      ', ncoefs)
+                    print('Degrees of freedom:          ', ndat - ncoefs)
                     print()
-                print('Chi2:                      ', sd(chi2, sigdig))
+                print('Chi2:                        ', sd(chi2, sigdig))
             
-        print('Reduced chi2:              ', sd(red_chi2, sigdig))
-        
-        # print('Estimated original sigma:  ', _np.sqrt(red_chi2) * ysigma_mean)   # Rough estimate of the true sigma_y
+        print('Reduced chi2:                ', sd(red_chi2, sigdig))
         
         if abs_diff:
             if verbosity>1: print()
-            print('Mean absolute difference:  ', sd(mean_abs_abs_ydiff, sigdig))
-            print('Med. absolute difference:  ', sd(med_abs_abs_ydiff,  sigdig))
-            if verbosity>2: print('Max. absolute difference:  ', sd(max_abs_diff_y, sigdig),
+            print('Mean |absolute difference|:  ', sd(mean_abs_abs_ydiff, sigdig))
+            print('Med. |absolute difference|:  ', sd(med_abs_abs_ydiff,  sigdig))
+            if verbosity>2: print('Max. |absolute difference|:  ', sd(max_abs_diff_y, sigdig),
                                   ' @ x =', sd(max_abs_diff_x, sigdig))
             
         if rel_diff or (verbosity>2):
             if verbosity>1: print()
-            print('Mean relative difference:  ', sd(mean_abs_rel_ydiff, sigdig))
-            print('Med. relative difference:  ', sd(med_abs_rel_ydiff,  sigdig))
-            if verbosity>2: print('Max. relative difference:  ', sd(max_rel_diff_y, sigdig),
+            print('Mean |relative difference|:  ', sd(mean_abs_rel_ydiff, sigdig))
+            print('Med. |relative difference|:  ', sd(med_abs_rel_ydiff,  sigdig))
+            if verbosity>2: print('Max. |relative difference|:  ', sd(max_rel_diff_y, sigdig),
                                   ' @ x =', sd(max_rel_diff_x, sigdig))
         
         
