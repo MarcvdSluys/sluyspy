@@ -208,15 +208,15 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
     chi2           = _np.sum(yresids**2)          # Chi^2 - NumPy needed for large numbers
     red_chi2       = chi2/(ndat-ncoefs)           # Reduced chi^2
 
-    # abs_ydiffs     = ydiffs                       # Absolute differences in y
-    abs_ydiffs     = _np.abs(ydiffs)              # Absolute values of absolute differences in y
-    mean_abs_ydiff = _np.nanmean(abs_ydiffs)      # The mean absolute difference between data and fit values
-    med_abs_ydiff  = _np.nanmedian(abs_ydiffs)    # The median absolute difference between data and fit values
+    # abs_ydiffs     = ydiffs                               # Absolute differences in y
+    abs_abs_ydiffs     = _np.abs(ydiffs)                  # Absolute values of absolute differences in y
+    mean_abs_abs_ydiff = _np.nanmean(abs_abs_ydiffs)      # The mean absolute difference between data and fit values
+    med_abs_abs_ydiff  = _np.nanmedian(abs_abs_ydiffs)    # The median absolute difference between data and fit values
     
-    # rel_diff_ys    = ydiffs[yvals!=0]/yvals[yvals!=0]  # Relative differences in y
-    rel_diff_ys    = _np.abs(ydiffs[yvals!=0]/yvals[yvals!=0])  # Absolute values of relative differences in y
-    mean_rel_ydiff = _np.nanmean(rel_diff_ys)        # The mean absolute difference between data and fit values
-    med_rel_ydiff  = _np.nanmedian(rel_diff_ys)      # The median absolute difference between data and fit values
+    # rel_ydiffs    = ydiffs[yvals!=0]/yvals[yvals!=0]      # Relative differences in y
+    abs_rel_ydiffs     = _np.abs(ydiffs[yvals!=0]/yvals[yvals!=0])  # Absolute values of relative differences in y
+    mean_abs_rel_ydiff = _np.nanmean(abs_rel_ydiffs)        # The mean absolute difference between data and fit values
+    med_abs_rel_ydiff  = _np.nanmedian(abs_rel_ydiffs)      # The median absolute difference between data and fit values
     
     
     # Compute and print details:
@@ -224,19 +224,19 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         
         # Find maximum differences:
         if verbosity>2:
-            max_abs_diff_y  = _np.max(abs_ydiffs)    # Maximum absolute difference in y
-            max_rel_diff_y  = _np.max(rel_diff_ys)   # Maximum relative difference in y
+            max_abs_diff_y  = _np.max(abs_abs_ydiffs)  # Maximum absolute difference in y
+            max_rel_diff_y  = _np.max(abs_rel_ydiffs)  # Maximum relative difference in y
             
             if type(xvals) == _pdc.series.Series:
-                max_abs_diff_x  = xvals[abs_ydiffs == max_abs_diff_y].to_numpy()[0]  # x value for maximum absolute difference (Pandas)
-                max_rel_diff_x  = xvals[ _np.logical_and(yvals!=0, rel_diff_ys == max_rel_diff_y)].to_numpy()[0]  # x value for maximum relative difference (Pandas)
+                max_abs_diff_x  = xvals[abs_abs_ydiffs == max_abs_diff_y].to_numpy()[0]  # x value for maximum absolute difference (Pandas)
+                max_rel_diff_x  = xvals[ _np.logical_and(yvals!=0, abs_rel_ydiffs == max_rel_diff_y)].to_numpy()[0]  # x value for maximum relative difference (Pandas)
             elif xvals is None:
                 max_abs_diff_x  = None
                 max_rel_diff_x  = None
                 xvals = yvals*0 + _np.nan  # Fill with NaNs
             else:
-                max_abs_diff_x  = xvals[abs_ydiffs == max_abs_diff_y][0]             # x value for maximum absolute difference (Numpy)
-                max_rel_diff_x  = xvals[ _np.logical_and(yvals!=0, rel_diff_ys == max_rel_diff_y)][0]  # x value for maximum relative difference (Numpy)
+                max_abs_diff_x  = xvals[abs_abs_ydiffs == max_abs_diff_y][0]             # x value for maximum absolute difference (Numpy)
+                max_rel_diff_x  = xvals[ _np.logical_and(yvals!=0, abs_rel_ydiffs == max_rel_diff_y)][0]  # x value for maximum relative difference (Numpy)
         
         # Print details:
         if verbosity>1:
@@ -255,15 +255,15 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         
         if abs_diff:
             if verbosity>1: print()
-            print('Mean absolute difference:  ', sd(mean_abs_ydiff, sigdig))
-            print('Med. absolute difference:  ', sd(med_abs_ydiff, sigdig))
+            print('Mean absolute difference:  ', sd(mean_abs_abs_ydiff, sigdig))
+            print('Med. absolute difference:  ', sd(med_abs_abs_ydiff,  sigdig))
             if verbosity>2: print('Max. absolute difference:  ', sd(max_abs_diff_y, sigdig),
                                   ' @ x =', sd(max_abs_diff_x, sigdig))
             
         if rel_diff or (verbosity>2):
             if verbosity>1: print()
-            print('Mean relative difference:  ', sd(mean_rel_ydiff, sigdig))
-            print('Med. relative difference:  ', sd(med_rel_ydiff, sigdig))
+            print('Mean relative difference:  ', sd(mean_abs_rel_ydiff, sigdig))
+            print('Med. relative difference:  ', sd(med_abs_rel_ydiff,  sigdig))
             if verbosity>2: print('Max. relative difference:  ', sd(max_rel_diff_y, sigdig),
                                   ' @ x =', sd(max_rel_diff_x, sigdig))
         
