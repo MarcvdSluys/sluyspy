@@ -268,42 +268,42 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         # Print details:
         if verbosity>1:
             print('Fit quality:')
-            print('Number of data points:       ', ndat)
+            print('Number of data points:            ', ndat)
             if verbosity>2:
                 if ncoefs>0:
-                    print('Number of coefficients:      ', ncoefs)
-                    print('Degrees of freedom:          ', ndat - ncoefs)
+                    print('Number of coefficients:           ', ncoefs)
+                    print('Degrees of freedom:               ', ndat - ncoefs)
                     print()
-                print('Chi2:                        ', sd(chi2, sigdig))
+                print('Chi2:                             ', sd(chi2, sigdig))
             
-        print('Reduced chi2:                ', sd(red_chi2, sigdig))
+        print('Reduced chi2:                     ', sd(red_chi2, sigdig))
         if verbosity>1:
-            print('sqrt reduced chi2:           ', sd(_np.sqrt(red_chi2), sigdig))
-            if mean_ysigma != 1: print('sqrt red.chi2 * mean sigma:  ', sd(_np.sqrt(red_chi2)*mean_ysigma, sigdig))
+            print('sqrt reduced chi2:                ', sd(_np.sqrt(red_chi2), sigdig))
+            if mean_ysigma != 1: print('sqrt red.chi2 * mean sigma:       ', sd(_np.sqrt(red_chi2)*mean_ysigma, sigdig))
         
         if abs_diff:
             if verbosity>1: print()
-            print('Mean |absolute difference|:  ', sd(mean_abs_abs_ydiff*yprintfac, sigdig))
-            print('Med. |absolute difference|:  ', sd(med_abs_abs_ydiff*yprintfac,  sigdig))
+            print('Mean/med. |absolute difference|:  ', sd(mean_abs_abs_ydiff*yprintfac, sigdig), '  /  ',
+                  sd(med_abs_abs_ydiff*yprintfac, sigdig))
             
             if verbosity>2:
-                print('Max. |absolute difference|:  ', sd(max_abs_diff_y*yprintfac, sigdig),
-                      ' @ x =', sd(max_abs_diff_x, sigdig))
+                print('Max. |absolute difference|:       ', sd(max_abs_diff_y*yprintfac, sigdig),
+                      '  @   x =', sd(max_abs_diff_x, sigdig))
                 
-                print('Mean absolute difference:    ', sd(mean_abs_ydiff*yprintfac, sigdig))
-                print('Med. absolute difference:    ', sd(med_abs_ydiff*yprintfac,  sigdig))
+                print('Mean/med. absolute difference:    ', sd(mean_abs_ydiff*yprintfac, sigdig), '  /  ',
+                      sd(med_abs_ydiff*yprintfac, sigdig))
             
         if rel_diff or (verbosity>2):
             if verbosity>1: print()
-            print('Mean |relative difference|:  ', sd(mean_abs_rel_ydiff, sigdig), rel_str)
-            print('Med. |relative difference|:  ', sd(med_abs_rel_ydiff,  sigdig), rel_str)
+            print('Mean/med. |relative difference|:  ', sd(mean_abs_rel_ydiff, sigdig), rel_str, '  /  ',
+                  sd(med_abs_rel_ydiff, sigdig), rel_str)
             
             if verbosity>2:
-                print('Max. |relative difference|:  ', sd(max_rel_diff_y, sigdig), rel_str,
-                      ' @ x =', sd(max_rel_diff_x, sigdig))
+                print('Max. |relative difference|:       ', sd(max_rel_diff_y, sigdig), rel_str,
+                      '  @   x =', sd(max_rel_diff_x, sigdig))
                 
-                print('Mean relative difference:    ', sd(mean_rel_ydiff, sigdig), rel_str)
-                print('Med. relative difference:    ', sd(med_rel_ydiff,  sigdig), rel_str)
+                print('Mean/med. relative difference:    ', sd(mean_rel_ydiff, sigdig), rel_str, '  /  ',
+                      sd(med_rel_ydiff, sigdig), rel_str)
             
         
         # Print fit coefficients:
