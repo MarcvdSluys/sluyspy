@@ -132,7 +132,7 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
 
 def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=None, fit_fun=None, yfit=None,
                       verbosity=2, abs_diff=True,rel_diff=False, sigdig=6, coef_names=None, coef_facs=None,
-                      rev_coefs=None):
+                      rev_coefs=None, yprintfac=1):
     
     """Compute and return the reduced chi^2, and print other fit details if desired.
     
@@ -164,6 +164,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
                           Useful for e.g. printing degrees when radians are fitted.
       rev_coefs (bool):   Reverse printing order in coefficient table: last coefficient at top.
                           Optional, defaults to True for fittype np_polyfit, to False otherwise.
+      yprintfac (float):  Multiplication factor when printing absolute differences in y (optional, defaults to 1).
     
     Returns:
       (float):            Reduced Chi^2.
@@ -259,15 +260,15 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         
         if abs_diff:
             if verbosity>1: print()
-            print('Mean |absolute difference|:  ', sd(mean_abs_abs_ydiff, sigdig))
-            print('Med. |absolute difference|:  ', sd(med_abs_abs_ydiff,  sigdig))
+            print('Mean |absolute difference|:  ', sd(mean_abs_abs_ydiff*yprintfac, sigdig))
+            print('Med. |absolute difference|:  ', sd(med_abs_abs_ydiff*yprintfac,  sigdig))
             
             if verbosity>2:
-                print('Max. |absolute difference|:  ', sd(max_abs_diff_y, sigdig),
+                print('Max. |absolute difference|:  ', sd(max_abs_diff_y*yprintfac, sigdig),
                       ' @ x =', sd(max_abs_diff_x, sigdig))
                 
-                print('Mean absolute difference:    ', sd(mean_abs_ydiff, sigdig))
-                print('Med. absolute difference:    ', sd(med_abs_ydiff,  sigdig))
+                print('Mean absolute difference:    ', sd(mean_abs_ydiff*yprintfac, sigdig))
+                print('Med. absolute difference:    ', sd(med_abs_ydiff*yprintfac,  sigdig))
             
         if rel_diff or (verbosity>2):
             if verbosity>1: print()
@@ -327,22 +328,23 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         if verbosity>4:
             print('\nFit data:')
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
-                  ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
+                  ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', '|y_dif_rel|') )
             
             if type(yvals) == _pdc.series.Series:
                 for ival in range(ndat):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
-                          (ival, xvals.iloc[ival],yvals.iloc[ival], ysigmas.iloc[ival], yfit.iloc[ival],
-                           ydiffs.iloc[ival], yresids.iloc[ival], _np.abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
+                          (ival, xvals.iloc[ival],yvals.iloc[ival]*yprintfac, ysigmas.iloc[ival]*yprintfac,
+                           yfit.iloc[ival]*yprintfac, ydiffs.iloc[ival]*yprintfac, yresids.iloc[ival]*yprintfac,
+                           _np.abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
             
             else:  # Probably Numpy:
                 for ival in range(ndat):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
-                          (ival, xvals[ival],yvals[ival], ysigmas[ival], yfit[ival], ydiffs[ival],
-                           yresids[ival], _np.abs(ydiffs[ival]/yvals[ival]) ) )
+                          (ival, xvals[ival],yvals[ival]*yprintfac, ysigmas[ival]*yprintfac, yfit[ival]*yprintfac,
+                           ydiffs[ival]*yprintfac, yresids[ival]*yprintfac, _np.abs(ydiffs[ival]/yvals[ival]) ) )
             
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
-                  ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', 'y_diff_rel') )
+                  ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', '|y_dif_rel|') )
             
     if verbosity>1: print()
     
