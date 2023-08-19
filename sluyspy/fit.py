@@ -197,6 +197,14 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
     if ysigmas is None:
         if verbosity>1: print('\nysigmas=None; assuming sigma=1 for all data points.\n')
         ysigmas = yvals*0 + 1  # Set ysigmas to 1 - works for pd.Series and np.arrays
+    else:
+        # Discard data points with sigma == 0:
+        ndat = len(ysigmas)                        # Number of data points
+        if xvals is not None:  xvals = xvals[ysigmas>0]
+        if yfit is not None:   yfit  = yfit[ysigmas>0]
+        yvals   = yvals[ysigmas>0]
+        ysigmas = ysigmas[ysigmas>0]
+        if (verbosity>1) and (len(ysigmas) != ndat): print('\nDiscarding data points with ysigma=0.\n')
     
     if verbosity>1: mean_ysigma = _np.nanmean(ysigmas) * yprintfac  # Mean sigma in y
     
@@ -219,7 +227,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
     yresids             = ydiffs/ysigmas                    # Weighted residuals
     chi2                = _np.sum(yresids**2)               # Chi^2 - NumPy needed for large numbers
     red_chi2            = chi2/(ndat-ncoefs)                # Reduced chi^2
-
+    
     abs_ydiffs          = ydiffs                            # Absolute differences in y
     mean_abs_ydiff      = _np.nanmean(abs_ydiffs)           # The mean absolute difference between data and fit values
     med_abs_ydiff       = _np.nanmedian(abs_ydiffs)         # The median absolute difference between data and fit values
