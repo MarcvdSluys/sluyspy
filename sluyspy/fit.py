@@ -132,7 +132,7 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
 
 def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=None, fit_fun=None, yfit=None,
                       verbosity=2, abs_diff=True,rel_diff=False, sigdig=6, coef_names=None, coef_facs=None,
-                      rev_coefs=None, yprintfac=1):
+                      rev_coefs=None, yprintfac=1, rel_as_pct=False):
     
     """Compute and return the reduced chi^2, and print other fit details if desired.
     
@@ -164,7 +164,9 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
                           Useful for e.g. printing degrees when radians are fitted.
       rev_coefs (bool):   Reverse printing order in coefficient table: last coefficient at top.
                           Optional, defaults to True for fittype np_polyfit, to False otherwise.
+    
       yprintfac (float):  Multiplication factor when printing absolute differences in y (optional, defaults to 1).
+      rel_as_pct (bool):  Print relative difference as percentage rather than fraction (optional, defaults to False).
     
     Returns:
       (float):            Reduced Chi^2.
@@ -196,7 +198,14 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         if verbosity>1: print('\nysigmas=None; assuming sigma=1 for all data points.\n')
         ysigmas = yvals*0 + 1  # Set ysigmas to 1 - works for pd.Series and np.arrays
     
-    
+        
+    rel_fac = 1  # Print fraction
+    rel_str = ' '
+    if rel_as_pct:
+        rel_fac = 100  # Print percentage
+        rel_str = '%'
+        
+        
     # Compute reduced chi^2:
     if coefs is None:
         ncoefs = 0                                # Number of coefficients
@@ -218,10 +227,11 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
     med_abs_abs_ydiff  = _np.nanmedian(abs_abs_ydiffs)      # The median absolute difference between data and fit values
     
     rel_ydiffs         = ydiffs[yvals!=0]/yvals[yvals!=0]   # Relative differences in y
+    rel_ydiffs        *= rel_fac                            # Fraction or percentage?
     mean_rel_ydiff     = _np.nanmean(rel_ydiffs)            # The mean absolute difference between data and fit values
     med_rel_ydiff      = _np.nanmedian(rel_ydiffs)          # The median absolute difference between data and fit values
     
-    abs_rel_ydiffs     = _np.abs(ydiffs[yvals!=0]/yvals[yvals!=0])  # Absolute values of relative differences in y
+    abs_rel_ydiffs     = _np.abs(rel_ydiffs)                # Absolute values of relative differences in y
     mean_abs_rel_ydiff = _np.nanmean(abs_rel_ydiffs)        # The mean absolute difference between data and fit values
     med_abs_rel_ydiff  = _np.nanmedian(abs_rel_ydiffs)      # The median absolute difference between data and fit values
     
@@ -272,15 +282,15 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
             
         if rel_diff or (verbosity>2):
             if verbosity>1: print()
-            print('Mean |relative difference|:  ', sd(mean_abs_rel_ydiff, sigdig))
-            print('Med. |relative difference|:  ', sd(med_abs_rel_ydiff,  sigdig))
+            print('Mean |relative difference|:  ', sd(mean_abs_rel_ydiff, sigdig), rel_str)
+            print('Med. |relative difference|:  ', sd(med_abs_rel_ydiff,  sigdig), rel_str)
             
             if verbosity>2:
-                print('Max. |relative difference|:  ', sd(max_rel_diff_y, sigdig),
+                print('Max. |relative difference|:  ', sd(max_rel_diff_y, sigdig), rel_str,
                       ' @ x =', sd(max_rel_diff_x, sigdig))
                 
-                print('Mean relative difference:    ', sd(mean_rel_ydiff, sigdig))
-                print('Med. relative difference:    ', sd(med_rel_ydiff,  sigdig))
+                print('Mean relative difference:    ', sd(mean_rel_ydiff, sigdig), rel_str)
+                print('Med. relative difference:    ', sd(med_rel_ydiff,  sigdig), rel_str)
             
         
         # Print fit coefficients:
@@ -334,14 +344,15 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
                 for ival in range(ndat):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
                           (ival, xvals.iloc[ival],yvals.iloc[ival]*yprintfac, ysigmas.iloc[ival]*yprintfac,
-                           yfit.iloc[ival]*yprintfac, ydiffs.iloc[ival]*yprintfac, yresids.iloc[ival]*yprintfac,
-                           _np.abs(ydiffs.iloc[ival]/yvals.iloc[ival]) ) )
+                           yfit.iloc[ival]*yprintfac, ydiffs.iloc[ival]*yprintfac,
+                           yresids.iloc[ival]*yprintfac, _np.abs(ydiffs.iloc[ival]/yvals.iloc[ival])*rel_fac ) )
             
             else:  # Probably Numpy:
                 for ival in range(ndat):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
-                          (ival, xvals[ival],yvals[ival]*yprintfac, ysigmas[ival]*yprintfac, yfit[ival]*yprintfac,
-                           ydiffs[ival]*yprintfac, yresids[ival]*yprintfac, _np.abs(ydiffs[ival]/yvals[ival]) ) )
+                          (ival, xvals[ival],yvals[ival]*yprintfac, ysigmas[ival]*yprintfac,
+                           yfit[ival]*yprintfac, ydiffs[ival]*yprintfac, yresids[ival]*yprintfac,
+                           _np.abs(ydiffs[ival]/yvals[ival])*rel_fac ) )
             
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', '|y_dif_rel|') )
