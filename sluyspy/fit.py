@@ -78,7 +78,7 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
       verbosity (int):     Verbosity to stdout (0-4).
     
     Returns:
-      (tuple):  Tuple containing (coefs, var_cov, red_chi2, ier):
+      (tuple):  Tuple containing (coefs, dcoefs, red_chi2, var_cov, ier):
     
       - coefs (float):     Array containing the final fitting coefficients.
       - dcoefs (float):    Array containing uncertainties on the fitting coefficients.
