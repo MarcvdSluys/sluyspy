@@ -4,16 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sluyspy"
-version = "0.0.28"
-authors = [
-  { name="Marc van der Sluys", email="git@vandersluys.nl" },
-]
+version = "0.0.29"
+authors = [ { name="Marc van der Sluys", email="git@vandersluys.nl" } ]
 description = "Marc van der Sluys' personal Python modules."
 readme   = "README.md"
 license  = {text = "EUPL 1.2"}
-keywords = ["personal","private"]
+keywords = ["personal", "private"]
 dependencies = ["astrotool","getch","matplotlib","numpy","pandas","pytz","scipy","solarenergy","termcolor"]
-# requires-python = ">=3.10"
 
 # See: https://pypi.org/pypi?:action=list_classifiers
 classifiers = [
