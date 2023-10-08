@@ -28,7 +28,7 @@ def wrap_line(line, wlen, indent=2):
       indent (int):  Indentation of the continuation line
     
     Returns:
-      (str):  The line with extra '\n' characters.
+      (str):  The line with extra newline characters.
     """
     
     llen = len(line)

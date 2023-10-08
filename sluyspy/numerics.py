@@ -38,7 +38,7 @@ def sigdig(num, dig=14):
     Note:
       - Trailing zeros are NOT printed - hence, this function does not EXACTLY print the desired number of
         significant digits;
-      - 0.075 with a single digit is printed as 0.07, hence *eps1!
+      - 0.075 with a single digit is printed as 0.07, hence multiply with eps1!
     
     See:
       E.g. the discussions here: https://stackoverflow.com/q/3410976/1386750
