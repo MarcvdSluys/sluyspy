@@ -1,9 +1,9 @@
 astrotool==0.0.10
 getch==1.0
-matplotlib==3.7.1
+matplotlib==3.8.0
 numpy
 pandas
 pytz==2023.3
-scipy==1.11.1
+scipy==1.11.3
 solarenergy==0.1.7
 termcolor==2.3.0
