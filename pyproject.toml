@@ -32,3 +32,4 @@ classifiers = [
 
 [project.urls]
 GitHub = "https://github.com/MarcvdSluys/sluyspy"
+ReadTheDocs = "https://sluyspy.readthedocs.io"
