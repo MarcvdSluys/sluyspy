@@ -21,7 +21,7 @@ import numpy.core as _np                 # Get NumPy
 from .cli import error as _error
 
 
-def start_plot(ptype='both', dark_bg=False, xkcd=False, title='Python plot'):
+def start_plot(ptype='both', dark_bg=False, xkcd=False, title='Python plot', fz=None,lw=None):
     """Start a matplotlib.pyplot plot with a choice of my favourite options.
     
     Parameters:
@@ -29,6 +29,9 @@ def start_plot(ptype='both', dark_bg=False, xkcd=False, title='Python plot'):
       dark_bg (bool):  Use a dark background.
       xkcd (bool):     Use XKCD style.
       title (str):     Window title.
+    
+      fz (int):        Font size (optional, defaults to None).
+      lw (int):        Line width (optional, defaults to None).
     
     Returns:
       (tuple):  Tuple containing the plot and axis objects.
@@ -58,7 +61,10 @@ def start_plot(ptype='both', dark_bg=False, xkcd=False, title='Python plot'):
         fig = _plt.figure(figsize=(8.5,8.5), num=title)     # 850x850: fits in my qiv screen w/o scaling
     else:
         _error('Unknown plot type: '+ptype+', aborting.')
-        
+    
+    if fz is not None: matplotlib.rcParams.update({'font.size': fz})        # Set font size for all text
+    if lw is not None: matplotlib.rcParams.update({'lines.linewidth': lw})  # Set default line width
+    
     ax = fig.add_subplot(111)                  # Create an axes object for the current figure
     if xkcd and dark_bg:  ax.spines[:].set_color('white')        # Needed for XKCD style on a dark background
     
