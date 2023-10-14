@@ -80,7 +80,6 @@ def tail_file(in_file, out_file, num_lines):
       in_file (str):    Name of the input file.
       out_file (str):   Name of the output file.
       num_lines (int):  Number of lines to save.
-      verbose (bool):   Print the result of the tail call in the shell.
     """
     
     import subprocess
@@ -88,3 +87,55 @@ def tail_file(in_file, out_file, num_lines):
                    shell=True, check=True).stdout.decode('utf-8')
     
     return
+
+
+def string_in_file(infile, string):
+    """Use the grep command in a shell to quickly check whether a file contains a string.
+    
+    Parameters:
+      infile (str):  Name of the file.
+      string (str):  Match string.
+    
+    Note: fast small files (<~1Mb) and/or few calls (<~100kb).
+    """
+    
+    with open(infile) as f:
+        if string in f.read():
+            return True
+        else:
+            return False
+    
+    return None
+
+
+def string_in_file_grep(infile, string):
+    """Use the grep command in a shell to quickly check whether a file contains a string.
+    
+    Parameters:
+      infile (str):  Name of the file.
+      string (str):  Match string.
+    
+    Note: fast for large files (>~1Mb) and/or multiple calls (>~100kb).
+    """
+    
+    import subprocess
+    try:
+        subprocess.run(['grep -c '+string+' '+infile], stdout=subprocess.PIPE,
+                       shell=True, check=True).stdout.decode('utf-8')
+        # Check=false: do not raise an error if string is not found (but return 0)
+        result = True  # result = int(count) > 0
+        
+    except subprocess.CalledProcessError as e:
+        result = None
+        if e.returncode == 1:  # Exit status: 0: line found, 1: no line found, 2: error
+            # count = e.output.decode('utf-8')
+            # result = int(count) > 0
+            result = False
+        else:
+            import sluyspy.cli as scli
+            scli.warn('string_in_file(): an error occurred when calling grep')
+            result = None
+    
+    return result
+
+
