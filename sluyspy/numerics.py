@@ -18,6 +18,7 @@
 
 
 import numpy as _np
+import astroconst as _ac
 
 
 eps  = _np.finfo(_np.float64).eps;  """Smallest value for which 1+eps != 1:  2.2204460492503131e-16"""
@@ -51,3 +52,16 @@ def sigdig(num, dig=14):
         sigdig = fmt % (num * eps1)  # w/o snum.eps1, (0.075,1) will be written as 0.07!
         
     return sigdig
+
+
+def map_pi_pi(ang):
+    """Map an (array of) angle(s) to lie between -PI and +PI.
+
+    Parameters:
+      ang (float):  (Array of) angle(s).
+    
+    Returns:
+      (float):  (Array) of angles between -PI and +PI.
+    """
+    
+    return _np.mod(ang+_ac.pi, _ac.pi2)-_ac.pi
