@@ -22,14 +22,14 @@ import astroconst as _ac
 import sluyspy.numerics as _snum
 
 
-def distance(l1,b1, l2,b2, miles=False):
+def distance(lon1,lat1, lon2,lat2, miles=False):
     """Compute the distance between two points over the Earth's surface.
     
     Parameters:
-      l1 (float):    Longitude of first location (rad).
-      b1 (float):    Latitude of first location (rad).
-      l2 (float):    Longitude of second location (rad).
-      b2 (float):    Latitude of second location (rad).
+      lon1 (float):  Longitude of first location (rad).
+      lat1 (float):  Latitude of first location (rad).
+      lon2 (float):  Longitude of second location (rad).
+      lat2 (float):  Latitude of second location (rad).
       miles (bool):  Return result in miles rather than kilometres.  Optional; defaults to False.
     
     Returns:
@@ -39,9 +39,9 @@ def distance(l1,b1, l2,b2, miles=False):
     r_e  = _ac.earth_r*1e-3                # Earth's radius in km
     fl   = 0.003352810665                  # Earth's flattening
     
-    mlat  = (b1+b2)*0.5
-    dlat2 = (b1-b2)*0.5
-    dlon2 = (l1-l2)*0.5
+    mlat  = (lat1+lat2)/2
+    dlat2 = (lat1-lat2)/2
+    dlon2 = (lon1-lon2)/2
     
     sins = _np.sin(dlat2)**2 * _np.cos(dlon2)**2 + _np.cos(mlat)**2 * _np.sin(dlon2)**2
     coss = _np.cos(dlat2)**2 * _np.cos(dlon2)**2 + _np.sin(mlat)**2 * _np.sin(dlon2)**2
