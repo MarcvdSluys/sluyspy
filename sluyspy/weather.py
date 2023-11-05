@@ -20,6 +20,7 @@
 import numpy as _np
 import pandas as _pd
 import datetime as _dt
+import astroconst as _ac
 
 
 
@@ -256,8 +257,8 @@ def knmi_station_data(remove_nans=False):
       (pd.df):  Pandas DataFrame containing and index and five columns:
     
       - index (int):  Station number. Note that most stations start with a leading zero, which is omitted here.
-      - lon (float):  Geographical longitude of the station, in degrees east of Greenwich.
-      - lat (float):  Geographical latitude of the station, in degrees north of the equator.
+      - lon (float):  Geographical longitude of the station, in radians east of Greenwich.
+      - lat (float):  Geographical latitude of the station, in radians north of the equator.
       - alt (float):  Altitude of the station above sea level, in metres.
       - name (str):   (A) name of the station.
       - fname (str):  String to compose a file name from.  This is the name from the KNMI .nc files,
@@ -271,6 +272,10 @@ def knmi_station_data(remove_nans=False):
         'name':  {6201: float('nan'), 6203: float('nan'), 6204: float('nan'), 6205: float('nan'), 6207: float('nan'), 6208: float('nan'), 6209: 'IJmond', 6210: 'Valkenburg Zh', 6211: float('nan'), 6214: float('nan'), 6215: 'Voorschoten', 6216: float('nan'), 6225: 'IJmuiden', 6229: float('nan'), 6233: float('nan'), 6235: 'De Kooy', 6236: float('nan'), 6237: float('nan'), 6238: float('nan'), 6239: float('nan'), 6240: 'Schiphol', 6242: 'Vlieland', 6248: 'Wijdenes', 6249: 'Berkhout', 6251: 'Hoorn Terschelling', 6252: float('nan'), 6257: 'Wijk aan Zee', 6258: 'Houtribdijk', 6260: 'De Bilt', 6265: 'Soesterberg', 6267: 'Stavoren', 6269: 'Lelystad', 6270: 'Leeuwarden', 6273: 'Marknesse', 6275: 'Deelen', 6277: 'Lauwersoog', 6278: 'Heino', 6279: 'Hoogeveen', 6280: 'Eelde', 6283: 'Hupsel', 6285: 'Huibertgat', 6286: 'Nieuw Beerta', 6290: 'Twenthe', 6308: 'Cadzand', 6310: 'Vlissingen', 6311: 'Hoofdplaat', 6312: 'Oosterschelde', 6313: 'Vlakte van De Raan', 6315: 'Hansweert', 6316: 'Schaar', 6317: float('nan'), 6319: 'Westdorpe', 6320: float('nan'), 6321: float('nan'), 6323: 'Wilhelminadorp', 6324: 'Stavenisse', 6330: 'Hoek van Holland', 6331: 'Tholen', 6340: 'Woensdrecht', 6343: 'Rotterdam Geulhaven', 6344: 'Rotterdam', 6348: 'Cabauw Mast', 6350: 'Gilze-Rijen', 6356: 'Herwijnen', 6370: 'Eindhoven', 6375: 'Volkel', 6377: 'Ell', 6380: 'Maastricht', 6391: 'Arcen'},
         'fname': {6201: 'd15-fa-1', 6203: 'p11-b', 6204: 'k14-fa-1c', 6205: 'a12-cpp', 6207: 'l9-ff-1', 6208: 'awg-1', 6209: 'ijmond_wp', 6210: float('nan'), 6211: 'j6-a', 6214: 'bg-ohvs2', 6215: 'voorschoten_aws', 6216: 'hollandse_kust_zuid_alfa_hkza', 6225: 'ijmuiden_wp', 6229: 'texelhors_wp', 6233: 'assendelft_btp', 6235: 'de_kooy_vk', 6236: 'muiden_btp', 6237: 'nieuw_vennep_btp', 6238: 'nieuwkoop_btp', 6239: 'f3-fb-1', 6240: 'amsterdam_schiphol_ap', 6242: 'vlieland', 6248: 'wijdenes_wp', 6249: 'berkhout_aws', 6251: 'terschelling_hoorn_aws', 6252: 'k13-a', 6257: 'wijk_aan_zee_aws', 6258: 'houtribdijk_wp', 6260: 'de_bilt_aws', 6265: float('nan'), 6267: 'stavoren_aws', 6269: 'lelystad_ap', 6270: 'leeuwarden', 6273: 'marknesse_aws', 6275: 'deelen', 6277: 'lauwersoog_aws', 6278: 'heino_aws', 6279: 'hoogeveen_aws', 6280: 'groningen_ap_eelde', 6283: 'hupsel_aws', 6285: 'huibertgat_wp', 6286: 'nieuw_beerta_aws', 6290: 'twenthe_aws', 6308: 'cadzand_wp', 6310: 'vlissingen_aws', 6311: float('nan'), 6312: 'oosterschelde_wp', 6313: 'vlakte_van_de_raan', 6315: 'hansweert', 6316: 'oosterschelde_4', 6317: 'borssele_alfa_bsa', 6319: 'westdorpe_aws', 6320: 'lichteiland_goeree', 6321: 'euro_platform', 6323: 'wilhelminadorp_aws', 6324: 'stavenisse', 6330: 'hoek_van_holland_aws', 6331: 'marollegat', 6340: 'woensdrecht', 6343: 'rotterdam_geulhaven', 6344: 'rotterdam_the_hague_ap', 6348: 'cabauw_tower_aws', 6350: 'gilze_rijen', 6356: 'herwijnen_aws', 6370: 'eindhoven_ap', 6375: 'volkel', 6377: 'ell_aws', 6380: 'maastricht_aachen_ap', 6391: 'arcen_aws'}
     } )
+    
+    # Convert coordinates from degrees to radians:
+    df.lon *= _ac.d2r
+    df.lat *= _ac.d2r
     
     if remove_nans:
         df = df[df['lon'].notna()]      # Keep only rows where df.col is NOT Null/None/NaN
