@@ -21,11 +21,14 @@ import numpy.core as _np                 # Get NumPy
 from .cli import error as _error
 
 
-def start_plot(ptype='both', dark_bg=False, xkcd=False, title='Python plot', fz=None,lw=None):
+def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, title='Python plot', fz=None,lw=None):
     """Start a matplotlib.pyplot plot with a choice of my favourite options.
     
     Parameters:
       ptype (str):     Plot type: 'screen', 'file', 'both' (a compromise) or 'square'.
+      hsize (float):   Horizontal size of the figure (hectopixels); can overrule setting by ptype.
+      vsize (float):   Vertical size of the figure (hectopixels); can overrule setting by ptype.
+    
       dark_bg (bool):  Use a dark background.
       xkcd (bool):     Use XKCD style.
       title (str):     Window title.
@@ -47,23 +50,24 @@ def start_plot(ptype='both', dark_bg=False, xkcd=False, title='Python plot', fz=
     
     if ptype == 'screen':
         matplotlib.rcParams.update({'font.size': 14})       # Set font size for all text, aimed at full screen display
-        fig = _plt.figure(figsize=(19.2,10.8), num=title)   # Set to 1920x1080 to fill my screen
+        if (hsize is None) and (vsize is None):  hsize = 19.2;  vsize = 10.8
     elif ptype == 'file':
         matplotlib.rcParams.update({'font.size': 14})       # Set font size for all text aimed at an electonic file
         matplotlib.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
-        fig = _plt.figure(figsize=(12.5,7), num=title)      # Set png size to 1250x700
+        if (hsize is None) and (vsize is None):  hsize = 12.5;  vsize = 7
     elif ptype == 'both':
         matplotlib.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
         matplotlib.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
-        fig = _plt.figure(figsize=(15,8.5), num=title)      # 1500x850: fits in my qiv screen w/o scaling
+        if (hsize is None) and (vsize is None):  hsize = 15.8;  vsize = 8.5
     elif ptype == 'square':
         matplotlib.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
-        fig = _plt.figure(figsize=(8.5,8.5), num=title)     # 850x850: fits in my qiv screen w/o scaling
+        if (hsize is None) and (vsize is None):  hsize = 8.5;  vsize = 8.5
     else:
         _error('Unknown plot type: '+ptype+', aborting.')
     
     if fz is not None: matplotlib.rcParams.update({'font.size': fz})        # Set font size for all text
-    if lw is not None: matplotlib.rcParams.update({'lines.linewidth': lw})  # Set default line width
+    if lw is not None: matplotlib.rcParams.update({'lines.linewidth': lw})  # Set custom default line width
+    fig = _plt.figure(figsize=(hsize,vsize), num=title)  # Custom size
     
     ax = fig.add_subplot(111)                  # Create an axes object for the current figure
     if xkcd and dark_bg:  ax.spines[:].set_color('white')        # Needed for XKCD style on a dark background
