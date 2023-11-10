@@ -157,7 +157,10 @@ def arrow_head_between_points(ax, xx,yy, dx=0,dy=0, scale=1, **kwargs):
     # Local scaling parameter: undo arrow-head scaling with length:
     lscale = 0.1 * scale / _np.sqrt((xx[1]-xx[0])**2 + (yy[1]-yy[0])**2)
     
-    ax.quiver(xx[0]+dx, yy[0]+dy, xx[1]-xx[0], yy[1]-yy[0],
+    if len(xx)!=2: _error('arrow_head_between_points(): The input variable xx must have two elements')
+    if len(yy)!=2: _error('arrow_head_between_points(): The input variable yy must have two elements')
+    
+    ax.quiver(xx[1]+dx, yy[1]+dy, xx[1]-xx[0], yy[1]-yy[0],
               angles='xy', scale_units='width', pivot='mid',
               scale=3/lscale, width=5e-3*lscale,
               headwidth=10*lscale, headlength=15*lscale, headaxislength=10*lscale,
