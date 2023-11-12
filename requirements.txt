@@ -1,10 +1,11 @@
-astrotool==0.0.11
+astroconst==0.0.10
+astrotool==0.0.12
 getch==1.0
-matplotlib==3.8.0
+matplotlib==3.8.1
 numpy==1.25.2
-pandas==2.0.3
+pandas==1.5.3
 pytz==2023.3
 pytz==2023.3.post1
 scipy==1.11.3
-solarenergy==0.1.7
+solarenergy==0.1.9
 termcolor==2.3.0

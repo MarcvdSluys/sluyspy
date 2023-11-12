@@ -1,5 +1,6 @@
 sluyspy
-astrotool==0.0.11
+astroconst==0.0.10
+astrotool==0.0.12
 getch==1.0
 matplotlib
 numpy
@@ -7,6 +8,6 @@ pandas
 pytz==2023.3
 pytz==2023.3.post1
 scipy
-solarenergy==0.1.7
+solarenergy==0.1.9
 termcolor==2.3.0
 sphinx-rtd-theme
