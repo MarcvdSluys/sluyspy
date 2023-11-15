@@ -65,3 +65,21 @@ def map_pi_pi(ang):
     """
     
     return _np.mod(ang+_ac.pi, _ac.pi2)-_ac.pi
+
+
+def nint(val):
+    """Convert a float to the nearest integer with proper rounding.
+    
+    Parameters:
+      val (float):  Value to convert.
+    
+    Returns:
+      (int):  Nearest integer (or float('nan')).
+    """
+    
+    if _np.isnan(val):
+        nint = float('nan')
+    else:
+        nint = int(_np.round(val,0))
+        
+    return nint

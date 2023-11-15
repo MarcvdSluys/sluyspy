@@ -78,13 +78,13 @@ def wind_dir_str_from_az(az):
 
 
 def sky_power_from_rain_means(rain):
-    print('Sorry, this function moved to solar_energy.cloud_power_from_rain_means()')
+    print('Sorry, this function moved to sluyspy.solar_energy._cloud_power_from_rain(), called from solar_power_from_true_sky_rain()')
     exit(1)
     return
 
 
 def sky_power_from_rain_medians(rain):
-    print('Sorry, this function moved to solar_energy.cloud_power_from_rain_medians()')
+    print('Sorry, this function moved to sluyspy.solar_energy._cloud_power_from_rain(), called from solar_power_from_true_sky_rain()')
     exit(1)
     return
 
