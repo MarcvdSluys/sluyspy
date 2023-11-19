@@ -1,12 +1,12 @@
 sluyspy
 astroconst==0.0.10
-astrotool==0.0.12
+astrotool==0.0.13
+dataclasses==0.6
 getch==1.0
 matplotlib
 numpy
 pandas
-pytz==2023.3
-pytz==2023.3.post1
+pytz==2021.3
 scipy
 solarenergy==0.1.9
 termcolor==2.3.0
