@@ -54,7 +54,19 @@ def horizons_ephem(obj, jd, loc='500@399'):
     df = df.rename(columns={'datetime_str':'dtm','datetime_jd':'jd','TDB-UT':'deltat','EclLon':'hc_lon','EclLat':'hc_lat','r':'hc_rad','ObsEclLon':'gc_lon','ObsEclLat':'gc_lat','delta':'gc_rad','RA':'ra','DEC':'dec','RA_app':'ra_app','DEC_app':'dec_app','alpha_true':'phang','illumination':'illum','illum_defect':'illum_def','V':'mag'})  # Rename columns
     
     # Convert datetime to datetime:
-    df.dtm = _pd.to_datetime(df.dtm)
+    # df.dtm = _pd.to_datetime(df.dtm)  #  - only a limited range!
+    df.dtm = df.dtm.str.replace('-Jan-','-01-')
+    df.dtm = df.dtm.str.replace('-Feb-','-02-')
+    df.dtm = df.dtm.str.replace('-Mar-','-03-')
+    df.dtm = df.dtm.str.replace('-Apr-','-04-')
+    df.dtm = df.dtm.str.replace('-May-','-05-')
+    df.dtm = df.dtm.str.replace('-Jun-','-06-')
+    df.dtm = df.dtm.str.replace('-Jul-','-07-')
+    df.dtm = df.dtm.str.replace('-Aug-','-08-')
+    df.dtm = df.dtm.str.replace('-Sep-','-09-')
+    df.dtm = df.dtm.str.replace('-Oct-','-10-')
+    df.dtm = df.dtm.str.replace('-Nov-','-11-')
+    df.dtm = df.dtm.str.replace('-Dec-','-12-')
     # print(df)
     
     return df
