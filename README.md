@@ -5,12 +5,12 @@ Downloads](https://img.shields.io/pypi/dm/sluyspy) [![Documentation
 Status](https://readthedocs.org/projects/sluyspy/badge/?version=latest)](https://sluyspy.readthedocs.io/en/latest/?badge=latest)
 ![PyPI - License](https://img.shields.io/pypi/l/sluyspy?color=%230A0)
 
-Marc van der Sluys' personal Python modules.
-The code is being developed by [Marc van der Sluys](http://marc.vandersluys.nl) of the department of
-Astrophysics at the Radboud University Nijmegen, the Institute of Nuclear and High-Energy Physics (Nikhef),
-and the Institute for Gravitational and Subatomic Physics (GRASP) at Utrecht University, all in The
-Netherlands.  The sluyspy package can be used under the conditions of the 
-[EUPL 1.2](https://www.eupl.eu/1.2/en/) licence.
+Marc van der Sluys' personal Python modules: functions that I should have found elsewhere but didn't.  The
+code is being developed by [Marc van der Sluys](http://marc.vandersluys.nl) of the Institute of Nuclear and
+High-Energy Physics (Nikhef) in Amsterdam and the Department of Physics at Utrecht University, both in The
+Netherlands.  The sluyspy package can be used under the conditions of the [EUPL
+1.2](https://www.eupl.eu/1.2/en/) licence.  Note that a lot of trial and error is going on, and there is no
+guarantee of backward compatibility.  You may want to borrow a function rather than use the package.
 
 
 ## Installation ##
