@@ -104,7 +104,7 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     # If call failed or fit did not converge:
     if ier<=0:
         if verbosity>0: print('Fit failed: %i' % ier)
-        return None, None, None, ier
+        return None, None, None, None, ier
     
     
     # Print specific curve_fit output:
@@ -183,11 +183,12 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         yfit      = _np.poly1d(coefs)(xvals)
         if rev_coefs is None: rev_coefs = True
     elif fittype=='scipy_curvefit':
-        if fit_fun is None: _scli.error('A fit function must be specified for fittype '+fittype)
+        if fit_fun is None: _scli.error('A fit function must be specified for fittype '+str(fittype))
+        if coefs is None: _scli.error('Fit coefficients must be specified for fittype '+str(fittype))
         yfit      = fit_fun(xvals, *coefs)
         if rev_coefs is None: rev_coefs = False
     elif fittype is None:
-        if yfit is None: _scli.error('yfit values must be specified for fittype '+fittype)
+        if yfit is None: _scli.error('yfit values must be specified for fittype '+str(fittype))
         if rev_coefs is None: rev_coefs = False
     else:
         _scli.error('Unknown fittype: '+fittype+'; must be one of "np_polyfit", "scipy_curvefit" or None.')
@@ -308,7 +309,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         
         # Print fit coefficients:
         if (verbosity>1) and (coefs is not None):
-            if coef_facs is None:  coef_facs = coefs*0+1  # Coefficient print factor is 1 by default:
+            if coef_facs is None:  coef_facs = _np.array(coefs)*0+1  # Coefficient print factor is 1 by default:
             
             # Give all coefficient names the same length:
             if coef_names is not None:
