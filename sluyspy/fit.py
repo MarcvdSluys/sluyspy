@@ -131,7 +131,7 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
 
 
 def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=None, fit_fun=None, yfit=None,
-                      verbosity=2, abs_diff=True,rel_diff=False, sigdig=6, coef_names=None, coef_facs=None,
+                      verbosity=2, abs_diff=True,rel_diff=True, sigdig=6, coef_names=None, coef_facs=None,
                       rev_coefs=None, yprintfac=1, rel_as_pct=False):
     
     """Compute and return the reduced chi^2, and print other fit details if desired.
@@ -156,7 +156,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
     
       verbosity (int):    Verbosity (0-3); optional - defaults to 2.
       abs_diff (bool):    Print absolute differences (optional; defaults to True).
-      rel_diff (bool):    Print relative differences (optional; defaults to False, unless verbosity>2).
+      rel_diff (bool):    Print relative differences (optional; defaults to True).
       sigdig (int):       Number of significant digits to print (optional, defaults to 6).
     
       coef_names (str):   Array of coefficient names for printing (optional).
@@ -255,7 +255,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
             max_abs_diff_y  = _np.max(abs_abs_ydiffs)  # Maximum absolute difference in y
             max_rel_diff_y  = _np.max(abs_rel_ydiffs)  # Maximum relative difference in y
             
-            if type(xvals) == _pdc.series.Series:
+            if type(xvals) is _pdc.series.Series:
                 max_abs_diff_x  = xvals[abs_abs_ydiffs == max_abs_diff_y].to_numpy()[0]  # x value for maximum absolute difference (Pandas)
                 max_rel_diff_x  = xvals[ _np.logical_and(yvals!=0, abs_rel_ydiffs == max_rel_diff_y)].to_numpy()[0]  # x value for maximum relative difference (Pandas)
             elif xvals is None:
@@ -268,6 +268,10 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
         
         # Print details:
         if verbosity>1:
+            print('Fit type:      ', fittype)
+            if fit_fun is not None:  print('Fit function:  ', fit_fun.__name__)
+            print()
+            
             print('Fit quality:')
             print('Number of data points:            ', ndat)
             if verbosity>2:
@@ -294,8 +298,8 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
                 print('Mean/med. absolute difference:    ', sd(mean_abs_ydiff*yprintfac, sigdig), '  /  ',
                       sd(med_abs_ydiff*yprintfac, sigdig))
             
-        if rel_diff or (verbosity>2):
-            if verbosity>1: print()
+        if rel_diff:
+            if verbosity>2: print()
             print('Mean/med. |relative difference|:  ', sd(mean_abs_rel_ydiff, sigdig), rel_str, '  /  ',
                   sd(med_abs_rel_ydiff, sigdig), rel_str)
             
@@ -354,7 +358,7 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
             print('%9s  %12s  %12s  %12s  %12s  %12s  %12s  %12s' %
                   ('i', 'x_val', 'y_val', 'y_sigma', 'y_fit', 'y_diff_abs', 'y_diff_wgt', '|y_dif_rel|') )
             
-            if type(yvals) == _pdc.series.Series:
+            if type(yvals) is _pdc.series.Series:
                 for ival in range(ndat):
                     print('%9i  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e  %12.5e' %
                           (ival, xvals.iloc[ival],yvals.iloc[ival]*yprintfac, ysigmas.iloc[ival]*yprintfac,
