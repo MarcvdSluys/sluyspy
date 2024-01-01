@@ -21,7 +21,8 @@ import numpy.core as _np                 # Get NumPy
 from .cli import error as _error
 
 
-def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, title='Python plot', fz=None,lw=None):
+def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, title='Python plot',
+               fz=None,lw=None):
     """Start a matplotlib.pyplot plot with a choice of my favourite options.
     
     Parameters:
@@ -38,6 +39,12 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     
     Returns:
       (tuple):  Tuple containing the plot and axis objects.
+    
+    Defaults:
+      - screen: size 1920x1080, font 14, lw: 1;
+      - file:   size 1250x700,  font 14, lw: 2;
+      - both:   size 1580x850,  font 16, lw: 2;
+      - square: size 850x850,   font 16, lw: 2.
     """
     
     import matplotlib
@@ -49,19 +56,19 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
         _plt.rcParams['path.effects'] = [patheffects.withStroke(linewidth=0)]  # Needed for XKCD style on a dark background
     
     if ptype == 'screen':
+        if (hsize is None) and (vsize is None):  hsize = 19.2;  vsize = 10.8  # 1920x1080
         matplotlib.rcParams.update({'font.size': 14})       # Set font size for all text, aimed at full screen display
-        if (hsize is None) and (vsize is None):  hsize = 19.2;  vsize = 10.8
     elif ptype == 'file':
+        if (hsize is None) and (vsize is None):  hsize = 12.5;  vsize = 7  # 1250x700
         matplotlib.rcParams.update({'font.size': 14})       # Set font size for all text aimed at an electonic file
         matplotlib.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
-        if (hsize is None) and (vsize is None):  hsize = 12.5;  vsize = 7
     elif ptype == 'both':
+        if (hsize is None) and (vsize is None):  hsize = 15.8;  vsize = 8.5  # 1580x850
         matplotlib.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
         matplotlib.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
-        if (hsize is None) and (vsize is None):  hsize = 15.8;  vsize = 8.5
     elif ptype == 'square':
+        if (hsize is None) and (vsize is None):  hsize = 8.5;  vsize = 8.5  # 850x850
         matplotlib.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
-        if (hsize is None) and (vsize is None):  hsize = 8.5;  vsize = 8.5
     else:
         _error('Unknown plot type: '+ptype+', aborting.')
     
@@ -69,7 +76,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     if lw is not None: matplotlib.rcParams.update({'lines.linewidth': lw})  # Set custom default line width
     fig = _plt.figure(figsize=(hsize,vsize), num=title)  # Custom size
     
-    ax = fig.add_subplot(111)                  # Create an axes object for the current figure
+    ax = fig.add_subplot(111)                                    # Create an axes object for the current figure
     if xkcd and dark_bg:  ax.spines[:].set_color('white')        # Needed for XKCD style on a dark background
     
     return fig, ax
