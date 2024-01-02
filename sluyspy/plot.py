@@ -56,18 +56,22 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
         _plt.rcParams['path.effects'] = [patheffects.withStroke(linewidth=0)]  # Needed for XKCD style on a dark background
     
     if ptype == 'screen':
-        if (hsize is None) and (vsize is None):  hsize = 19.2;  vsize = 10.8  # 1920x1080
+        if hsize is None: hsize = 19.2  # 1920
+        if vsize is None: vsize = 10.8  # 1080
         matplotlib.rcParams.update({'font.size': 14})       # Set font size for all text, aimed at full screen display
     elif ptype == 'file':
-        if (hsize is None) and (vsize is None):  hsize = 12.5;  vsize = 7  # 1250x700
+        if hsize is None: hsize = 12.5  # 1250
+        if vsize is None: vsize =  7.0  # 700
         matplotlib.rcParams.update({'font.size': 14})       # Set font size for all text aimed at an electonic file
         matplotlib.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
     elif ptype == 'both':
-        if (hsize is None) and (vsize is None):  hsize = 15.8;  vsize = 8.5  # 1580x850
+        if hsize is None: hsize = 15.8  # 1580
+        if vsize is None: vsize =  8.5  # 850
         matplotlib.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
         matplotlib.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
     elif ptype == 'square':
-        if (hsize is None) and (vsize is None):  hsize = 8.5;  vsize = 8.5  # 850x850
+        if hsize is None: hsize = 8.5  # 850
+        if vsize is None: vsize = 8.5  # 850
         matplotlib.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
     else:
         _error('Unknown plot type: '+ptype+', aborting.')
