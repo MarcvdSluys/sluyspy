@@ -22,20 +22,23 @@ from .cli import error as _error
 
 
 def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, title='Python plot',
-               fz=None,lw=None):
+               fz=None,lw=None, plot3d=False, man_zorder=True):
     """Start a matplotlib.pyplot plot with a choice of my favourite options.
     
     Parameters:
-      ptype (str):     Plot type: 'screen', 'file', 'both' (a compromise) or 'square'.
-      hsize (float):   Horizontal size of the figure (hectopixels); can overrule setting by ptype.
-      vsize (float):   Vertical size of the figure (hectopixels); can overrule setting by ptype.
+      ptype (str):        Plot type: 'screen', 'file', 'both' (a compromise) or 'square'.
+      hsize (float):      Horizontal size of the figure (hectopixels); can overrule setting by ptype.
+      vsize (float):      Vertical size of the figure (hectopixels); can overrule setting by ptype.
     
-      dark_bg (bool):  Use a dark background (optional, defaults to False).
-      xkcd (bool):     Use XKCD style (optional, defaults to False).
-      title (str):     Window title (optional, defaults to 'Python plot').
+      dark_bg (bool):     Use a dark background (optional, defaults to False).
+      xkcd (bool):        Use XKCD style (optional, defaults to False).
+      title (str):        Window title (optional, defaults to 'Python plot').
     
-      fz (int):        Font size (optional, defaults to None -> 14 or 16).
-      lw (int):        Line width (optional, defaults to None -> 1 or 2).
+      fz (int):           Font size (optional, defaults to None -> 14 or 16).
+      lw (int):           Line width (optional, defaults to None -> 1 or 2).
+    
+      plot3d (bool):      Start a 3D plot (optional, defaults to False -> 2D).
+      map_zorder (bool):  Use manual zorder (defaults to True - opposed to pyplot default: compute).
     
     Returns:
       (tuple):  Tuple containing the plot and axis objects.
@@ -80,7 +83,11 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     if lw is not None: matplotlib.rcParams.update({'lines.linewidth': lw})  # Set custom default line width
     fig = _plt.figure(figsize=(hsize,vsize), num=title)  # Custom size
     
-    ax = fig.add_subplot(111)                                    # Create an axes object for the current figure
+    if plot3d:
+        ax = fig.add_subplot(111, projection='3d', computed_zorder=(not man_zorder))  # Create a 3D axes object for the current figure
+    else:
+        ax = fig.add_subplot(111)                                # Create a 2D axes object for the current figure
+        
     if xkcd and dark_bg:  ax.spines[:].set_color('white')        # Needed for XKCD style on a dark background
     
     return fig, ax
