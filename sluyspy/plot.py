@@ -30,12 +30,12 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
       hsize (float):   Horizontal size of the figure (hectopixels); can overrule setting by ptype.
       vsize (float):   Vertical size of the figure (hectopixels); can overrule setting by ptype.
     
-      dark_bg (bool):  Use a dark background.
-      xkcd (bool):     Use XKCD style.
-      title (str):     Window title.
+      dark_bg (bool):  Use a dark background (optional, defaults to False).
+      xkcd (bool):     Use XKCD style (optional, defaults to False).
+      title (str):     Window title (optional, defaults to 'Python plot').
     
-      fz (int):        Font size (optional, defaults to None).
-      lw (int):        Line width (optional, defaults to None).
+      fz (int):        Font size (optional, defaults to None -> 14 or 16).
+      lw (int):        Line width (optional, defaults to None -> 1 or 2).
     
     Returns:
       (tuple):  Tuple containing the plot and axis objects.
@@ -90,7 +90,7 @@ def hist_norm(obj, x, bins=None, range=None, density=False, weights=None, cumula
               histtype='bar', align='mid', orientation='vertical', rwidth=None, log=False, color=None, label=None,
               stacked=False, *, data=None, **kwargs):
     """Draw a histogram normalised by total number rather than probability density.
-
+    
     Parameters:
       obj (pyplot object):  Pyplot object or axes object to plot to.
       x (array or sequence of arrays):  Data.
@@ -109,7 +109,7 @@ def hist_norm(obj, x, bins=None, range=None, density=False, weights=None, cumula
       label (str or None):  Legend label, default: None.
       stacked (bool):  Stack multiple data on top of each other, rather than side by side, default: False.
       data (indexable object, optional):  If given, the following parameters also accept a string s, which is interpreted as data[s] (unless this raises an exception): x, weights.
-
+    
     
     Returns:
       (tuple):  Tuple consisting of (n, bin_edges, patches):
@@ -135,7 +135,7 @@ def show_ctrlc():
     try:
         _plt.show()
     except KeyboardInterrupt:
-        print(' - Received keyboard interrupt, aborting.')  # " - " to create some space after "^C"
+        print(' - Received keyboard interrupt whilst showing plot, aborting.')  # " - " to create some space after "^C"
         exit(0)
         
     return
@@ -151,7 +151,7 @@ def pause_ctrlc(interval):
     try:
         _plt.pause(interval)
     except KeyboardInterrupt:
-        print(' - Received keyboard interrupt, aborting.')  # " - " to create some space after "^C"
+        print(' - Received keyboard interrupt whilst pausing plot, aborting.')  # " - " to create some space after "^C"
         exit(0)
         
     return
