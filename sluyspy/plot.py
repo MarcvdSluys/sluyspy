@@ -26,7 +26,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     """Start a matplotlib.pyplot plot with a choice of my favourite options.
     
     Parameters:
-      ptype (str):        Plot type: 'screen', 'file', 'both' (a compromise) or 'square'.
+      ptype (str):        Plot type: 'screen', 'file', 'both' (a compromise; default) or 'square'.
       hsize (float):      Horizontal size of the figure (hectopixels); can overrule setting by ptype.
       vsize (float):      Vertical size of the figure (hectopixels); can overrule setting by ptype.
     
@@ -91,6 +91,29 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     if xkcd and dark_bg:  ax.spines[:].set_color('white')        # Needed for XKCD style on a dark background
     
     return fig, ax
+
+
+def save_close_fig(fig, file_name='plot.png', tight=1):
+    """Save the current figure to disc and close it.
+    
+    Parameters:
+      fig (pyplot.figure):  Current figure object.
+      file_name (str):      Name for the output file (optional, defaults to plot.png).
+      tight (int):          Tightness of the margins: 0: not at all, 1: some (default), 2: quite, 3: very!
+    """
+    
+    if tight>0: fig.tight_layout()                                 # Use narrow margins
+    
+    if tight>2:
+        fig.savefig(file_name, bbox_inches='tight', pad_inches=0)  # Use very, very narrow margins!
+    elif tight>1:
+        fig.savefig(file_name, bbox_inches='tight')                # Use very narrow margins
+    else:
+        fig.savefig(file_name)                                     # Save figure
+    
+    _plt.close()
+    
+    return
 
 
 def hist_norm(obj, x, bins=None, range=None, density=False, weights=None, cumulative=False, bottom=None,
