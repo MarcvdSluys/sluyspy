@@ -26,7 +26,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     """Start a matplotlib.pyplot plot with a choice of my favourite options.
     
     Parameters:
-      ptype (str):        Plot type: 'screen', 'file', 'both' (a compromise; default) or 'square'.
+      ptype (str):        Plot type: 'screen', 'file', 'both' (a compromise; default), 'square' or 'org'.
       hsize (float):      Horizontal size of the figure (hectopixels); can overrule setting by ptype.
       vsize (float):      Vertical size of the figure (hectopixels); can overrule setting by ptype.
     
@@ -44,10 +44,11 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
       (tuple):  Tuple containing the plot and axis objects.
     
     Defaults:
-      - screen: size 1920x1080, font 14, lw: 1;
-      - file:   size 1250x700,  font 14, lw: 2;
-      - both:   size 1580x850,  font 16, lw: 2;
-      - square: size 850x850,   font 16, lw: 2.
+      - screen: size 1920x1080, font 14, lw: 1 - aimed at my screen;
+      - file:   size 1250x700,  font 14, lw: 2 - aimed for file -> LaTeX;
+      - both:   size 1580x850,  font 16, lw: 2 - a compromise between the above;
+      - square: size 850x850,   font 16, lw: 2 - a square plot;
+      - org:    size 930x520,   font 12, lw: 1 - aimed at output in emacs Orgmode.
     """
     
     import matplotlib
@@ -76,6 +77,10 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
         if hsize is None: hsize = 8.5  # 850
         if vsize is None: vsize = 8.5  # 850
         matplotlib.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
+    elif ptype == 'org':
+        if hsize is None: hsize = 9.3  # 930
+        if vsize is None: vsize = 5.2  # 520
+        matplotlib.rcParams.update({'font.size': 12})       # Set font size for all text: small
     else:
         _error('Unknown plot type: '+ptype+', aborting.')
     
