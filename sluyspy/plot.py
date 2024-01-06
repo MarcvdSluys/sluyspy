@@ -78,8 +78,8 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
         if vsize is None: vsize = 8.5  # 850
         matplotlib.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
     elif ptype == 'org':
-        if hsize is None: hsize = 9.3  # 930
-        if vsize is None: vsize = 5.2  # 520
+        if hsize is None: hsize = 9.0  # 900
+        if vsize is None: vsize = 5.0  # 500
         matplotlib.rcParams.update({'font.size': 12})       # Set font size for all text: small
     else:
         _error('Unknown plot type: '+ptype+', aborting.')
@@ -98,15 +98,39 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     return fig, ax
 
 
-def save_close_fig(fig, file_name='plot.png', tight=1):
+def save_close_fig(fig,ax, file_name='plot.png', title=None, xlbl=None,ylbl=None, legend=False, grid=True,
+                   logx=False,logy=False, tight=1):
     """Save the current figure to disc and close it.
     
     Parameters:
-      fig (pyplot.figure):  Current figure object.
+      fig (pyplot.figure):  Current Pyplot figure object.
+      ax (pyplot axes):     Current Pyplot axes object.
       file_name (str):      Name for the output file (optional, defaults to plot.png).
+    
+      title (str):          Text to use as plot title (optional, defaults to None).
+      xlbl (str):           Text to use as label for the horizontal axis (optional, defaults to None).
+      ylbl (str):           Text to use as label for the vertical axis (optional, defaults to None).
+    
+      legend (bool):        Show a legend (optional, defaults to False).
+      grid (bool):          Show a grid (optional, defaults to True).
+      logx (bool):          Make the horizontal axis logarithmic (optional, defaults to False -> linear).
+      logy (bool):          Make the vertical axis logarithmic (optional, defaults to False -> linear).
+    
       tight (int):          Tightness of the margins: 0: not at all, 1: some (default), 2: quite, 3: very!
     """
     
+    # Plot labels:
+    if title is not None: _plt.title(title)                        # Plot title
+    if xlbl is not None:  _plt.xlabel(xlbl)                        # Label the horizontal axis
+    if ylbl is not None:  _plt.ylabel(ylbl)                        # Label the vertical axis
+    
+    # Plot features:
+    if legend: ax.legend(loc='best')                               # Create a legend
+    if logx: _plt.xscale('log')                                    # Logarithmic horizontal axis
+    if logy: _plt.yscale('log')                                    # Logarithmic vertical axis
+    if grid: ax.grid(grid)                                         # Plot a grid
+    
+    # Tightness of the margins:
     if tight>0: fig.tight_layout()                                 # Use narrow margins
     
     if tight>2:
