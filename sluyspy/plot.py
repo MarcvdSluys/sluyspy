@@ -98,14 +98,14 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     return fig, ax
 
 
-def save_close_fig(fig,ax, file_name='plot.png', title=None, xlbl=None,ylbl=None, legend=False, grid=True,
-                   logx=False,logy=False, tight=1):
-    """Save the current figure to disc and close it.
+def finish_plot(fig,ax, file_name='plot.png', title=None, xlbl=None,ylbl=None, legend=False, grid=True,
+                logx=False,logy=False, tight=1):
+    """Show the current figure on screen or save it to disc and close it.
     
     Parameters:
       fig (pyplot.figure):  Current Pyplot figure object.
       ax (pyplot axes):     Current Pyplot axes object.
-      file_name (str):      Name for the output file (optional, defaults to plot.png).
+      file_name (str):      Name for the output file (optional, defaults to plot.png).  Use 'screen' for screen.
     
       title (str):          Text to use as plot title (optional, defaults to None).
       xlbl (str):           Text to use as label for the horizontal axis (optional, defaults to None).
@@ -133,12 +133,15 @@ def save_close_fig(fig,ax, file_name='plot.png', title=None, xlbl=None,ylbl=None
     # Tightness of the margins:
     if tight>0: fig.tight_layout()                                 # Use narrow margins
     
-    if tight>2:
-        fig.savefig(file_name, bbox_inches='tight', pad_inches=0)  # Use very, very narrow margins!
-    elif tight>1:
-        fig.savefig(file_name, bbox_inches='tight')                # Use very narrow margins
+    if file_name == 'screen':
+        show_ctrlc()
     else:
-        fig.savefig(file_name)                                     # Save figure
+        if tight>2:
+            fig.savefig(file_name, bbox_inches='tight', pad_inches=0)  # Use very, very narrow margins!
+        elif tight>1:
+            fig.savefig(file_name, bbox_inches='tight')                # Use very narrow margins
+        else:
+            fig.savefig(file_name)                                     # Save figure
     
     _plt.close()
     
