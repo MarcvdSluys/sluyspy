@@ -59,7 +59,8 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
         print('rcond:      ', rcond)
     
     # Compute reduced chi^2 and print general fit details:
-    red_chi2 = print_fit_details('np_polyfit', coefs, xvals,yvals,ysigmas, verbosity=verbosity)
+    red_chi2 = print_fit_details(xvals,yvals, ysigmas=ysigmas, fittype='np_polyfit', coefs=coefs,
+                                 verbosity=verbosity)
     
     return coefs, red_chi2
 
@@ -124,15 +125,15 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     dcoefs = _np.sqrt(_np.diag(var_cov))              # Standard deviations on the coefficients
     
     # Compute reduced chi^2 and print general fit details:
-    red_chi2 = print_fit_details('scipy_curvefit', coefs, xvals,yvals,ysigmas, dcoefs=dcoefs, var_cov=var_cov,
-                                 fit_fun=fit_fun, verbosity=verbosity)
+    red_chi2 = print_fit_details(xvals,yvals,ysigmas, fittype='scipy_curvefit', coefs=coefs, dcoefs=dcoefs,
+                                 var_cov=var_cov, fit_fun=fit_fun, verbosity=verbosity)
     
     return coefs, dcoefs, red_chi2, var_cov, ier
 
 
-def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=None, fit_fun=None, yfit=None,
-                      verbosity=2, abs_diff=True,rel_diff=True, sigdig=6, coef_names=None, coef_facs=None,
-                      rev_coefs=None, yprintfac=1, rel_as_pct=False):
+def print_fit_details(xvals,yvals, ysigmas=None, fittype=None, coefs=None,dcoefs=None, var_cov=None,
+                      fit_fun=None, yfit=None, verbosity=2, abs_diff=True,rel_diff=True, sigdig=6,
+                      coef_names=None, coef_facs=None, rev_coefs=None, yprintfac=1, rel_as_pct=False):
     
     """Compute and return the reduced chi^2, and print other fit details if desired.
     
@@ -143,27 +144,29 @@ def print_fit_details(fittype, coefs, xvals,yvals,ysigmas, dcoefs=None, var_cov=
     is specified, a bit more detail can be printed.
     
     Parameters:
-      fittype (str):      Type of fit: 'np_polyfit', 'scipy_curvefit' or None.
-      coefs (float):      Array with fit coefficients.
       xvals (float):      Array with x values.
       yvals (float):      Array with y values.
-      ysigmas (float):    Array with y sigmas.
     
-      dcoefs (float):     Uncertainties in coefficients from scipy_curvefit; optional.
-      var_cov (float):    Variance-covariance matrix in 2D NumPy array; optional.
-      fit_fun (fun):      Fit function used for scipy_curvefit; optional.
-      yfit (float):       "Fit" values for Y for fittype=None; optional.
+      ysigmas (float):    Array with y sigmas; optional, defaults to None (i.e. using 1 for all ysigmas).
+    
+      fittype (str):      Type of fit: 'np_polyfit', 'scipy_curvefit'; optional, defaults to None.
+      coefs (float):      Array with fit coefficients; optional, defaults to None.
+    
+      dcoefs (float):     Uncertainties in coefficients from scipy_curvefit; optional, defaults to None.
+      var_cov (float):    Variance-covariance matrix in 2D NumPy array; optional, defaults to None.
+      fit_fun (fun):      Fit function used for scipy_curvefit; optional, defaults to None.
+      yfit (float):       "Fit" values for Y for fittype=None; optional, defaults to None.
     
       verbosity (int):    Verbosity (0-3); optional - defaults to 2.
       abs_diff (bool):    Print absolute differences (optional; defaults to True).
       rel_diff (bool):    Print relative differences (optional; defaults to True).
       sigdig (int):       Number of significant digits to print (optional, defaults to 6).
     
-      coef_names (str):   Array of coefficient names for printing (optional).
-      coef_facs (float):  Array of coefficient multiplication factors for printing (optional; defaults to 1).
-                          Useful for e.g. printing degrees when radians are fitted.
+      coef_names (str):   Array of coefficient names for printing (optional, defaults to None).
+      coef_facs (float):  Array of coefficient multiplication factors for printing (optional; defaults to None,
+                          in which case 1 is used).  Useful for e.g. printing degrees when radians are fitted.
       rev_coefs (bool):   Reverse printing order in coefficient table: last coefficient at top.
-                          Optional, defaults to True for fittype np_polyfit, to False otherwise.
+                          Optional, defaults to None, resulting in True for fittype np_polyfit, False otherwise.
     
       yprintfac (float):  Multiplication factor when printing absolute differences in y (optional, defaults to 1).
       rel_as_pct (bool):  Print relative difference as percentage rather than fraction (optional, defaults to False).
@@ -414,7 +417,6 @@ def polynomial(x, *coefs):
     
     y = 0
     i = 0
-    
     for coef in coefs:
         y += coef * _np.power(x, i)
         i += 1
