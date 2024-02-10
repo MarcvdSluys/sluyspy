@@ -98,14 +98,14 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     return fig, ax
 
 
-def finish_plot(fig,ax, file_name='plot.png', title=None, xlbl=None,ylbl=None, legend=False, grid=True,
+def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=False, grid=True,
                 logx=False,logy=False, tight=1):
     """Show the current figure on screen or save it to disc and close it.
     
     Parameters:
       fig (pyplot.figure):  Current Pyplot figure object.
       ax (pyplot axes):     Current Pyplot axes object.
-      file_name (str):      Name for the output file (optional, defaults to plot.png).  Use 'screen' for screen.
+      file_name (str):      Name for the output file (optional, defaults to None -> screen).
     
       title (str):          Text to use as plot title (optional, defaults to None).
       xlbl (str):           Text to use as label for the horizontal axis (optional, defaults to None).
@@ -133,7 +133,8 @@ def finish_plot(fig,ax, file_name='plot.png', title=None, xlbl=None,ylbl=None, l
     # Tightness of the margins:
     if tight>0: fig.tight_layout()                                 # Use narrow margins
     
-    if file_name == 'screen':
+    if (file_name is None) or (file_name == 'screen'):
+        if file_name == 'screen': print("sluyspy.plot.finish_plot(): file_name = 'screen' is obsolescent and will be removed.  Use None instead.")
         show_ctrlc()
     else:
         if tight>2:
