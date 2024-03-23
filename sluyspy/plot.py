@@ -99,7 +99,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
 
 
 def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=False, grid=True,
-                logx=False,logy=False, tight=1):
+                logx=False,logy=False, tight=1, save=True, close=True):
     """Show the current figure on screen or save it to disc and close it.
     
     Parameters:
@@ -117,6 +117,9 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
       logy (bool):          Make the vertical axis logarithmic (optional, defaults to False -> linear).
     
       tight (int):          Tightness of the margins: 0: not at all, 1: some (default), 2: quite, 3: very!
+    
+      save (bool):          Actually save the plot (if not, allow further changes, and don't close!).
+      close (bool):         Actually close the plot (if not, allow further changes).
     """
     
     # Plot labels:
@@ -137,14 +140,17 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
         if file_name == 'screen': print("sluyspy.plot.finish_plot(): file_name = 'screen' is obsolescent and will be removed.  Use None instead.")
         show_ctrlc()
     else:
-        if tight>2:
-            fig.savefig(file_name, bbox_inches='tight', pad_inches=0)  # Use very, very narrow margins!
-        elif tight>1:
-            fig.savefig(file_name, bbox_inches='tight')                # Use very narrow margins
+        if save:
+            if tight>2:
+                fig.savefig(file_name, bbox_inches='tight', pad_inches=0)  # Use very, very narrow margins!
+            elif tight>1:
+                fig.savefig(file_name, bbox_inches='tight')                # Use very narrow margins
+            else:
+                fig.savefig(file_name)                                     # Save figure
         else:
-            fig.savefig(file_name)                                     # Save figure
+            close = False  # Don't close the plot if you didn't save it!
     
-    _plt.close()
+    if close: _plt.close()
     
     return
 
