@@ -25,7 +25,7 @@ import astroconst as _ac
 def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts):
     """Compute a simple, Newtonian(!) compact-binary-coalescence waveform.
     
-    Parameters:  
+    Parameters:
       m1 (float):  Mass of binary component 1 (kg).
       m2 (float):  Mass of binary component 2 (kg).
       dist (float):  Distance of binary (m).
@@ -34,7 +34,7 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts):
       tcoal (float):   Coalescence time (s).
       Npts (float):    Number of data points (-).
     
-    Returns:  
+    Returns:
       (pd.df):  Pandas dataframe containing variables.
     """
     
@@ -85,3 +85,61 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts):
     return df
 
 
+def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, PRfac, no_FP=False,
+                verbosity=0):
+    
+    """Compute a simplified noise curve for a gravitational-wave interferometer.
+    
+    Parameters:
+      Npts (float):    Number of data points (-).
+      f_low (float):   Lower frequency cut off (Hz).
+      f_high (float):  Higher frequency cut off (Hz).
+    
+      Len (float):     Length of interferometer arms (m).
+      P_L (float):     Laser power (W).
+      lam_L (float):   Laser wavelength (m).
+      eta_pd (float):  Efficiency of photodetector (fraction 0-1).
+    
+      M_mir (float):   Mass of the end mirror/test mass (kg).
+      R_in (float):    Reflectivity of the input mirrors of the (main) Fabry-Perot cavity (fraction 0-1).
+      R_end (float):   Reflectivity of the end mirrors of the interferometer (fraction 0-1).
+    
+      PRfac (float):   Factor for power recycling (factor 1-...).
+      no_FP (bool):    Do NOT use a Fabry-Perot cavity (optional; defaults to False, i.e. DO use a FPC).
+    
+    Returns:
+      (pd.df):  Pandas.DataFrame containing noise strains.
+    """
+    
+    # Create DataFrame:
+    df = _pd.DataFrame(data=_np.logspace(_np.log10(f_low), _np.log10(f_high), Npts), columns=['freq'])  # Initial column, Npts rows
+    
+    if no_FP:
+        Fin = 1
+        Leff_L = 1
+        f_pole = 0
+        f_pole_fac = 1
+    else:
+        Fin = _ac.pi * _np.sqrt(R_in*R_end) / (1 - R_in*R_end)   # Finesse
+        Leff_L = 2*Fin/_ac.pi
+        f_pole = _ac.c / (4 * Fin * Len)                        # Pole frequency
+        f_pole_fac = _np.sqrt( 1 + _np.square(df.freq/f_pole) )
+    
+    if verbosity > 1:
+        print()
+        print('Finesse:   ', Fin)
+        print('Leff/L:    ', Leff_L)
+        print('f_pole:    ', f_pole)
+        print()
+    
+    df['shot'] = \
+        1/(8*Fin*Len) * _np.sqrt( (4*_ac.pi*_ac.h_bar*_ac.c * lam_L) / (eta_pd * PRfac * P_L) ) * f_pole_fac
+    
+    df['rad'] = 16*_np.sqrt(2) * Fin / (M_mir * Len * _np.square(_ac.pi2*df.freq)) \
+        * _np.sqrt((_ac.h_bar * P_L * PRfac)/(_ac.pi2 * lam_L * _ac.c)) / f_pole_fac
+    
+    df['tot'] = df.shot + df.rad
+    
+    return df
+
+    
