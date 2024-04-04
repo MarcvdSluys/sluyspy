@@ -115,7 +115,7 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
     df = _pd.DataFrame(data=_np.logspace(_np.log10(f_low), _np.log10(f_high), Npts), columns=['freq'])  # Initial column, Npts rows
     
     if no_FP:
-        Fin = 1
+        Fin = _ac.pi/2
         Leff_L = 1
         f_pole = 0
         f_pole_fac = 1
