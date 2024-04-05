@@ -42,9 +42,10 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts):
     mu = m1*m2/mt
     Mc = (m1*m2/mt**(1/3))**(3/5)
     
-    fisco       = _ac.c**3 / (6**(3/2) * _ac.pi * _ac.g * mt)
-    fisco_force = _ac.c**3 / (1**(3/2) * _ac.pi * _ac.g * mt)
-
+    f_isco = _ac.c**3 / (6**(3/2) * _ac.pi * _ac.g * mt)
+    # f_max  = f_isco
+    f_max  = _ac.c**3 / (1**(3/2) * _ac.pi * _ac.g * mt)
+    
     tstart = tcoal - tlen
     
     # Create DataFrame:
@@ -52,7 +53,7 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts):
     
     GMcc3 = _ac.g*Mc/_ac.c**3
     df['fgw']  = 1/_ac.pi * _np.power(5/256 * 1/(tcoal-df.time), 3/8) * GMcc3**(-5/8)
-    df = df[df.fgw < fisco_force]  # Cut the REALLY wrong bits...
+    df = df[df.fgw < f_max]  # Cut the REALLY wrong bits...
     
     df['dfdt'] = 96/5 * _ac.pi**(8/3) * GMcc3**(5/3) * _np.power(df.fgw, 11/3)
     df['worb'] = df.fgw/2 * _ac.pi2  # worb = forb * 2pi = f_gw/2 * 2pi
@@ -80,7 +81,66 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts):
     # df['htilde_cr'] = df.htilde * cosi          * _np.exp( df.Psi_cr * 1j )
     # df['htilde_tot'] = _np.abs(_np.real(df.htilde_pl + df.htilde_cr)/2)  # _np.cos(df.Psi_pl)
     
-    print('Fisco, Fisco,force: ', fisco, fisco_force)
+    print('f_isco, f_max: ', f_isco, f_max)
+    
+    return df
+
+
+def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, fmax_fac=1):
+    """Compute a simple, Newtonian(!) compact-binary-coalescence waveform in the frequency domain for a given
+    range of frequencies.
+    
+    Parameters:
+      m1 (float):      Mass of binary component 1 (kg).
+      m2 (float):      Mass of binary component 2 (kg).
+      dist (float):    Distance of binary (m).
+      cosi (float):    Cosine of the inclination angle: +/-1 = face on, 0 = edge-on.
+      f_low (float):   Lower cut-off frequency (Hz).
+      f_high (float):  Upper cut-off frequency (Hz).
+      tcoal (float):   Coalescence time (s).
+      Npts (float):    Number of data points (-).
+    
+    Returns:
+      (pd.df):  Pandas dataframe containing variables.
+    """
+    
+    mt = m1+m2
+    Mc = (m1*m2/mt**(1/3))**(3/5)
+    
+    f_isco  = _ac.c**3 / (6**(3/2) * _ac.pi * _ac.g * mt)
+    f_max   = f_isco * fmax_fac
+    Rs = 2*_ac.G*mt/_ac.c**2
+    if m1 < 3.9*_ac.sun_m:        # 11.5km ~ Rs for BH of 3.9Mo
+        R1 = 11.5*_ac.km          # NS - all NSs have R=11.5km: https://arxiv.org/abs/1205.6871
+    else:
+        R1 = 2*_ac.G*m1/_ac.c**2  # BH
+    if m2 < 3.9*_ac.sun_m:
+        R2 = 11.5*_ac.km          # NS
+    else:
+        R2 = 2*_ac.G*m2/_ac.c**2  # BH
+    a_min = R1+R2
+    f_max1 = 1/_ac.pi * _np.sqrt(_ac.G * mt / a_min**3)
+    
+    # Create DataFrame:
+    df = _pd.DataFrame(data=_np.logspace(_np.log10(f_low), _np.log10(f_high), Npts), columns=['fgw'])  # Initial column, Npts rows
+    
+    df = df[df.fgw < f_max]  # Cut the REALLY wrong bits...
+    
+    
+    # Frequency domain:
+    df['htilde'] = _ac.pi**(-2/3) * _np.sqrt(5/24) * _ac.c / dist \
+        * (_ac.G * Mc / _ac.c**3)**(5/6) * _np.power(df.fgw, -7/6)
+    
+    df['htilde_pSqrtHz'] = df.htilde * _np.sqrt(df.fgw)
+    
+    # df['Psi_pl'] = _ac.pi2 * df.fgw * 1  -  0  - _ac.pio4  \
+    #     +  3/4 * _np.power(_ac.G * Mc/_ac.c**3 * 8*_ac.pi * df.fgw, -5/3)
+    # df['Psi_cr'] = df.Psi_pl + _ac.pio2
+    # df['htilde_pl'] = df.htilde * (1+cosi**2)/2 * _np.exp( df.Psi_pl * 1j )
+    # df['htilde_cr'] = df.htilde * cosi          * _np.exp( df.Psi_cr * 1j )
+    # df['htilde_tot'] = _np.abs(_np.real(df.htilde_pl + df.htilde_cr)/2)  # _np.cos(df.Psi_pl)
+    
+    print('f_isco, f_max, f_max1, Rs (km): ', f_isco, f_max, f_max1, Rs/1000)
     
     return df
 
@@ -122,7 +182,7 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
     else:
         Fin = _ac.pi * _np.sqrt(R_in*R_end) / (1 - R_in*R_end)   # Finesse
         Leff_L = 2*Fin/_ac.pi
-        f_pole = _ac.c / (4 * Fin * Len)                        # Pole frequency
+        f_pole = _ac.c / (4 * Fin * Len)                         # Pole frequency
         f_pole_fac = _np.sqrt( 1 + _np.square(df.freq/f_pole) )
     
     if verbosity > 1:
@@ -139,6 +199,11 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
         * _np.sqrt((_ac.h_bar * P_L * PRfac)/(_ac.pi2 * lam_L * _ac.c)) / f_pole_fac
     
     df['tot'] = df.shot + df.rad
+    gitd
+    
+    # seismic_isolation = 1e-5
+    # df['seis'] = 1e-8 / np.power(df.freq,4) / Len * seismic_isolation
+    # df.tot += df.seis
     
     return df
 
