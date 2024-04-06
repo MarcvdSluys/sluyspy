@@ -84,9 +84,15 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     else:
         _error('Unknown plot type: '+ptype+', aborting.')
     
+    # Sort out plot title ("number") - doublets cause mixed plots!
+    titlel = title  # Local version
+    plotnum = 2
+    while _plt.fignum_exists(titlel):
+        titlel = title + ' ' + str(plotnum)
+    
     if fz is not None: matplotlib.rcParams.update({'font.size': fz})        # Set font size for all text
     if lw is not None: matplotlib.rcParams.update({'lines.linewidth': lw})  # Set custom default line width
-    fig = _plt.figure(figsize=(hsize,vsize), num=title)  # Custom size
+    fig = _plt.figure(figsize=(hsize,vsize), num=titlel)  # Custom size
     
     if plot3d:
         ax = fig.add_subplot(111, projection='3d', computed_zorder=(not man_zorder))  # Create a 3D axes object for the current figure
@@ -123,18 +129,18 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
     """
     
     # Plot labels:
-    if title is not None: _plt.title(title)                        # Plot title
-    if xlbl is not None:  _plt.xlabel(xlbl)                        # Label the horizontal axis
-    if ylbl is not None:  _plt.ylabel(ylbl)                        # Label the vertical axis
+    if title is not None: fig.title(title)                        # Plot title
+    if xlbl is not None:  ax.set_xlabel(xlbl)                     # Label the horizontal axis
+    if ylbl is not None:  ax.set_ylabel(ylbl)                     # Label the vertical axis
     
     # Plot features:
-    if legend: ax.legend(loc='best')                               # Create a legend
-    if logx: _plt.xscale('log')                                    # Logarithmic horizontal axis
-    if logy: _plt.yscale('log')                                    # Logarithmic vertical axis
-    if grid: ax.grid(grid)                                         # Plot a grid
+    if legend: ax.legend(loc='best')                              # Create a legend
+    if logx: ax.set_xscale('log')                                 # Logarithmic horizontal axis
+    if logy: ax.set_yscale('log')                                 # Logarithmic vertical axis
+    if grid: ax.grid(grid)                                        # Plot a grid
     
     # Tightness of the margins:
-    if tight>0: fig.tight_layout()                                 # Use narrow margins
+    if tight>0: fig.tight_layout()                                # Use narrow margins
     
     if (file_name is None) or (file_name == 'screen'):
         if file_name == 'screen': print("sluyspy.plot.finish_plot(): file_name = 'screen' is obsolescent and will be removed.  Use None instead.")
@@ -150,7 +156,7 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
         else:
             close = False  # Don't close the plot if you didn't save it!
     
-    if close: _plt.close()
+    if close: _plt.close(fig=fig)
     
     return
 
