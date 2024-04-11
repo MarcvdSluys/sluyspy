@@ -104,7 +104,7 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, fmax_fac=1, ver
       (pd.df):  Pandas dataframe containing variables, including:
                 - fgw:            GW frequency in Hz
                 - htilde:         h~ in 1/Hz
-                - htilde_pSqrtHz: h~ in 1/sqrt(Hz)  (= htilde * sqrt(fgw))
+                - htilde_pSqrtHz: h~ in 1/sqrt(Hz)  (= 2 * htilde * sqrt(fgw))
     """
     
     mt = m1+m2
@@ -132,11 +132,10 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, fmax_fac=1, ver
     df = df[df.fgw < f_max]  # Cut the REALLY wrong bits...
     
     
-    # Frequency domain:
-    df['htilde'] = _ac.pi**(-2/3) * _np.sqrt(5/24) * _ac.c / dist \
-        * (_ac.G * Mc / _ac.c**3)**(5/6) * _np.power(df.fgw, -7/6)    # [h] = 1/Hz  CHECK: divide by 2?
-    
-    df['htilde_pSqrtHz'] = df.htilde * _np.sqrt(df.fgw)               # [h] = 1/sqrt(Hz)
+    # Frequency domain (see Maggiore Eqs. 4.43-37, p.174):
+    h_sq = 5/(24 * _ac.pi**(4/3) * dist**2 * _ac.c**3) * (_ac.G * Mc)**(5/3) / _np.power(df.fgw, 7/3)  # |h(f)|^2 (Maggiore Eq.4.370, p.231)
+    df['htilde']         = 2/5 * _np.sqrt(h_sq)              # [h] = 1/Hz - Maggiore, Table 7.1, Eq.7.181
+    df['htilde_pSqrtHz'] = 2 * df.htilde * _np.sqrt(df.fgw)  # [h] = 1/sqrt(Hz) - for (plot) comparison to ASD; see PRX 6, 041015 (2016), Fig.1
     
     # df['Psi_pl'] = _ac.pi2 * df.fgw * 1  -  0  - _ac.pio4  \
     #     +  3/4 * _np.power(_ac.G * Mc/_ac.c**3 * 8*_ac.pi * df.fgw, -5/3)
