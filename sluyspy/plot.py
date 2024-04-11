@@ -84,7 +84,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     else:
         _error('Unknown plot type: '+ptype+', aborting.')
     
-    # Sort out plot title ("number") - doublets cause mixed plots!
+    # Find unique plot title ("number") - doublets cause mixed plots!
     titlel = title  # Local version
     plotnum = 2
     while _plt.fignum_exists(titlel):
