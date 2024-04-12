@@ -134,6 +134,7 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, fmax_fac=1, ver
     
     # Frequency domain (see Maggiore Eqs. 4.43-37, p.174):
     h_sq = 5/(24 * _ac.pi**(4/3) * dist**2 * _ac.c**3) * (_ac.G * Mc)**(5/3) / _np.power(df.fgw, 7/3)  # |h(f)|^2 (Maggiore Eq.4.370, p.231)
+    # h_sq *= 1.25  # Hack that would give nicer matches! - i.e., 2/5 -> 1/2 in the line below
     df['htilde']         = 2/5 * _np.sqrt(h_sq)              # [h] = 1/Hz - Maggiore, Table 7.1, Eq.7.181
     df['htilde_pSqrtHz'] = 2 * df.htilde * _np.sqrt(df.fgw)  # [h] = 1/sqrt(Hz) - for (plot) comparison to ASD; see PRX 6, 041015 (2016), Fig.1
     
@@ -157,7 +158,7 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, fmax_fac=1, ver
 
 
 def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, PRfac, no_FP=False,
-                verbosity=0):
+                adhoc_lowf=False, verbosity=0):
     
     """Compute a simplified noise curve for a gravitational-wave interferometer.
     
@@ -177,11 +178,16 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
     
       PRfac (float):    Factor for power recycling (factor 1-...).
       no_FP (bool):     Do NOT use a Fabry-Perot cavity (optional; defaults to False, i.e. DO use a FPC).
-    
-      verbosity (int):  Verbosity level, defaults to 0: no output.
+
+      adhoc_lowf (bool):  Add an ad-hoc low-f term to mimic termal/Newtonian/seismic noise (defaults to False).
+      verbosity (int):    Verbosity level, defaults to 0: no output.
     
     Returns:
-      (pd.df):  Pandas.DataFrame containing noise strains.
+      (pd.df):  Pandas.DataFrame containing noise strains, with columns:
+                - asd: the total amplitude spectral density, in strain/sqrt(Hz);
+                - asd_shot:  the shot-noise component of the ASD, in strain/sqrt(Hz);
+                - asd_rad:   the radiation-pressure component of the ASD, in strain/sqrt(Hz);
+                - asd_lowf:  the ad-hoc low-frequency component of the ASD, in strain/sqrt(Hz), if desired.
     """
     
     # Create DataFrame:
@@ -197,6 +203,9 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
         Leff_L = 2*Fin/_ac.pi
         f_pole = _ac.c / (4 * Fin * Len)                         # Pole frequency
         f_pole_fac = _np.sqrt( 1 + _np.square(df.freq/f_pole) )
+        
+        
+    df['asd'] = 0  # Most important column first - assign proper values below
     
     df['asd_shot'] = \
         1/(8*Fin*Len) * _np.sqrt( (4*_ac.pi*_ac.h_bar*_ac.c * lam_L) / (eta_pd * PRfac * P_L) ) * f_pole_fac
@@ -206,12 +215,13 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
     
     df['asd'] = df.asd_shot + df.asd_rad
     
-    # Seismic noise: Ad-hoc term, (strongly!) adapted from Bader PhD thesis, Eq. 1.2.15:
-    seismic_isolation = 1e-4  # 10^10 needed for h ~ 1e-23 m/sqrt(Hz) @10Hz
-    alpha = 1e-6  # 1e-6 - 1e-9 m Hz^(3/2)
-    pow = 6       # ought to be 2!!!  {1e-4, 1e-6, 6} looks more like PRX 6 041015 (2016), Fig.1 curves for O1 (and O2?)
-    df['asd_seis'] = alpha / _np.power(df.freq, pow) / Len * seismic_isolation
-    df.asd += df.asd_seis
+    if adhoc_lowf:
+        # Ad-hoc low-f term, (strongly!) adapted from seismic noise Bader PhD thesis, Eq. 1.2.15:
+        seismic_isolation = 1e-4  # 10^10 needed for h ~ 1e-23 m/sqrt(Hz) @10Hz
+        alpha = 1e-6  # 1e-6 - 1e-9 m Hz^(3/2)
+        pow = 6       # {1e-4, 1e-6, 6} looks roughly like PRX 6 041015 (2016), Fig.1 curves for O1 (and O2?)
+        df['asd_lowf'] = alpha / _np.power(df.freq, pow) / Len * seismic_isolation
+        df.asd += df.asd_lowf
     
     if verbosity > 1:
         print()
