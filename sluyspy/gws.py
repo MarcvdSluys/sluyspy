@@ -91,14 +91,14 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, fmax_fac=1, ver
     range of frequencies.
     
     Parameters:
-      m1 (float):      Mass of binary component 1 (kg).
-      m2 (float):      Mass of binary component 2 (kg).
-      dist (float):    Distance of binary (m).
-      cosi (float):    Cosine of the inclination angle: +/-1 = face on, 0 = edge-on.
-      f_low (float):   Lower cut-off frequency (Hz).
-      f_high (float):  Upper cut-off frequency (Hz).
-      tcoal (float):   Coalescence time (s).
-      Npts (float):    Number of data points (-).
+      m1 (float):         Mass of binary component 1 (kg).
+      m2 (float):         Mass of binary component 2 (kg).
+      dist (float):       Distance of binary (m).
+      cosi (float):       Cosine of the inclination angle: +/-1 = face on, 0 = edge-on.
+      f_low (float):      Lower cut-off frequency (Hz).
+      f_high (float):     Upper cut-off frequency (Hz).
+      fmax_fac (float):   Factor to multiply f_max with (-).
+      Npts (float):       Number of data points (-).
     
     Returns:
       (pd.df):  Pandas dataframe containing variables, including:
@@ -194,14 +194,14 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
     df = _pd.DataFrame(data=_np.logspace(_np.log10(f_low), _np.log10(f_high), Npts), columns=['freq'])  # Initial column, Npts rows
     
     if no_FP:
-        Fin = _ac.pi/2
-        Leff_L = 1
-        f_pole = 0
+        Fin        = _ac.pi/2
+        Leff_L     = 1
+        f_pole     = 0
         f_pole_fac = 1
     else:
-        Fin = _ac.pi * _np.sqrt(R_in*R_end) / (1 - R_in*R_end)   # Finesse
-        Leff_L = 2*Fin/_ac.pi
-        f_pole = _ac.c / (4 * Fin * Len)                         # Pole frequency
+        Fin        = _ac.pi * _np.sqrt(R_in*R_end) / (1 - R_in*R_end)   # Finesse
+        Leff_L     = 2*Fin/_ac.pi
+        f_pole     = _ac.c / (4 * Fin * Len)                         # Pole frequency
         f_pole_fac = _np.sqrt( 1 + _np.square(df.freq/f_pole) )
         
         
@@ -223,13 +223,32 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
         df['asd_lowf'] = alpha / _np.power(df.freq, pow) / Len * seismic_isolation
         df.asd += df.asd_lowf
     
+    if verbosity > 2:
+        print()
+        print('Len:            ', Len/1000, 'km')
+        print('P_L:            ', P_L, 'W')
+        print('lam_L:          ', lam_L*1e9, 'nm')
+        print('eta_pd:         ', eta_pd)
+        print()
+        print('M_mir:          ', M_mir, 'kg')
+        print('R_in:           ', R_in)
+        print('R_end:          ', R_end)
+        print()
+        print('PRfac:          ', PRfac)
+        print()
+        
     if verbosity > 1:
         print()
-        print('Finesse:   ', Fin)
-        print('Leff/L:    ', Leff_L)
-        print('f_pole:    ', f_pole)
-        print('min ASD:   ', df.asd.min())
+        print('Finesse:        ', Fin)
+        print('Leff/L:         ', Leff_L)
+        print('f_pole:         ', f_pole)
         print()
+        print('min ASD_shot:   ', df.asd_shot.min(), '/sqrt(Hz)')
+        print('min ASD_rad:    ', df.asd_rad.min(),  '/sqrt(Hz)')
+        print('min ASD:        ', df.asd.min(),      '/sqrt(Hz)')
+        print('min ASD:        ', df.asd.min()*10,   '@ 100Hz')
+        print()
+        # print('MI ASD: ', 1/(_ac.pi*Len) * )
     
     return df
 
