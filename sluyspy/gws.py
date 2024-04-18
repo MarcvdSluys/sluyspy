@@ -253,3 +253,75 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
     return df
 
     
+def isco_radius_from_mass(mass, spin=0, as_km=False):
+    """Compute the black-hole ISCO GW radius from its mass and spin.
+    
+    Parameters:
+      mass (float):  mass of the black hole (Mo).
+      spin (float):  spin of the black hole (-1 - +1, defaults to 0).
+      as_km (bool):  the result is expressed in km, else in terms of the BH mass M (defaults to False).
+    
+    Returns:
+      (float):  ISCO radius in either km or M, as desired.
+    """
+    
+    scalar_input = True
+    mass = _np.asarray(_np.copy(mass+spin*0), dtype=float)  # Copy and typecast to numpy.ndarray - ensure float!
+    spin = _np.asarray(_np.copy(mass*0+spin), dtype=float)  # Copy and typecast to numpy.ndarray - ensure float!
+    if mass.ndim == 0:
+        mass = mass[None]  # Makes mass a 1D array.  Comment: use np.newaxis instead?
+    else:
+        scalar_input = False
+    if spin.ndim == 0:
+        spin = spin[None]  # Makes spin a 1D array.  Comment: use np.newaxis instead?
+    else:
+        scalar_input = False
+    
+    z1 = 1 + _np.power(1 - _np.square(spin),_ac.c3rd) * \
+        ( _np.power(1+_np.abs(spin),_ac.c3rd) + _np.power(1-_np.abs(spin),_ac.c3rd) )
+    z2 = _np.sqrt(3*_np.square(spin) + _np.square(z1))
+    
+    r_isco = _np.zeros_like(mass+spin)
+    sel = spin<0
+    r_isco[sel]  = mass[sel] * (3+z2[sel] - _np.sqrt((3-z1[sel])*(3+z1[sel] + 2*z2[sel])) )  # Expressed in M
+    sel = spin>=0
+    r_isco[sel]  = mass[sel] * (3+z2[sel] + _np.sqrt((3-z1[sel])*(3+z1[sel] + 2*z2[sel])) )  # Expressed in M
+    
+    if scalar_input:
+        return float(_np.squeeze(r_isco))  # Array -> scalar (float)
+    
+    return r_isco
+
+
+def isco_frequency_from_isco_radius(mass, r_isco, as_km=False):
+    """Compute the ISCO GW frequency from the mass and ISCO radius expressed in M.
+    
+    Parameters:
+      mass (float):    mass of the object (Mo).
+      r_isco (float):  ISCO radius of the object (in units of M, the BH mass).
+      as_km (bool):    the ISCO radius is expressed in km, else in terms of the BH mass M (defaults to False).
+    
+    Returns:
+      (float):  ISCO GW frequency in Hertz.
+    """
+    
+    f_isco_gw = 2 * _ac.c**3 / (2*_ac.pi * _np.power(r_isco/mass,1.5) * _ac.g*mass*_ac.m_sun)
+    
+    return f_isco_gw
+
+
+def isco_frequency_from_mass(mass, spin=0):
+    """Compute the ISCO GW frequency from the mass and ISCO radius expressed in M.
+    
+    Parameters:
+      mass (float):    mass of the object (Mo).
+      spin (float):    spin of the black hole (-1 - +1, defaults to 0).
+    
+    Returns:
+      (float):  ISCO GW frequency in Hertz.
+    """
+    
+    r_isco = isco_radius_from_mass(mass, spin, as_km=False)  # R_isco in terms of M
+    f_isco_gw = 2 * _ac.c**3 / (2*_ac.pi * _np.power(r_isco/mass,1.5) * _ac.g*mass*_ac.m_sun)
+    
+    return f_isco_gw
