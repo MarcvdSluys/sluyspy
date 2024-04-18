@@ -191,7 +191,7 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
     """
     
     # Create DataFrame:
-    df = _pd.DataFrame(data=_np.logspace(_np.log10(f_low), _np.log10(f_high), Npts), columns=['freq'])  # Initial column, Npts rows
+    df = _pd.DataFrame(data=_np.logspace(_np.log10(f_low), _np.log10(f_high), Npts), columns=['fgw'])  # Initial column, Npts rows
     
     if no_FP:
         Fin        = _ac.pi/2
@@ -202,7 +202,7 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
         Fin        = _ac.pi * _np.sqrt(R_in*R_end) / (1 - R_in*R_end)   # Finesse
         Leff_L     = 2*Fin/_ac.pi
         f_pole     = _ac.c / (4 * Fin * Len)                         # Pole frequency
-        f_pole_fac = _np.sqrt( 1 + _np.square(df.freq/f_pole) )
+        f_pole_fac = _np.sqrt( 1 + _np.square(df.fgw/f_pole) )
         
         
     df['asd'] = 0  # Most important column first - assign proper values below
@@ -210,7 +210,7 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
     df['asd_shot'] = \
         1/(8*Fin*Len) * _np.sqrt( (4*_ac.pi*_ac.h_bar*_ac.c * lam_L) / (eta_pd * PRfac * P_L) ) * f_pole_fac
     
-    df['asd_rad'] = 16*_np.sqrt(2) * Fin / (M_mir * Len * _np.square(_ac.pi2*df.freq)) \
+    df['asd_rad'] = 16*_np.sqrt(2) * Fin / (M_mir * Len * _np.square(_ac.pi2*df.fgw)) \
         * _np.sqrt((_ac.h_bar * P_L * PRfac)/(_ac.pi2 * lam_L * _ac.c)) / f_pole_fac
     
     df['asd'] = df.asd_shot + df.asd_rad
@@ -220,7 +220,7 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
         seismic_isolation = 1e-4  # 10^10 needed for h ~ 1e-23 m/sqrt(Hz) @10Hz
         alpha = 1e-6  # 1e-6 - 1e-9 m Hz^(3/2)
         pow = 6       # {1e-4, 1e-6, 6} looks roughly like PRX 6 041015 (2016), Fig.1 curves for O1 (and O2?)
-        df['asd_lowf'] = alpha / _np.power(df.freq, pow) / Len * seismic_isolation
+        df['asd_lowf'] = alpha / _np.power(df.fgw, pow) / Len * seismic_isolation
         df.asd += df.asd_lowf
     
     if verbosity > 2:
