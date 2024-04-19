@@ -22,7 +22,7 @@ import pandas as _pd
 import astroconst as _ac
 
 
-def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts, risco_fac=1.5, Fplcr=2/5):
+def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts, risco_fac=1.5, Fplcr=2/5, verbosity=0):
     """Compute a simple, Newtonian(!) compact-binary-coalescence waveform.
     
     Parameters:
@@ -37,6 +37,7 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts, risco_fac=1.5, Fplcr=2/5):
     
       Fplcr (float):      The mean value of F_+ and F_x: <F> ~ sqrt(<F_+^2 + F_x^2>),
                           which includes the inclination.  Defaults to 2/5.
+      verbosity (int):    Verbosity level, defaults to 0: no output.
     
     Returns:
       (pd.df):  Pandas dataframe containing variables.
@@ -46,16 +47,15 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts, risco_fac=1.5, Fplcr=2/5):
     mu = m1*m2/mt
     Mc = (m1*m2/mt**(1/3))**(3/5)
     
-    Rs = 2 * _ac.G * mt / _ac.c**2
-    if m1 < 3.9*_ac.sun_m:        # 11.5km ~ Rs for BH of 3.9Mo
-        R1 = 11.5*_ac.km          # NS - all NSs have R=11.5km: https://arxiv.org/abs/1205.6871
+    if m1 < 3.9*_ac.sun_m:        # R_NS = 11.5km ~ Rs = R_BH for BH of 3.9Mo
+        R1 = 11.5*_ac.km          # R_NS (m) - all NSs have R=11.5km: https://arxiv.org/abs/1205.6871
     else:
-        R1 = 2*_ac.G*m1/_ac.c**2  # BH
+        R1 = 2*_ac.G*m1/_ac.c**2  # R_BH (m)
     if m2 < 3.9*_ac.sun_m:
-        R2 = 11.5*_ac.km          # NS
+        R2 = 11.5*_ac.km          # R_NS (m)
     else:
-        R2 = 2*_ac.G*m2/_ac.c**2  # BH
-    a_min = R1+R2
+        R2 = 2*_ac.G*m2/_ac.c**2  # R_BH (m)
+    a_min = R1 + R2               # (m)
     
     f_isco = _ac.c**3 / (6**(3/2) * _ac.pi * _ac.g * mt)
     # f_max  = f_isco
@@ -75,7 +75,6 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts, risco_fac=1.5, Fplcr=2/5):
     df['worb'] = df.fgw/2 * _ac.pi2  # worb = forb * 2pi = f_gw/2 * 2pi
     df['aorb'] = _np.power((_ac.g*mt) / _np.square(df.worb), 1/3)  # aorb^3 = G Mt / w^2
     
-    df['aorb_Risco'] = df.aorb / Rs / 6
     df['vorb1'] = df.worb * df.aorb * m2/mt / _ac.c
     df['vorb2'] = df.worb * df.aorb * m1/mt / _ac.c
     
@@ -85,18 +84,13 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts, risco_fac=1.5, Fplcr=2/5):
     df['hcr']  = df.ampl * cosi          * _np.sin(h_phase)
     df['h']    = Fplcr * (df.hpl + df.hcr)
     
-    # Frequency domain:
-    df['htilde'] = _ac.pi**(-2/3) * _np.sqrt(5/24) * _ac.c / dist \
-        * (_ac.G * Mc / _ac.c**3)**(5/6) * _np.power(df.fgw, -7/6)
+    if verbosity>0:
+        print('f_low, f_high (Hz):          ', df.fgw.iloc[0], df.fgw.iloc[-1])
+        print('a_min (km):                  ', a_min/1000)
+        print('f_isco, f_max (Hz):          ', f_isco, f_max)
+        
+        if verbosity>8: print(df)
     
-    # df['Psi_pl'] = _ac.pi2 * df.fgw * 1  -  0  - _ac.pio4  \
-    #     +  3/4 * _np.power(_ac.G * Mc/_ac.c**3 * 8*_ac.pi * df.fgw, -5/3)
-    # df['Psi_cr'] = df.Psi_pl + _ac.pio2
-    # df['htilde_pl'] = df.htilde * (1+cosi**2)/2 * _np.exp( df.Psi_pl * 1j )
-    # df['htilde_cr'] = df.htilde * cosi          * _np.exp( df.Psi_cr * 1j )
-    # df['htilde_tot'] = _np.abs(_np.real(df.htilde_pl + df.htilde_cr)/2)  # _np.cos(df.Psi_pl)
-    
-    print('f_isco, f_max: ', f_isco, f_max)
     
     return df
 
@@ -112,8 +106,9 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, 
       cosi (float):       Cosine of the inclination angle: +/-1 = face on, 0 = edge-on.
       f_low (float):      Lower cut-off frequency (Hz).
       f_high (float):     Upper cut-off frequency (Hz).
-      risco_fac (float):  R_isco = R_star * risco_fac (-, defaults to 1.5); used to compute f_max.
       Npts (float):       Number of data points (-).
+      risco_fac (float):  R_isco = R_star * risco_fac (-, defaults to 1.5); used to compute f_max.
+      verbosity (int):    Verbosity level, defaults to 0: no output.
     
     Returns:
       (pd.df):  Pandas dataframe containing variables, including:
@@ -125,7 +120,6 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, 
     mt = m1+m2
     Mc = (m1*m2/mt**(1/3))**(3/5)
     
-    Rs = 2*_ac.G*mt/_ac.c**2
     if m1 < 3.9*_ac.sun_m:        # 11.5km ~ Rs for BH of 3.9Mo
         R1 = 11.5*_ac.km          # NS - all NSs have R=11.5km: https://arxiv.org/abs/1205.6871
     else:
@@ -149,8 +143,8 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, 
     # Frequency domain (see Maggiore Eqs. 4.43-37, p.174):
     h_sq = 5/(24 * _ac.pi**(4/3) * dist**2 * _ac.c**3) * (_ac.G * Mc)**(5/3) / _np.power(df.fgw, 7/3)  # |h(f)|^2 (Maggiore Eq.4.370, p.231)
     # h_sq *= 1.25  # Hack that would give nicer matches! - i.e., 2/5 -> 1/2 in the line below
-    df['htilde']         = 2/5 * _np.sqrt(h_sq)              # [h] = 1/Hz - Maggiore, Table 7.1, Eq.7.181
-    df['htilde_pSqrtHz'] = 2 * df.htilde * _np.sqrt(df.fgw)  # [h] = 1/sqrt(Hz) - for (plot) comparison to ASD; see PRX 6, 041015 (2016), Fig.1
+    df['htilde']         = 2/5 * _np.sqrt(h_sq)                # [h] = 1/Hz - Maggiore, Table 7.1, Eq.7.181
+    df['htilde_pSqrtHz'] = 2   * df.htilde * _np.sqrt(df.fgw)  # [h] = 1/sqrt(Hz) - for (plot) comparison to ASD; see PRX 6, 041015 (2016), Fig.1
     
     # df['Psi_pl'] = _ac.pi2 * df.fgw * 1  -  0  - _ac.pio4  \
     #     +  3/4 * _np.power(_ac.G * Mc/_ac.c**3 * 8*_ac.pi * df.fgw, -5/3)
@@ -161,7 +155,7 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, 
     
     if verbosity>0:
         print('f_low, f_high (Hz):          ', f_low, f_high)
-        print('Rs (km):                     ', Rs/1000)
+        print('a_min (km):                  ', a_min/1000)
         print('f_isco, f_max (Hz):          ', f_isco, f_max)
         print('h_start, h_end (1/Hz):       ', df.htilde.iloc[0], df.htilde.iloc[-1])
         print('h_start, h_end (1/sqrt Hz):  ', df.htilde_pSqrtHz.iloc[0], df.htilde_pSqrtHz.iloc[-1])
