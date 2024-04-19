@@ -47,15 +47,9 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts, risco_fac=1.5, Fplcr=2/5, v
     mu = m1*m2/mt
     Mc = (m1*m2/mt**(1/3))**(3/5)
     
-    if m1 < 3.9*_ac.sun_m:        # R_NS = 11.5km ~ Rs = R_BH for BH of 3.9Mo
-        R1 = 11.5*_ac.km          # R_NS (m) - all NSs have R=11.5km: https://arxiv.org/abs/1205.6871
-    else:
-        R1 = 2*_ac.G*m1/_ac.c**2  # R_BH (m)
-    if m2 < 3.9*_ac.sun_m:
-        R2 = 11.5*_ac.km          # R_NS (m)
-    else:
-        R2 = 2*_ac.G*m2/_ac.c**2  # R_BH (m)
-    a_min = R1 + R2               # (m)
+    R1 = radius_BH_NS_from_mass(m1)  # Get the BH/NS radius for this mass (m)
+    R2 = radius_BH_NS_from_mass(m2)
+    a_min = R1 + R2                  # (m)
     
     f_isco = _ac.c**3 / (6**(3/2) * _ac.pi * _ac.g * mt)
     # f_max  = f_isco
@@ -333,3 +327,29 @@ def isco_frequency_from_mass(mass, spin=0):
     f_isco_gw = 2 * _ac.c**3 / (2*_ac.pi * _np.power(r_isco/mass,1.5) * _ac.g*mass*_ac.m_sun)
     
     return f_isco_gw
+
+
+def radius_BH_NS_from_mass(mass):
+    """Estimate the radius of a (non-spinning) black hole or neutron star from its mass.
+    
+    Parameters:
+      mass (float):  mass of the object (kg).
+    
+    Returns:
+      (float):  radius of the object (m).
+    
+    
+    Note: this function simply returns:
+      - 11.5 km as the radius of a NS if mass < 3.9Mo;
+      - the Schwarzschild radius if mass >= 3.9Mo.
+    
+    Rationale:
+      - all NSs have radii of ~11.5km here: https://arxiv.org/abs/1205.6871;
+      - Rs ~ 11.5km for a 3.9Mo BH.
+    """
+    
+    if mass < 3.9*_ac.sun_m:         # R_s ~ 11.5km for BH of 3.9Mo
+        rad = 11.5*_ac.km            # R_NS (m)
+    else:
+        rad = 2*_ac.G*mass/_ac.c**2  # R_BH (m)
+    return rad
