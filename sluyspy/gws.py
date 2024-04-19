@@ -106,9 +106,37 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, 
     
     Returns:
       (pd.df):  Pandas dataframe containing variables, including:
-                - fgw:            GW frequency in Hz
-                - htilde:         h~ in 1/Hz
-                - htilde_pSqrtHz: h~ in 1/sqrt(Hz)  (= 2 * htilde * sqrt(fgw))
+                - fgw:            GW frequency in Hz;
+                - htilde:         h~ in 1/Hz;
+                - htilde_pSqrtHz: h~ in 1/sqrt(Hz)  (= 2 * htilde * sqrt(fgw)).
+    """
+    
+    # Create DataFrame with the frequency range and call cbc_waveform_frequency_array() to fill it:
+    df = _pd.DataFrame(data=_np.logspace(_np.log10(f_low), _np.log10(f_high), Npts), columns=['fgw'])  # Initial column, Npts rows
+    
+    df = cbc_waveform_frequency_array(df, m1,m2, dist,cosi, risco_fac=1.5, verbosity=0)
+    
+    return df
+
+
+def cbc_waveform_frequency_array(df, m1,m2, dist,cosi, risco_fac=1.5, verbosity=0):
+    """Compute a simple, Newtonian(!) compact-binary-coalescence waveform in the frequency domain for a given
+    range of frequencies.
+    
+    Parameters:
+      df (pd.df):         Pandas DataFrame containing frequency array (Hz) in column 'fgw'.
+      m1 (float):         Mass of binary component 1 (kg).
+      m2 (float):         Mass of binary component 2 (kg).
+      dist (float):       Distance of binary (m).
+      cosi (float):       Cosine of the inclination angle: +/-1 = face on, 0 = edge-on.
+      risco_fac (float):  R_isco = R_star * risco_fac (-, defaults to 1.5); used to compute f_max.
+      verbosity (int):    Verbosity level, defaults to 0: no output.
+    
+    Returns:
+      (pd.df):  Pandas dataframe containing variables, including:
+                - fgw:            GW frequency in Hz (input);
+                - htilde:         h~ in 1/Hz;
+                - htilde_pSqrtHz: h~ in 1/sqrt(Hz)  (= 2 * htilde * sqrt(fgw)).
     """
     
     mt = m1+m2
@@ -128,17 +156,12 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, 
     # f_max = _ac.c**3 / (3**(3/2) * _ac.pi * _ac.g * mt)       # Roughly matches PRX 6 041015 (2016)
     f_max = 1/_ac.pi * _np.sqrt(_ac.G * mt / (risco_fac*a_min)**3)  # f_max based on 1.5 x (sum of radii) and Kepler - same as above, but allows NSs
     
-    # Create DataFrame:
-    df = _pd.DataFrame(data=_np.logspace(_np.log10(f_low), _np.log10(f_high), Npts), columns=['fgw'])  # Initial column, Npts rows
-    
-    df = df[df.fgw < f_max]  # Cut the REALLY wrong bits...
-    
     
     # Frequency domain (see Maggiore Eqs. 4.43-37, p.174):
     h_sq = 5/(24 * _ac.pi**(4/3) * dist**2 * _ac.c**3) * (_ac.G * Mc)**(5/3) / _np.power(df.fgw, 7/3)  # |h(f)|^2 (Maggiore Eq.4.370, p.231)
-    # h_sq *= 1.25  # Hack that would give nicer matches! - i.e., 2/5 -> 1/2 in the line below
-    df['htilde']         = 2/5 * _np.sqrt(h_sq)                # [h] = 1/Hz - Maggiore, Table 7.1, Eq.7.181
-    df['htilde_pSqrtHz'] = 2   * df.htilde * _np.sqrt(df.fgw)  # [h] = 1/sqrt(Hz) - for (plot) comparison to ASD; see PRX 6, 041015 (2016), Fig.1
+    # h_sq *= 1.665  # Hack that would give nicer matches! - i.e., 2/5 -> 2/3 or sqrt(2/5)! in the line below
+    df['htilde']         = 2/5 * _np.sqrt(h_sq)              # [h] = 1/Hz - Maggiore, Table 7.1, Eq.7.181
+    df['htilde_pSqrtHz'] = 2 * df.htilde * _np.sqrt(df.fgw)  # [h] = 1/sqrt(Hz) - for (plot) comparison to ASD; see PRX 6, 041015 (2016), Fig.1
     
     # df['Psi_pl'] = _ac.pi2 * df.fgw * 1  -  0  - _ac.pio4  \
     #     +  3/4 * _np.power(_ac.G * Mc/_ac.c**3 * 8*_ac.pi * df.fgw, -5/3)
@@ -146,6 +169,11 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, 
     # df['htilde_pl'] = df.htilde * (1+cosi**2)/2 * _np.exp( df.Psi_pl * 1j )
     # df['htilde_cr'] = df.htilde * cosi          * _np.exp( df.Psi_cr * 1j )
     # df['htilde_tot'] = _np.abs(_np.real(df.htilde_pl + df.htilde_cr)/2)  # _np.cos(df.Psi_pl)
+    
+    
+    df = df[df.fgw < f_max]  # Cut the REALLY wrong bits...
+    f_low  = df.fgw.iloc[0]
+    f_high = df.fgw.iloc[-1]
     
     if verbosity>0:
         print('f_low, f_high (Hz):          ', f_low, f_high)
