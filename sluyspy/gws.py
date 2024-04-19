@@ -22,17 +22,21 @@ import pandas as _pd
 import astroconst as _ac
 
 
-def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts):
+def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts, risco_fac=1.5, Fplcr=2/5):
     """Compute a simple, Newtonian(!) compact-binary-coalescence waveform.
     
     Parameters:
-      m1 (float):  Mass of binary component 1 (kg).
-      m2 (float):  Mass of binary component 2 (kg).
-      dist (float):  Distance of binary (m).
-      cosi (float):    Cosine of the inclination angle: +/-1 = face on, 0 = edge-on.
-      tlen (float):    Length of time of array (s).
-      tcoal (float):   Coalescence time (s).
-      Npts (float):    Number of data points (-).
+      m1 (float):         Mass of binary component 1 (kg).
+      m2 (float):         Mass of binary component 2 (kg).
+      dist (float):       Distance of binary (m).
+      cosi (float):       Cosine of the inclination angle: +/-1 = face on, 0 = edge-on.
+      tlen (float):       Length of time of array (s).
+      tcoal (float):      Coalescence time (s).
+      risco_fac (float):  R_isco = R_star * risco_fac (-, defaults to 1.5); used to compute f_max.
+      Npts (float):       Number of data points (-).
+    
+      Fplcr (float):      The mean value of F_+ and F_x: <F> ~ sqrt(<F_+^2 + F_x^2>),
+                          which includes the inclination.  Defaults to 2/5.
     
     Returns:
       (pd.df):  Pandas dataframe containing variables.
@@ -42,9 +46,21 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts):
     mu = m1*m2/mt
     Mc = (m1*m2/mt**(1/3))**(3/5)
     
+    Rs = 2 * _ac.G * mt / _ac.c**2
+    if m1 < 3.9*_ac.sun_m:        # 11.5km ~ Rs for BH of 3.9Mo
+        R1 = 11.5*_ac.km          # NS - all NSs have R=11.5km: https://arxiv.org/abs/1205.6871
+    else:
+        R1 = 2*_ac.G*m1/_ac.c**2  # BH
+    if m2 < 3.9*_ac.sun_m:
+        R2 = 11.5*_ac.km          # NS
+    else:
+        R2 = 2*_ac.G*m2/_ac.c**2  # BH
+    a_min = R1+R2
+    
     f_isco = _ac.c**3 / (6**(3/2) * _ac.pi * _ac.g * mt)
     # f_max  = f_isco
-    f_max  = _ac.c**3 / (1**(3/2) * _ac.pi * _ac.g * mt)
+    # f_max  = _ac.c**3 / (1**(3/2) * _ac.pi * _ac.g * mt)
+    f_max = 1/_ac.pi * _np.sqrt(_ac.G * mt / (risco_fac*a_min)**3)  # f_max based on 1.5 x (sum of radii) and Kepler - same as above, but allows NSs
     
     tstart = tcoal - tlen
     
@@ -59,7 +75,6 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts):
     df['worb'] = df.fgw/2 * _ac.pi2  # worb = forb * 2pi = f_gw/2 * 2pi
     df['aorb'] = _np.power((_ac.g*mt) / _np.square(df.worb), 1/3)  # aorb^3 = G Mt / w^2
     
-    Rs = 2 * _ac.G * mt / _ac.c**2
     df['aorb_Risco'] = df.aorb / Rs / 6
     df['vorb1'] = df.worb * df.aorb * m2/mt / _ac.c
     df['vorb2'] = df.worb * df.aorb * m1/mt / _ac.c
@@ -68,7 +83,7 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts):
     h_phase    = 2*df.worb*(df.time-tcoal)
     df['hpl']  = df.ampl * (1+cosi**2)/2 * _np.cos(h_phase)
     df['hcr']  = df.ampl * cosi          * _np.sin(h_phase)
-    df['h']    = (df.hpl + df.hcr)/2 * 1e21
+    df['h']    = Fplcr * (df.hpl + df.hcr)
     
     # Frequency domain:
     df['htilde'] = _ac.pi**(-2/3) * _np.sqrt(5/24) * _ac.c / dist \
@@ -86,7 +101,7 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts):
     return df
 
 
-def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, fmax_fac=1, verbosity=0):
+def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, verbosity=0):
     """Compute a simple, Newtonian(!) compact-binary-coalescence waveform in the frequency domain for a given
     range of frequencies.
     
@@ -97,7 +112,7 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, fmax_fac=1, ver
       cosi (float):       Cosine of the inclination angle: +/-1 = face on, 0 = edge-on.
       f_low (float):      Lower cut-off frequency (Hz).
       f_high (float):     Upper cut-off frequency (Hz).
-      fmax_fac (float):   Factor to multiply f_max with (-).
+      risco_fac (float):  R_isco = R_star * risco_fac (-, defaults to 1.5); used to compute f_max.
       Npts (float):       Number of data points (-).
     
     Returns:
@@ -122,9 +137,8 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, fmax_fac=1, ver
     a_min = R1+R2
     
     f_isco  = _ac.c**3 / (6**(3/2) * _ac.pi * _ac.g * mt)
-    # f_max   = f_isco * fmax_fac
     # f_max = _ac.c**3 / (3**(3/2) * _ac.pi * _ac.g * mt)       # Roughly matches PRX 6 041015 (2016)
-    f_max = 1/_ac.pi * _np.sqrt(_ac.G * mt / (1.5*a_min)**3)  # f_max based on 1.5 x (sum of radii) and Kepler - same as above, but allows NSs
+    f_max = 1/_ac.pi * _np.sqrt(_ac.G * mt / (risco_fac*a_min)**3)  # f_max based on 1.5 x (sum of radii) and Kepler - same as above, but allows NSs
     
     # Create DataFrame:
     df = _pd.DataFrame(data=_np.logspace(_np.log10(f_low), _np.log10(f_high), Npts), columns=['fgw'])  # Initial column, Npts rows

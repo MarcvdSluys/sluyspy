@@ -41,7 +41,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
       map_zorder (bool):  Use manual zorder (defaults to True - opposed to pyplot default: compute).
     
     Returns:
-      (tuple):  Tuple containing the plot and axis objects.
+      (tuple):  Tuple (fig,ax) containing the figure and axis objects.
     
     Defaults:
       - screen: size 1920x1080, font 14, lw: 1 - aimed at my screen;
