@@ -89,7 +89,7 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts, risco_fac=1.5, Fplcr=2/5, v
     return df
 
 
-def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, verbosity=0):
+def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, Fplcr=2/5, verbosity=0):
     """Compute a simple, Newtonian(!) compact-binary-coalescence waveform in the frequency domain for a given
     range of frequencies.
     
@@ -102,6 +102,8 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, 
       f_high (float):     Upper cut-off frequency (Hz).
       Npts (float):       Number of data points (-).
       risco_fac (float):  R_isco = R_star * risco_fac (-, defaults to 1.5); used to compute f_max.
+      Fplcr (float):      The mean value of F_+ and F_x: <F> ~ sqrt(<F_+^2 + F_x^2>),
+                          which includes the inclination.  Defaults to 2/5.
       verbosity (int):    Verbosity level, defaults to 0: no output.
     
     Returns:
@@ -114,12 +116,12 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, 
     # Create DataFrame with the frequency range and call cbc_waveform_frequency_array() to fill it:
     df = _pd.DataFrame(data=_np.logspace(_np.log10(f_low), _np.log10(f_high), Npts), columns=['fgw'])  # Initial column, Npts rows
     
-    df = cbc_waveform_frequency_array(df, m1,m2, dist,cosi, risco_fac=1.5, verbosity=0)
+    df = cbc_waveform_frequency_array(df, m1,m2, dist,cosi, risco_fac=1.5, Fplcr=2/5, verbosity=0)
     
     return df
 
 
-def cbc_waveform_frequency_array(df, m1,m2, dist,cosi, risco_fac=1.5, verbosity=0):
+def cbc_waveform_frequency_array(df, m1,m2, dist,cosi, risco_fac=1.5, Fplcr=2/5, verbosity=0):
     """Compute a simple, Newtonian(!) compact-binary-coalescence waveform in the frequency domain for a given
     range of frequencies.
     
@@ -130,6 +132,8 @@ def cbc_waveform_frequency_array(df, m1,m2, dist,cosi, risco_fac=1.5, verbosity=
       dist (float):       Distance of binary (m).
       cosi (float):       Cosine of the inclination angle: +/-1 = face on, 0 = edge-on.
       risco_fac (float):  R_isco = R_star * risco_fac (-, defaults to 1.5); used to compute f_max.
+      Fplcr (float):      The mean value of F_+ and F_x: <F> ~ sqrt(<F_+^2 + F_x^2>),
+                          which includes the inclination.  Defaults to 2/5.
       verbosity (int):    Verbosity level, defaults to 0: no output.
     
     Returns:
@@ -154,8 +158,8 @@ def cbc_waveform_frequency_array(df, m1,m2, dist,cosi, risco_fac=1.5, verbosity=
     # Frequency domain (see Maggiore Eqs. 4.43-37, p.174):
     h_sq = 5/(24 * _ac.pi**(4/3) * dist**2 * _ac.c**3) * (_ac.G * Mc)**(5/3) / _np.power(df.fgw, 7/3)  # |h(f)|^2 (Maggiore Eq.4.370, p.231)
     # h_sq *= 1.665  # Hack that would give nicer matches! - i.e., 2/5 -> 2/3 or sqrt(2/5)! in the line below
-    df['htilde']         = 2/5 * _np.sqrt(h_sq)                # [h] = 1/Hz - Maggiore, Table 7.1, Eq.7.181
-    df['htilde_pSqrtHz'] = 2   * df.htilde * _np.sqrt(df.fgw)  # [h] = 1/sqrt(Hz) - for (plot) comparison to ASD; see PRX 6, 041015 (2016), Fig.1
+    df['htilde']         = Fplcr * _np.sqrt(h_sq)                # [h] = 1/Hz - Maggiore, Table 7.1, Eq.7.181
+    df['htilde_pSqrtHz'] = 2     * df.htilde * _np.sqrt(df.fgw)  # [h] = 1/sqrt(Hz) - for (plot) comparison to ASD; see PRX 6, 041015 (2016), Fig.1
     
     # df['Psi_pl'] = _ac.pi2 * df.fgw * 1  -  0  - _ac.pio4  \
     #     +  3/4 * _np.power(_ac.G * Mc/_ac.c**3 * 8*_ac.pi * df.fgw, -5/3)
