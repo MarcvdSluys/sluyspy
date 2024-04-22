@@ -22,7 +22,7 @@ from .cli import error as _error
 
 
 def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, title='Python plot',
-               fz=None,lw=None, plot3d=False, man_zorder=True):
+               fz=None,lw=None, plot3d=False, man_zorder=True, cblind=True):
     """Start a matplotlib.pyplot plot with a choice of my favourite options.
     
     Parameters:
@@ -39,6 +39,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     
       plot3d (bool):      Start a 3D plot (optional, defaults to False -> 2D).
       map_zorder (bool):  Use manual zorder (defaults to True - opposed to pyplot default: compute).
+      cblind (bool):      Choose a colour-blindness-aware colour palette (optional, defaults to True).
     
     Returns:
       (tuple):  Tuple (fig,ax) containing the figure and axis objects.
@@ -51,36 +52,37 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
       - org:    size 930x520,   font 12, lw: 1 - aimed at output in emacs Orgmode.
     """
     
-    import matplotlib
+    import matplotlib as _mpl
+    
+    if cblind is True: _plt.style.use('tableau-colorblind10')
     
     if xkcd:  _plt.xkcd()                                   # Plot everything that follows in XKCD style
     if dark_bg:  _plt.style.use('dark_background')          # Invert colours
     if xkcd and dark_bg:
-        from matplotlib import patheffects
-        _plt.rcParams['path.effects'] = [patheffects.withStroke(linewidth=0)]  # Needed for XKCD style on a dark background
+        _plt.rcParams['path.effects'] = [_mpl.patheffects.withStroke(linewidth=0)]  # Needed for XKCD style on a dark background
     
     if ptype == 'screen':
         if hsize is None: hsize = 19.2  # 1920
         if vsize is None: vsize = 10.8  # 1080
-        matplotlib.rcParams.update({'font.size': 14})       # Set font size for all text, aimed at full screen display
+        _mpl.rcParams.update({'font.size': 14})       # Set font size for all text, aimed at full screen display
     elif ptype == 'file':
         if hsize is None: hsize = 12.5  # 1250
         if vsize is None: vsize =  7.0  # 700
-        matplotlib.rcParams.update({'font.size': 14})       # Set font size for all text aimed at an electonic file
-        matplotlib.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
+        _mpl.rcParams.update({'font.size': 14})       # Set font size for all text aimed at an electonic file
+        _mpl.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
     elif ptype == 'both':
         if hsize is None: hsize = 15.8  # 1580
         if vsize is None: vsize =  8.5  # 850
-        matplotlib.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
-        matplotlib.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
+        _mpl.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
+        _mpl.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
     elif ptype == 'square':
         if hsize is None: hsize = 8.5  # 850
         if vsize is None: vsize = 8.5  # 850
-        matplotlib.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
+        _mpl.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
     elif ptype == 'org':
         if hsize is None: hsize = 9.0  # 900
         if vsize is None: vsize = 5.0  # 500
-        matplotlib.rcParams.update({'font.size': 12})       # Set font size for all text: small
+        _mpl.rcParams.update({'font.size': 12})       # Set font size for all text: small
     else:
         _error('Unknown plot type: '+ptype+', aborting.')
     
@@ -90,8 +92,8 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     while _plt.fignum_exists(titlel):
         titlel = title + ' ' + str(plotnum)
     
-    if fz is not None: matplotlib.rcParams.update({'font.size': fz})        # Set font size for all text
-    if lw is not None: matplotlib.rcParams.update({'lines.linewidth': lw})  # Set custom default line width
+    if fz is not None: _mpl.rcParams.update({'font.size': fz})        # Set font size for all text
+    if lw is not None: _mpl.rcParams.update({'lines.linewidth': lw})  # Set custom default line width
     fig = _plt.figure(figsize=(hsize,vsize), num=titlel)  # Custom size
     
     if plot3d:
