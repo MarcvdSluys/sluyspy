@@ -27,8 +27,8 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     
     Parameters:
       ptype (str):        Plot type: 'screen', 'file', 'both' (a compromise; default), 'square' or 'org'.
-      hsize (float):      Horizontal size of the figure (hectopixels); can overrule setting by ptype.
-      vsize (float):      Vertical size of the figure (hectopixels); can overrule setting by ptype.
+      hsize (float):      Horizontal size of the figure (pixels if >50, hectopixels otherwise); can overrule setting by ptype.
+      vsize (float):      Vertical size of the figure (pixels if >50, hectopixels otherwise); can overrule setting by ptype.
     
       dark_bg (bool):     Use a dark background (optional, defaults to False).
       xkcd (bool):        Use XKCD style (optional, defaults to False).
@@ -61,27 +61,31 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     if xkcd and dark_bg:
         _plt.rcParams['path.effects'] = [_mpl.patheffects.withStroke(linewidth=0)]  # Needed for XKCD style on a dark background
     
+    # If size>50, assume pixels/"dots" are specified; convert to "inches":
+    if hsize is not None and hsize>50: hsize /= 100  # default: 100 dpi
+    if vsize is not None and vsize>50: vsize /= 100  # default: 100 dpi
+    
     if ptype == 'screen':
-        if hsize is None: hsize = 19.2  # 1920
-        if vsize is None: vsize = 10.8  # 1080
+        if hsize is None: hsize = 19.2  # 1920 pixels
+        if vsize is None: vsize = 10.8  # 1080 pixels
         _mpl.rcParams.update({'font.size': 14})       # Set font size for all text, aimed at full screen display
     elif ptype == 'file':
-        if hsize is None: hsize = 12.5  # 1250
-        if vsize is None: vsize =  7.0  # 700
+        if hsize is None: hsize = 12.5  # 1250 pixels
+        if vsize is None: vsize =  7.0  # 700 pixels
         _mpl.rcParams.update({'font.size': 14})       # Set font size for all text aimed at an electonic file
         _mpl.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
     elif ptype == 'both':
-        if hsize is None: hsize = 15.8  # 1580
-        if vsize is None: vsize =  8.5  # 850
+        if hsize is None: hsize = 15.8  # 1580 pixels
+        if vsize is None: vsize =  8.5  # 850 pixels
         _mpl.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
         _mpl.rcParams.update({'lines.linewidth': 2})  # Set default line width to 2
     elif ptype == 'square':
-        if hsize is None: hsize = 8.5  # 850
-        if vsize is None: vsize = 8.5  # 850
+        if hsize is None: hsize = 8.5  # 850 pixels
+        if vsize is None: vsize = 8.5  # 850 pixels
         _mpl.rcParams.update({'font.size': 16})       # Set font size for all text: compromise screen visibility and report readability
     elif ptype == 'org':
-        if hsize is None: hsize = 9.0  # 900
-        if vsize is None: vsize = 5.0  # 500
+        if hsize is None: hsize = 9.0  # 900 pixels
+        if vsize is None: vsize = 5.0  # 500 pixels
         _mpl.rcParams.update({'font.size': 12})       # Set font size for all text: small
     else:
         _error('Unknown plot type: '+ptype+', aborting.')
