@@ -16,8 +16,9 @@
 
 """Plot functions for the sluyspy package."""
 
-import matplotlib.pyplot as _plt         # Get matplotlib.pyplot
-import numpy.core as _np                 # Get NumPy
+import matplotlib as _mpl               # Get matplotlib.pyplot
+import matplotlib.pyplot as _plt        # Get matplotlib.pyplot
+import numpy.core as _np                # Get NumPy
 from .cli import error as _error
 
 
@@ -51,8 +52,6 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
       - square: size 850x850,   font 16, lw: 2 - a square plot;
       - org:    size 930x520,   font 12, lw: 1 - aimed at output in emacs Orgmode.
     """
-    
-    import matplotlib as _mpl
     
     if cblind is True: _plt.style.use('tableau-colorblind10')
     
@@ -141,8 +140,12 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
     
     # Plot features:
     if legend: ax.legend(loc='best')                              # Create a legend
-    if logx: ax.set_xscale('log')                                 # Logarithmic horizontal axis
-    if logy: ax.set_yscale('log')                                 # Logarithmic vertical axis
+    if logx:
+        ax.set_xscale('log')                                 # Logarithmic horizontal axis
+        _plt.gca().xaxis.set_major_formatter(_mpl.ticker.FormatStrFormatter('%0g'))  # Use non-scientific format where possible
+    if logy:
+        ax.set_yscale('log')                                 # Logarithmic vertical axis
+        _plt.gca().yaxis.set_major_formatter(_mpl.ticker.FormatStrFormatter('%0g'))  # Use non-scientific format where possible
     if grid: ax.grid(grid)                                        # Plot a grid
     
     # Tightness of the margins:
