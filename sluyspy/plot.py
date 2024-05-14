@@ -110,7 +110,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
 
 
 def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=False, grid=True,
-                logx=False,logy=False, tight=1, save=True, close=True):
+                logx=False,logy=False, logx_gfmt=True, logy_gfmt=True, tight=1, save=True, close=True):
     """Show the current figure on screen or save it to disc and close it.
     
     Parameters:
@@ -124,8 +124,12 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
     
       legend (bool):        Show a legend (optional, defaults to False).
       grid (bool):          Show a grid (optional, defaults to True).
+    
       logx (bool):          Make the horizontal axis logarithmic (optional, defaults to False -> linear).
       logy (bool):          Make the vertical axis logarithmic (optional, defaults to False -> linear).
+    
+      logx_gfmt (bool):     Use non-scientific format where possible on the horizontal axis.  Changes 10^0 -> 1, but also 10^40 -> 1e+40
+      logy_gfmt (bool):     Use non-scientific format where possible on the vertical axis.  Changes 10^0 -> 1, but also 10^40 -> 1e+40
     
       tight (int):          Tightness of the margins: 0: not at all, 1: some (default), 2: quite, 3: very!
     
@@ -142,10 +146,10 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
     if legend: ax.legend(loc='best')                              # Create a legend
     if logx:
         ax.set_xscale('log')                                 # Logarithmic horizontal axis
-        _plt.gca().xaxis.set_major_formatter(_mpl.ticker.FormatStrFormatter('%0g'))  # Use non-scientific format where possible
+        if logx_gfmt: _plt.gca().xaxis.set_major_formatter(_mpl.ticker.FormatStrFormatter('%0g'))  # Use non-scientific format where possible
     if logy:
         ax.set_yscale('log')                                 # Logarithmic vertical axis
-        _plt.gca().yaxis.set_major_formatter(_mpl.ticker.FormatStrFormatter('%0g'))  # Use non-scientific format where possible
+        if logy_gfmt: _plt.gca().yaxis.set_major_formatter(_mpl.ticker.FormatStrFormatter('%0g'))  # Use non-scientific format where possible
     if grid: ax.grid(grid)                                        # Plot a grid
     
     # Tightness of the margins:
