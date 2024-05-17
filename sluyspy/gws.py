@@ -315,6 +315,8 @@ def isco_radius_from_mass(mass, spin=0, as_km=False):
     sel = spin>=0
     r_isco[sel]  = mass[sel] * (3+z2[sel] + _np.sqrt((3-z1[sel])*(3+z1[sel] + 2*z2[sel])) )  # Expressed in M
     
+    if as_km: r_isco *= _ac.G*_ac.Mo/_ac.c**2 / 1000  # Convert from M to m to km
+    
     if scalar_input:
         return float(_np.squeeze(r_isco))  # Array -> scalar (float)
     
@@ -332,6 +334,8 @@ def isco_frequency_from_isco_radius(mass, r_isco, as_km=False):
     Returns:
       (float):  ISCO GW frequency in Hertz.
     """
+    
+    if not as_km: r_isco *= _ac.G*_ac.Mo/_ac.c**2 / 1000  # Convert from M to m to km
     
     f_isco_gw = 2 * _ac.c**3 / (2*_ac.pi * _np.power(r_isco/mass,1.5) * _ac.g*mass*_ac.m_sun)
     
