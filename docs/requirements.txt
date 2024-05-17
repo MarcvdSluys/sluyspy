@@ -1,5 +1,5 @@
 sluyspy
-astroconst==0.0.10
+astroconst==0.0.11
 astroquery==0.4.7
 astrotool==0.0.14
 getch==1.0
