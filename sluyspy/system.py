@@ -19,6 +19,7 @@
 
 from pathlib import Path as _Path
 import socket as _socket
+import time as _time
 
 
 def host():
@@ -139,3 +140,21 @@ def string_in_file_grep(infile, string):
     return result
 
 
+def sleep(time, verbosity=0):
+    """Call time.sleep and exit graciously upon keyboard interrupt (Ctrl-C).
+    
+    Parameters:
+      time (float):  Sleep time in seconds.
+    
+    Returns:
+      (int):  status: 0: uninterrupted, 1: interrupted.
+    """
+    
+    try:
+        _time.sleep(time)            # Sleep for time seconds
+    except KeyboardInterrupt:
+        if verbosity == 1: print(' - Received keyboard interrupt, aborting.')                  # " - " to create some space after "^C"
+        if verbosity > 1:  print(' - Received keyboard interrupt whilst sleeping, aborting.')  # " - " to create some space after "^C"
+        return 1
+    
+    return 0
