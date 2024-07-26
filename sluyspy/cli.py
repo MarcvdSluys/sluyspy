@@ -69,3 +69,14 @@ def warn(message, exit_program=False, exit_code=1):
     
     if exit_program: exit(exit_code)
     return
+
+
+def cls():
+    """Clear the terminal screen.
+    
+    Nicked from https://stackoverflow.com/a/50560686/1386750
+    """
+    
+    print("\033[H\033[J", end="")
+    return
+

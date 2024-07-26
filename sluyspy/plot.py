@@ -16,7 +16,7 @@
 
 """Plot functions for the sluyspy package."""
 
-import matplotlib as _mpl               # Get matplotlib.pyplot
+import matplotlib as _mpl               # Get matplotlib
 import matplotlib.pyplot as _plt        # Get matplotlib.pyplot
 import numpy.core as _np                # Get NumPy
 from .cli import error as _error
