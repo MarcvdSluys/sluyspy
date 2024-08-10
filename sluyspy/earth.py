@@ -57,3 +57,50 @@ def distance(lon1,lat1, lon2,lat2, miles=False):
     if miles: distance = distance * 0.62137119  # Miles rather than km - this is just one of the many definitions of a mile!
     
     return distance
+
+
+def effective_radius_from_latitude(lat):
+    """Compute the effective radius of the Earth from the latitude.
+    
+    Parameters:
+      lat (float):  geographical latitude (radians).
+    
+    Returns:
+      (float):  effective radius of the Earth (metres).
+    """
+    
+    abslat = _np.abs(lat)
+    
+    Reff = 2 * 9.780356*(1+0.0052885*_np.square(_np.sin(abslat)) - 0.0000059*_np.square(_np.sin(2*abslat))) \
+        / (3.085462e-6 + 2.27e-9 * _np.cos(2*abslat) - 2e-12 * _np.cos(4*abslat))  # Earth radius in metres
+    
+    return Reff
+
+
+def distance_direction_from_longitude_latitude(lon, lat):
+    """Compute the distance and direction between points for two arrays of longitude and latitude coordinates.
+    
+    The distance is in kilometres, the direction angle in radians, where 0=N, pi/2=E, +/-pi=S and -pi/2=W.
+    
+    Parameters:
+      lon (float):  array of (at least two) longitude coordinates (radians).
+      lat (float):  array of (at least two) latitude coordinates (radians).
+    
+    Returns:
+      (tuple):  (ddist, direc):
+    
+      ddist (float):  array with distances between the subsequent coordinate sets (km).  ddist[0]=NaN.
+      direc (float):  array with direction angles between the subsequent coordinate sets (radians).  ddist[0]=NaN.
+
+    """
+    
+    Re     = effective_radius_from_latitude(lat)/1000  # Lat in radians, Re in m -> km
+    rad2km = Re  # 2 pi rad = 2 pi Re km
+    xpos   = lon * _np.cos(lat) * rad2km
+    ypos   = lat * rad2km
+    dxpos  = xpos - xpos.shift(1)
+    dypos  = ypos - ypos.shift(1)
+    ddist  = _np.sqrt(_np.square(dxpos) + _np.square(dypos))  # km
+    direc  = _np.arctan2(dxpos, dypos)  # rad: N=0, E=pi/2, S=+/-pi, W=-pi/2 rad
+    
+    return ddist, direc
