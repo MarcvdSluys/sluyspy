@@ -20,6 +20,8 @@
 from pathlib import Path as _Path
 import socket as _socket
 import time as _time
+import subprocess as _subprocess
+
 
 
 def host():
@@ -83,9 +85,8 @@ def tail_file(in_file, out_file, num_lines):
       num_lines (int):  Number of lines to save.
     """
     
-    import subprocess
-    subprocess.run(['tail -'+str(num_lines)+' '+in_file+' > '+out_file], stdout=subprocess.PIPE,
-                   shell=True, check=True).stdout.decode('utf-8')
+    _subprocess.run(['tail -'+str(num_lines)+' '+in_file+' > '+out_file], stdout=_subprocess.PIPE,
+                    shell=True, check=True).stdout.decode('utf-8')
     
     return
 
@@ -119,14 +120,13 @@ def string_in_file_grep(infile, string):
     Note: fast for large files (>~1Mb) and/or multiple calls (>~100kb).
     """
     
-    import subprocess
     try:
-        subprocess.run(['grep -c '+string+' '+infile], stdout=subprocess.PIPE,
-                       shell=True, check=True).stdout.decode('utf-8')
+        _subprocess.run(['grep -c '+string+' '+infile], stdout=_subprocess.PIPE,
+                        shell=True, check=True).stdout.decode('utf-8')
         # Check=false: do not raise an error if string is not found (but return 0)
         result = True  # result = int(count) > 0
         
-    except subprocess.CalledProcessError as e:
+    except _subprocess.CalledProcessError as e:
         result = None
         if e.returncode == 1:  # Exit status: 0: line found, 1: no line found, 2: error
             # count = e.output.decode('utf-8')
@@ -158,3 +158,35 @@ def sleep(time, verbosity=0):
         return 1
     
     return 0
+
+
+def run_status(command):
+    """Run a command and return the status/exit code.
+    
+    Parameters:
+      command (str):  command to run.
+    
+    Returns:
+      (int):  status/exit code.
+    """
+    
+    result = _subprocess.run([command], stdout=_subprocess.PIPE, stderr=_subprocess.PIPE, shell=True)
+    
+    return result.returncode
+
+
+def run_output(command):
+    """Run a command and return the standard output.
+    
+    Parameters:
+      command (str):  command to run.
+    
+    Returns:
+      (str):  standard output.
+    """
+    
+    result = _subprocess.run([command], stdout=_subprocess.PIPE, stderr=_subprocess.PIPE, shell=True).stdout.decode('utf-8')
+    
+    return result.strip()
+
+
