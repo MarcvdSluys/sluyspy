@@ -138,7 +138,7 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
     """
     
     # Plot labels:
-    if title is not None: fig.title(title)                        # Plot title
+    if title is not None: _plt.title(title)                       # Plot title
     if xlbl is not None:  ax.set_xlabel(xlbl)                     # Label the horizontal axis
     if ylbl is not None:  ax.set_ylabel(ylbl)                     # Label the vertical axis
     
