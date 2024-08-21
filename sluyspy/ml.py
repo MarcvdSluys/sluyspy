@@ -34,18 +34,18 @@ def stats_from_conf_mat(df):
         - p:  Total number of actual positive cases in the data.
         - n:  Total number of actual negaitive cases in the data.
     
-        - tpr:  TPR: true positive rate (sensitivity): TPR = TP/P.
-        - tnr:  TNR: true negative rate (specificity): TNR = TN/N.
-        - fpr:  FPR: false positive rate (fall out): FPR = FP/N.
-        - fnr:  FNR: false negative rate (miss rate): FNR = FN/P.
+        - tpr:  TPR: true positive rate (sensitivity):  TPR = TP/P = TP/(TP+FN).
+        - tnr:  TNR: true negative rate (specificity):  TNR = TN/N = TN/(TN+FP).
+        - fpr:  FPR: false positive rate (fall out):    FPR = FP/N = FP/(FP+TN).
+        - fnr:  FNR: false negative rate (miss rate):   FNR = FN/P = FN/(FN+TP).
     
         - ppv:  PPV - positive predictive value - precision: PPV = TP/(TP+FP).
-        - npv:  NPV - negative predictive value: NPV = TN/(TN+FN).
-        - fdr:  FDR - false discovery rate: FDR = FP/(TP+FP).
-        - for:  FOR - false omission rate: FOR = FN/(TN+FN).
+        - npv:  NPV - negative predictive value:             NPV = TN/(TN+FN).
+        - fdr:  FDR - false discovery rate:                  FDR = FP/(TP+FP).
+        - for:  FOR - false omission rate:                   FOR = FN/(TN+FN).
     
-        - acc:  accuracy: fraction of true predictions: ACC = (TP+TN)/(P+N).
-        - f1:  F1 score: harmonic mean of PPV and TPR: F1 = PPV*TPR/(PPV+TPR).
+        - acc:  accuracy: fraction of true predictions:  ACC = (TP+TN)/(P+N).
+        - f1:  F1 score: harmonic mean of PPV and TPR:   F1  = PPV*TPR/(PPV+TPR).
     """
     
     tp = df.tp
