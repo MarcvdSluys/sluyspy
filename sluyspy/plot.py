@@ -197,7 +197,7 @@ def hist_norm(obj, x, bins=None, range=None, density=False, weights=None, cumula
       label (str or None):  Legend label, default: None.
       stacked (bool):  Stack multiple data on top of each other, rather than side by side, default: False.
       data (indexable object, optional):  If given, the following parameters also accept a string s, which is interpreted as data[s] (unless this raises an exception): x, weights.
-    
+      kwargs (dict):  Keyword arguments to be passed to pyplot.quiver().
     
     Returns:
       (tuple):  Tuple consisting of (n, bin_edges, patches):
@@ -246,8 +246,8 @@ def pause_ctrlc(interval):
 
 
 def arrow_head_between_points(ax, xx,yy, dx=0,dy=0, scale=1, **kwargs):
-    """Plot an arrow head between two 2D points.
-
+    """Plot an arrow head between two 2D points and try to scale properly.
+    
     Parameters:
       ax (axes):      Axes object to plot on.
       xx (float):     Array with two x values, for arrow-head position and direction.
@@ -255,6 +255,7 @@ def arrow_head_between_points(ax, xx,yy, dx=0,dy=0, scale=1, **kwargs):
       dx (float):     Shift arrow head in x direction.
       dy (float):     Shift arrow head in y direction.
       scale (float):  Scale arrow head.
+      kwargs (dict):  Keyword arguments to be passed to pyplot.quiver().
     """
     
     # Local scaling parameter: undo arrow-head scaling with length:
@@ -268,4 +269,34 @@ def arrow_head_between_points(ax, xx,yy, dx=0,dy=0, scale=1, **kwargs):
               scale=3/lscale, width=5e-3*lscale,
               headwidth=10*lscale, headlength=15*lscale, headaxislength=10*lscale,
               **kwargs)
+    return
+
+
+def arrow_between_points(ax, xx,yy, scale=1, zorder=2, **kwargs):
+    """Plot an arrow between two 2D points and try to scale the shaft and head properly.
+    
+    Parameters:
+      ax (axes):      Axes object to plot on.
+      xx (float):     Array with two x values, for tail and head position.
+      yy (float):     Array with two y values, for tail and head position.
+      scale (float):  Scale arrow shaft and head.
+      zorder (int):   Zorder for the arrow.  Zorder<2 places it below the grid.
+      kwargs (dict):  Keyword arguments to be passed to pyplot.quiver().
+    """
+    
+    # Local scaling parameter: undo arrow-head scaling with length:
+    sscale = 0.01 * scale  # Shaft AND head
+    hscale = 2.5           # Head only, on tip of sscale
+    
+    if len(xx)!=2: _error('arrow_between_points(): The input variable xx must have two elements')
+    if len(yy)!=2: _error('arrow_between_points(): The input variable yy must have two elements')
+    
+    ax.quiver(xx[0], yy[0], xx[1]-xx[0], yy[1]-yy[0],  # x1,y1 -> dx,dy
+              angles='xy', units='xy', scale=1,
+              pivot='tail', scale_units=None,  # Defaults
+              width=sscale,                    # Shaft width
+              headwidth=2*hscale, headlength=3*hscale, headaxislength=2*hscale,  # Head size - scales strangely with width
+              zorder=zorder,    # zorder <2 places arrow below grid.
+              **kwargs)
+    
     return
