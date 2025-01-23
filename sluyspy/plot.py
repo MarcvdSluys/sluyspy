@@ -109,8 +109,9 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
     return fig, ax
 
 
-def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=False, grid=True,
-                logx=False,logy=False, logx_gfmt=True, logy_gfmt=True, tight=1, save=True, close=True):
+def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=False, legend_loc='best',
+                grid=True, logx=False,logy=False, logx_gfmt=True, logy_gfmt=True, tight=1, save=True,
+                close=True):
     """Show the current figure on screen or save it to disc and close it.
     
     Parameters:
@@ -123,6 +124,7 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
       ylbl (str):           Text to use as label for the vertical axis (optional, defaults to None).
     
       legend (bool):        Show a legend (optional, defaults to False).
+      legend_loc (str):     Location for the legend (optional, defaults to 'best').
       grid (bool):          Show a grid (optional, defaults to True).
     
       logx (bool):          Make the horizontal axis logarithmic (optional, defaults to False -> linear).
@@ -143,7 +145,7 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
     if ylbl is not None:  ax.set_ylabel(ylbl)                     # Label the vertical axis
     
     # Plot features:
-    if legend: ax.legend(loc='best')                              # Create a legend
+    if legend: ax.legend(loc=legend_loc)                          # Create a legend
     if logx:
         ax.set_xscale('log')                                 # Logarithmic horizontal axis
         if logx_gfmt: _plt.gca().xaxis.set_major_formatter(_mpl.ticker.FormatStrFormatter('%0g'))  # Use non-scientific format where possible
