@@ -44,7 +44,7 @@ class Environment:
     knmi_daily_dir:  str = '';  """Directory for daily KNMI data"""
     wpw_dir:         str = '';  """WP weather directory"""
     
-    hwc_dir:         str = '';  """HWC main directory"""
+    thesky_dir:      str = '';  """TheSky main directory"""
     
     
 def environment(cfg_file='.python_environment.cfg'):
@@ -92,7 +92,7 @@ def environment(cfg_file='.python_environment.cfg'):
     env.wpw_dir         = config.get('Weather', 'wpw_dir',         fallback=env.wpw_dir).replace('~', env.home)          # WP weather dir
     
     # Section HWC:
-    env.hwc_dir         = config.get('HWC', 'hwc_dir',             fallback=env.hwc_dir).replace('~', env.home)              # HWC main dir
+    env.thesky_dir      = config.get('HWC', 'thesky_dir',          fallback=env.thesky_dir).replace('~', env.home)       # TheSky main dir
     
     return env
 
