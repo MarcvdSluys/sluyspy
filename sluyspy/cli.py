@@ -50,7 +50,10 @@ def error(message, exit_program=True, exit_code=1):
       exit_code (int):      Exit code to exit the program with, defaults to 1.
     """
     
-    _sys.stderr.write('\n'+_clr('ERROR: '+str(message), 'white', 'on_red', attrs=['bold'])+'\n\n')
+    lmessage = 'ERROR: '+str(message)  # Local version
+    if exit_program: lmessage += ', aborting.'
+    
+    _sys.stderr.write('\n'+_clr(lmessage, 'white', 'on_red', attrs=['bold'])+'\n\n')
     
     if exit_program: exit(exit_code)
     return
@@ -65,7 +68,10 @@ def warn(message, exit_program=False, exit_code=1):
       exit_code (int):      Exit code to exit the program with, defaults to 1.
     """
     
-    _sys.stderr.write('\n'+_clr('Warning: '+str(message), 'white', 'on_yellow', attrs=['bold'])+'\n\n')
+    lmessage = 'Warning: '+str(message)  # Local version
+    if exit_program: lmessage += ', aborting.'
+    
+    _sys.stderr.write('\n'+_clr(message, 'white', 'on_yellow', attrs=['bold'])+'\n\n')
     
     if exit_program: exit(exit_code)
     return
