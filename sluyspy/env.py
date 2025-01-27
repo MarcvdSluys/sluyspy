@@ -26,25 +26,27 @@ import astroconst as _ac
 
 @_dataclass
 class Environment:
-    tz:       str  = '';     """Time zone"""
-    geo_lon:  float = 0.0;   """Geographical longitude in radians east of Greenwich"""
-    geo_lat:  float = 0.0;   """Geographical latitude in radians north of the equator"""
-    geo_alt:  float = 0.0;   """Geographical altitude in metres above sea level"""
+    tz:              str  = '';     """Time zone"""
+    geo_lon:         float = 0.0;   """Geographical longitude in radians east of Greenwich"""
+    geo_lat:         float = 0.0;   """Geographical latitude in radians north of the equator"""
+    geo_alt:         float = 0.0;   """Geographical altitude in metres above sea level"""
     
-    host:     str  = '';     """Host name"""
-    home:     str  = '';     """Home directory"""
-    on_zotac: bool = False;  """Am I on Zotac?"""
-    on_think: bool = False;  """Am I on Think?"""
+    host:            str  = '';     """Host name"""
+    home:            str  = '';     """Home directory"""
+    on_think:        bool = False;  """Am I on Think?"""
+    on_zotac:        bool = False;  """Am I on Zotac?"""
+    on_hwc:          bool = False;  """Am I on HWC?"""
     
-    sp_dir:          str = '';  """Solar-panel directory"""
-    el_dir:          str = '';  """Electricity-meter directory"""
+    sp_dir:          str = '';      """Solar-panel directory"""
+    el_dir:          str = '';      """Electricity-meter directory"""
     
-    knmi_10min_dir:  str = '';  """Directory for 10-min KNMI data"""
-    knmi_hourly_dir: str = '';  """Directory for hourly KNMI data"""
-    knmi_daily_dir:  str = '';  """Directory for daily KNMI data"""
-    wpw_dir:         str = '';  """WP weather directory"""
+    knmi_10min_dir:  str = '';      """Directory for 10-min KNMI data"""
+    knmi_hourly_dir: str = '';      """Directory for hourly KNMI data"""
+    knmi_daily_dir:  str = '';      """Directory for daily KNMI data"""
+    wpw_dir:         str = '';      """WP weather directory"""
     
-    thesky_dir:      str = '';  """TheSky main directory"""
+    thesky_dir:      str = '';      """TheSky main directory"""
+    hwc_dir:         str = '';      """HWC main directory"""
     
     
 def environment(cfg_file='.python_environment.cfg'):
@@ -61,9 +63,9 @@ def environment(cfg_file='.python_environment.cfg'):
     env.host = _ssys.host()
     env.home = _ssys.homedir()
     
-    env.on_zotac = env.host == 'zotac'
     env.on_think = env.host == 'think'
-    
+    env.on_zotac = env.host == 'zotac'
+    env.on_hwc   = env.host == 'hwc'
     
     # Read system config file:
     import configparser
@@ -93,6 +95,7 @@ def environment(cfg_file='.python_environment.cfg'):
     
     # Section HWC:
     env.thesky_dir      = config.get('HWC', 'thesky_dir',          fallback=env.thesky_dir).replace('~', env.home)       # TheSky main dir
+    env.hwc_dir         = config.get('HWC', 'hwc_dir',             fallback=env.hwc_dir).replace('~', env.home)          # HWC main dir
     
     return env
 

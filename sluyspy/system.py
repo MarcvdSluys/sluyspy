@@ -49,6 +49,8 @@ def on_think():
     
     Returns:
       (bool):  True when I am on a host called think, False otherwise.
+    
+    Note: this function is used to set env.host.
     """
     
     return host() == 'think'
@@ -59,6 +61,8 @@ def on_zotac():
     
     Returns:
       (bool):  True when I am on a host called zotac, False otherwise.
+    
+    Note: this function is used to set env.host.
     """
     
     return host() == 'zotac'
@@ -69,6 +73,8 @@ def on_hwc():
     
     Returns:
       (bool):  True when I am on host hwc, False otherwise.
+    
+    Note: this function is used to set env.host.
     """
     
     return _Path('/home/hemel/').is_dir()
