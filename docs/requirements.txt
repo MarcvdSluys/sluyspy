@@ -1,6 +1,6 @@
 sluyspy
 astroconst==0.0.12
-astroquery==0.4.7
+astroquery==0.4.9.post1
 astrotool==0.0.16
 getch==1.0
 matplotlib
