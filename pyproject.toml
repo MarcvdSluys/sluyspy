@@ -8,7 +8,7 @@ version = "0.0.40"
 authors = [ { name="Marc van der Sluys", email="git@vandersluys.nl" } ]
 description = "Marc van der Sluys' personal Python modules."
 readme   = "README.md"
-license  = {text = "EUPL 1.2"}
+license  = "EUPL-1.2"
 keywords = ["personal", "private"]
 dependencies = ["astrotool","getch","matplotlib","numpy","pandas","pytz","scipy","solarenergy","termcolor"]
 
@@ -18,7 +18,6 @@ classifiers = [
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
