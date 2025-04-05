@@ -10,7 +10,7 @@ description = "Marc van der Sluys' personal Python modules."
 readme   = "README.md"
 license  = "EUPL-1.2"
 keywords = ["personal", "private"]
-dependencies = ["astrotool","getch","matplotlib","numpy","pandas","pytz","scipy","solarenergy","termcolor"]
+dependencies = ["astrotool","matplotlib","numpy","pandas","pytz","scipy","solarenergy","termcolor"]
 
 # See: https://pypi.org/pypi?:action=list_classifiers
 classifiers = [

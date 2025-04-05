@@ -30,12 +30,9 @@ def dialog(text):
       (str):  The single character typed by the user.
     """
     
-    # import getch  # pip3.12 install getch fails...
-    
     _sys.stdout.write(text+' ')  # No newline
     _sys.stdout.flush()          # Show the previous line
     
-    # char = getch.getche()  # Ask for user input, displayed on the screen
     char = input()         # Ask for user input, no external packages
     print()                # Newline after input
     
