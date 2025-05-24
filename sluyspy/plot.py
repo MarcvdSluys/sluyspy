@@ -23,7 +23,7 @@ from .cli import error as _error
 
 
 def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, title='Python plot',
-               fz=None,lw=None, plot3d=False, man_zorder=True, cblind=True):
+               fz=None,serif=False, lw=None, plot3d=False, man_zorder=True, cblind=True):
     """Start a matplotlib.pyplot plot with a choice of my favourite options.
     
     Parameters:
@@ -36,6 +36,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
       title (str):        Window title (optional, defaults to 'Python plot').
     
       fz (int):           Font size (optional, defaults to None -> 14 or 16).
+      serif (bool):       Use a LaTeX-like serif font (defaults to False).
       lw (int):           Line width (optional, defaults to None -> 1 or 2).
     
       plot3d (bool):      Start a 3D plot (optional, defaults to False -> 2D).
@@ -96,6 +97,11 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
         titlel = title + ' ' + str(plotnum)
     
     if fz is not None: _mpl.rcParams.update({'font.size': fz})        # Set font size for all text
+    
+    if serif:  # Use LaTeX-like serif font:
+        _plt.rcParams['font.family'] = 'serif'    # Normal text
+        _plt.rcParams['mathtext.fontset'] = 'cm'  # Math mode
+    
     if lw is not None: _mpl.rcParams.update({'lines.linewidth': lw})  # Set custom default line width
     fig = _plt.figure(figsize=(hsize,vsize), num=titlel)  # Custom size
     
