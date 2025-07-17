@@ -75,6 +75,139 @@ def warn(message, exit_program=False, exit_code=1):
     return
 
 
+def bold(message, dark_bg=True):
+    """Print a text to the cli in bold white or black.
+    
+    Parameters:
+      message (str):     Message to print.
+      dark_bg (bool):    For a dark background?
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    if dark_bg:
+        bold_message = _clr(message, 'white', attrs=['bold'])
+    else:
+        bold_message = _clr(message, 'black', attrs=['bold'])
+    
+    return bold_message
+
+
+def red(message, dark_bg=True):
+    """Print a text to the cli in red.
+    
+    Parameters:
+      message (str):     Message to print.
+      dark_bg (bool):    For a dark background?
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    if dark_bg:
+        clr_message = _clr(message, 'red', attrs=['bold'])
+    else:
+        clr_message = _clr(message, 'red')
+    
+    return clr_message
+
+
+def green(message, dark_bg=True):
+    """Print a text to the cli in green.
+    
+    Parameters:
+      message (str):     Message to print.
+      dark_bg (bool):    For a dark background?
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    if dark_bg:
+        clr_message = _clr(message, 'green', attrs=['bold'])
+    else:
+        clr_message = _clr(message, 'green')
+    
+    return clr_message
+
+
+def blue(message, dark_bg=True):
+    """Print a text to the cli in blue.
+    
+    Parameters:
+      message (str):     Message to print.
+      dark_bg (bool):    For a dark background?
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    if dark_bg:
+        clr_message = _clr(message, 'blue', attrs=['bold'])
+    else:
+        clr_message = _clr(message, 'blue')
+    
+    return clr_message
+
+
+def yellow(message, dark_bg=True):
+    """Print a text to the cli in yellow.
+    
+    Parameters:
+      message (str):     Message to print.
+      dark_bg (bool):    For a dark background?
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    if dark_bg:
+        clr_message = _clr(message, 'yellow', attrs=['bold'])
+    else:
+        clr_message = _clr(message, 'yellow')
+    
+    return clr_message
+
+
+def magenta(message, dark_bg=True):
+    """Print a text to the cli in magenta.
+    
+    Parameters:
+      message (str):     Message to print.
+      dark_bg (bool):    For a dark background?
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    if dark_bg:
+        clr_message = _clr(message, 'magenta', attrs=['bold'])
+    else:
+        clr_message = _clr(message, 'magenta')
+    
+    return clr_message
+
+
+def cyan(message, dark_bg=True):
+    """Print a text to the cli in cyan.
+    
+    Parameters:
+      message (str):     Message to print.
+      dark_bg (bool):    For a dark background?
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    if dark_bg:
+        clr_message = _clr(message, 'cyan', attrs=['bold'])
+    else:
+        clr_message = _clr(message, 'cyan')
+    
+    return clr_message
+
+
 def cls():
     """Clear the terminal screen.
     
