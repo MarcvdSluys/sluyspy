@@ -9,10 +9,15 @@ Submodules
 
    sluyspy.air_visual
    sluyspy.cli
+   sluyspy.earth
    sluyspy.env
+   sluyspy.ephem
    sluyspy.fit
+   sluyspy.gws
    sluyspy.html
+   sluyspy.ml
    sluyspy.numerics
+   sluyspy.pandas
    sluyspy.plot
    sluyspy.solar_energy
    sluyspy.solar_panels
