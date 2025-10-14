@@ -76,7 +76,13 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
       yvals (float):       Array containing y values to fit.
       coefs0 (float):      Array with initial guess for fitting coefficients.
       ysigmas (float):     Array containing y sigmas/uncertainties.
-      verbosity (int):     Verbosity to stdout (0-4).
+      verbosity (int):     Verbosity:  0: quiet,
+                                       1: print red.chi2 + mean |abs/rel. differences|,
+                                       2: + fit coefficients,
+                                       3: + mean abs/rel. differences + max. |diffs| + correlation matrix,
+                                       4: + SciPy details + var-covar matrix,
+                                       5: + SciPy info dict + df with fit data;
+                                       defaults to 0.
     
     Returns:
       (tuple):  Tuple containing (coefs, dcoefs, red_chi2, var_cov, ier):
