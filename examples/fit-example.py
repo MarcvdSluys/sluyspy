@@ -27,17 +27,17 @@ def main():
     
     df = pd.DataFrame()
     df['time'] = np.linspace(0., 2 * coefs_true[2] * ac.pi2, Npt)  # Period*2pi*2 -> 2 periods
-    df['signal'] = fitfun(df.time, *coefs_true)
+    df['signal'] = fitfun(df.time, *coefs_true)  # Use the fitting function to generate the signal
     
     np.random.seed(1)
     df['data'] = df.signal + np.random.normal(0, sigma, Npt)
-    # print(df)
     
     # Fit the data:
     print('\nVerbose (4/5) output from sluyspy.fit.scipy_curvefit_chi2():')
-    coefs_start = coefs_true * np.random.normal(1, 0.1, len(coefs_true))  # Offset start parameters
+    coefs_start = coefs_true * np.random.normal(1, 0.5, len(coefs_true))  # Offset start parameters
     coefs, dcoefs, red_chi2, var_cov, ier = sfit.scipy_curvefit_chi2(fitfun, df.time,df.data, coefs_start,
                                                                      verbosity=4)
+    
     print('\nResults returned to caller function:\n')
     print('coefs:     ', coefs)
     print('dcoefs:    ', dcoefs)
@@ -46,6 +46,7 @@ def main():
     print('ier:       ', ier)
         
     df['fit'] = fitfun(df.time, *coefs)  # Compute fit function
+    print(df)
     
     # Make a plot:
     make_plot(df)

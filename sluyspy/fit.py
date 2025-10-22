@@ -66,7 +66,7 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
 
 
 
-def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0):
+def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, bounds=[-_np.inf,_np.inf], method=None, verbosity=0):
     """Wrapper for SciPy's curve_fit, that returns the fitting coefficients and reduced chi^2.
        Print details if desired.
     
@@ -75,7 +75,9 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
       xvals (float):       Array containing x values to fit.
       yvals (float):       Array containing y values to fit.
       coefs0 (float):      Array with initial guess for fitting coefficients.
-      ysigmas (float):     Array containing y sigmas/uncertainties.
+      ysigmas (float):     Array or scalar containing y sigmas/uncertainties (optional, defaults to None).
+      bounds (tuple):      Pass parameter boundaries ([lower],[upper]) to curve_fit(): (optional; defaults to [-infty,infty]).
+      method (str):        Pass fit method to curve_fit(): 'lm','trf','dogbox' (optional; defaults to None).
       verbosity (int):     Verbosity:  0: quiet,
                                        1: print red.chi2 + mean |abs/rel. differences|,
                                        2: + fit coefficients,
@@ -99,7 +101,7 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, verbosity=0
     try:
         # Do the fit:
         coefs, var_cov, infodict, mesg, ier = _curve_fit(fit_fun, xvals, yvals, p0=coefs0, sigma=ysigmas,
-                                                         method='lm', full_output=True)
+                                                         bounds=bounds, method=method, full_output=True)
     
     # If call failed:
     except Exception as e:
