@@ -116,7 +116,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
 
 
 def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=False, legend_loc='best',
-                grid=True, logx=False,logy=False, logx_gfmt=True, logy_gfmt=True, tight=1, save=True,
+                grid=True, logx=False,logy=False, logx_gfmt=True, logy_gfmt=True, tight=2, save=True,
                 close=True):
     """Show the current figure on screen or save it to disc and close it.
     
@@ -139,7 +139,7 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
       logx_gfmt (bool):     Use non-scientific format where possible on the horizontal axis.  Changes 10^0 -> 1, but also 10^40 -> 1e+40
       logy_gfmt (bool):     Use non-scientific format where possible on the vertical axis.  Changes 10^0 -> 1, but also 10^40 -> 1e+40
     
-      tight (int):          Tightness of the margins: 0: not at all, 1: some (default), 2: quite, 3: very!
+      tight (int):          Tightness of the margins: 0: not at all, 1: some, 2: quite (default), 3: very!
     
       save (bool):          Actually save the plot (if not, allow further changes, and don't close!).
       close (bool):         Actually close the plot (if not, allow further changes).
