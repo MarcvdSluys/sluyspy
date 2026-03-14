@@ -72,20 +72,28 @@ def environment(cfg_file='.python_environment.cfg'):
     config = configparser.ConfigParser(inline_comment_prefixes=('#'))
     config.read(env.home+'/'+cfg_file)
     
-    # Section Localisation:
-    env.tz      = config.get('Localisation', 'timezone',  fallback=env.tz)       # My timezone
+    # Section Localisation (obsolescent):
+    env.tz      = config.get(     'Localisation', 'timezone',  fallback=env.tz)       # My timezone
     env.geo_lon = config.getfloat('Localisation', 'longitude', fallback=env.geo_lon)  # My longitude
     env.geo_lat = config.getfloat('Localisation', 'latitude',  fallback=env.geo_lat)  # My latitude
     env.geo_alt = config.getfloat('Localisation', 'altitude',  fallback=env.geo_alt)  # My altitude
+    
+    # Section Localisation (new, prefer):
+    env.tz      = config.get(     'Localisation', 'tz',       fallback=env.tz)        # My timezone
+    env.geo_lon = config.getfloat('Localisation', 'geo_lon',  fallback=env.geo_lon)   # My longitude
+    env.geo_lat = config.getfloat('Localisation', 'geo_lat',  fallback=env.geo_lat)   # My latitude
+    env.geo_alt = config.getfloat('Localisation', 'geo_alt',  fallback=env.geo_alt)   # My altitude
     
     env.geo_lon *= _ac.d2r  # Convert from degrees to radians
     env.geo_lat *= _ac.d2r
     
     # Section SolarPanels:
-    env.sp_dir = config.get('SolarPanels', 'basedir', fallback=env.sp_dir).replace('~', env.home)  # SP base dir
+    env.sp_dir = config.get('SolarPanels', 'basedir', fallback=env.sp_dir).replace('~', env.home)  # SP base dir - move towards sp_dir
+    env.sp_dir = config.get('SolarPanels', 'sp_dir',  fallback=env.sp_dir).replace('~', env.home)  # SP base dir - prefer over ambiguous basedir
     
     # Section ElectricityMeter:
-    env.el_dir = config.get('ElectricityMeter', 'basedir', fallback=env.el_dir).replace('~', env.home)  # EM base dir
+    env.el_dir = config.get('ElectricityMeter', 'basedir', fallback=env.el_dir).replace('~', env.home)  # EM base dir - move towards el_dir
+    env.el_dir = config.get('ElectricityMeter', 'el_dir',  fallback=env.el_dir).replace('~', env.home)  # EM base dir - prefer over ambiguous basedir
     
     # Section Weather:
     env.knmi_10min_dir  = config.get('Weather', 'knmi_10min_dir',  fallback=env.knmi_10min_dir).replace('~',  env.home)  # KNMI 10-min dir
