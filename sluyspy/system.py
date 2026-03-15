@@ -88,11 +88,11 @@ def where_am_i():
     """
     
     host = 'Unknown'
-    if on_think:
+    if on_think():
         host = 'think'
-    elif on_zotac:
+    elif on_zotac():
         host = 'zotac'
-    elif on_hwc:
+    elif on_hwc():
         host = 'hwc'
     
     return host
