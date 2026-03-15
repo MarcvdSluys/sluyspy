@@ -27,8 +27,8 @@ import astroconst as _ac
 @_dataclass
 class Environment:
     tz:              str  = '';     """Time zone"""
-    geo_lon:         float = 0.0;   """Geographical longitude in radians east of Greenwich"""
-    geo_lat:         float = 0.0;   """Geographical latitude in radians north of the equator"""
+    geo_lon_deg:     float = 0.0;   """Geographical longitude in degrees east of Greenwich"""
+    geo_lat_deg:     float = 0.0;   """Geographical latitude in degrees north of the equator"""
     geo_alt:         float = 0.0;   """Geographical altitude in metres above sea level"""
     
     host:            str  = '';     """Host name"""
@@ -73,19 +73,19 @@ def environment(cfg_file='.python_environment.cfg'):
     config.read(env.home+'/'+cfg_file)
     
     # Section Localisation (obsolescent):
-    env.tz      = config.get(     'Localisation', 'timezone',  fallback=env.tz)       # My timezone
-    env.geo_lon = config.getfloat('Localisation', 'longitude', fallback=env.geo_lon)  # My longitude
-    env.geo_lat = config.getfloat('Localisation', 'latitude',  fallback=env.geo_lat)  # My latitude
-    env.geo_alt = config.getfloat('Localisation', 'altitude',  fallback=env.geo_alt)  # My altitude
+    env.tz          = config.get(     'Localisation', 'timezone',  fallback=env.tz)       # My timezone
+    env.geo_lon_deg = config.getfloat('Localisation', 'longitude', fallback=env.geo_lon)  # My longitude
+    env.geo_lat_deg = config.getfloat('Localisation', 'latitude',  fallback=env.geo_lat)  # My latitude
+    env.geo_alt     = config.getfloat('Localisation', 'altitude',  fallback=env.geo_alt)  # My altitude
     
     # Section Localisation (new, prefer):
-    env.tz      = config.get(     'Localisation', 'tz',       fallback=env.tz)        # My timezone
-    env.geo_lon = config.getfloat('Localisation', 'geo_lon',  fallback=env.geo_lon)   # My longitude
-    env.geo_lat = config.getfloat('Localisation', 'geo_lat',  fallback=env.geo_lat)   # My latitude
-    env.geo_alt = config.getfloat('Localisation', 'geo_alt',  fallback=env.geo_alt)   # My altitude
+    env.tz          = config.get(     'Localisation', 'tz',           fallback=env.tz)        # My timezone
+    env.geo_lon_deg = config.getfloat('Localisation', 'geo_lon_deg',  fallback=env.geo_lon_deg)   # My longitude
+    env.geo_lat_deg = config.getfloat('Localisation', 'geo_lat_deg',  fallback=env.geo_lat_deg)   # My latitude
+    env.geo_alt     = config.getfloat('Localisation', 'geo_alt',      fallback=env.geo_alt)   # My altitude
     
-    env.geo_lon *= _ac.d2r  # Convert from degrees to radians
-    env.geo_lat *= _ac.d2r
+    env.geo_lon = env.geo_lon_deg * _ac.d2r  # Convert from degrees to radians
+    env.geo_lat = env.geo_lat_deg * _ac.d2r
     
     # Section SolarPanels:
     env.sp_dir = config.get('SolarPanels', 'basedir', fallback=env.sp_dir).replace('~', env.home)  # SP base dir - move towards sp_dir
