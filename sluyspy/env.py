@@ -26,27 +26,31 @@ import astroconst as _ac
 
 @_dataclass
 class Environment:
-    tz:              str  = '';     """Time zone"""
-    geo_lon_deg:     float = 0.0;   """Geographical longitude in degrees east of Greenwich"""
-    geo_lat_deg:     float = 0.0;   """Geographical latitude in degrees north of the equator"""
-    geo_alt:         float = 0.0;   """Geographical altitude in metres above sea level"""
+    tz:              str  = '';      """Time zone"""
+    geo_lon_deg:     float = 0.0;    """Geographical longitude in degrees east of Greenwich"""
+    geo_lat_deg:     float = 0.0;    """Geographical latitude in degrees north of the equator"""
+    geo_alt:         float = 0.0;    """Geographical altitude in metres above sea level"""
     
-    host:            str  = '';     """Host name"""
-    home:            str  = '';     """Home directory"""
-    on_think:        bool = False;  """Am I on Think?"""
-    on_zotac:        bool = False;  """Am I on Zotac?"""
-    on_hwc:          bool = False;  """Am I on HWC?"""
+    host:            str  = '';      """Host name"""
+    home:            str  = '';      """Home directory"""
     
-    sp_dir:          str = '';      """Solar-panel directory"""
-    el_dir:          str = '';      """Electricity-meter directory"""
+    on_think:        bool = False;   """Am I on Think?"""
+    on_zotac:        bool = False;   """Am I on Zotac?"""
+    on_hwc:          bool = False;   """Am I on HWC?"""
     
-    knmi_10min_dir:  str = '';      """Directory for 10-min KNMI data"""
-    knmi_hourly_dir: str = '';      """Directory for hourly KNMI data"""
-    knmi_daily_dir:  str = '';      """Directory for daily KNMI data"""
-    wpw_dir:         str = '';      """WP weather directory"""
+    sp_dir:          str = '';       """Solar-panel directory"""
+    sp_az_deg:       float = 180.0;  """Azimuth for solar panels in degrees from north (0=north, 90=east, 180=south, 270=west)"""
+    sp_tilt_deg:     float = 45.0;   """Tilt for solar panels in degrees from horizontal (0=flat, 90=vertical == zenith angle)"""
     
-    thesky_dir:      str = '';      """TheSky main directory"""
-    hwc_dir:         str = '';      """HWC main directory"""
+    el_dir:          str = '';       """Electricity-meter directory"""
+    
+    knmi_10min_dir:  str = '';       """Directory for 10-min KNMI data"""
+    knmi_hourly_dir: str = '';       """Directory for hourly KNMI data"""
+    knmi_daily_dir:  str = '';       """Directory for daily KNMI data"""
+    wpw_dir:         str = '';       """WP weather directory"""
+    
+    thesky_dir:      str = '';       """TheSky main directory"""
+    hwc_dir:         str = '';       """HWC main directory"""
     
     
 def environment(cfg_file='.python_environment.cfg'):
@@ -73,23 +77,27 @@ def environment(cfg_file='.python_environment.cfg'):
     config.read(env.home+'/'+cfg_file)
     
     # Section Localisation (obsolescent):
-    env.tz          = config.get(     'Localisation', 'timezone',  fallback=env.tz)       # My timezone
-    env.geo_lon_deg = config.getfloat('Localisation', 'longitude', fallback=env.geo_lon)  # My longitude
-    env.geo_lat_deg = config.getfloat('Localisation', 'latitude',  fallback=env.geo_lat)  # My latitude
-    env.geo_alt     = config.getfloat('Localisation', 'altitude',  fallback=env.geo_alt)  # My altitude
+    env.tz          = config.get(     'Localisation', 'timezone',  fallback=env.tz)           # My timezone
+    env.geo_lon_deg = config.getfloat('Localisation', 'longitude', fallback=env.geo_lon_deg)  # My longitude
+    env.geo_lat_deg = config.getfloat('Localisation', 'latitude',  fallback=env.geo_lat_deg)  # My latitude
+    env.geo_alt     = config.getfloat('Localisation', 'altitude',  fallback=env.geo_alt)      # My altitude
     
     # Section Localisation (new, prefer):
-    env.tz          = config.get(     'Localisation', 'tz',           fallback=env.tz)        # My timezone
-    env.geo_lon_deg = config.getfloat('Localisation', 'geo_lon_deg',  fallback=env.geo_lon_deg)   # My longitude
-    env.geo_lat_deg = config.getfloat('Localisation', 'geo_lat_deg',  fallback=env.geo_lat_deg)   # My latitude
-    env.geo_alt     = config.getfloat('Localisation', 'geo_alt',      fallback=env.geo_alt)   # My altitude
+    env.tz          = config.get(     'Localisation', 'tz',           fallback=env.tz)           # My timezone
+    env.geo_lon_deg = config.getfloat('Localisation', 'geo_lon_deg',  fallback=env.geo_lon_deg)  # My longitude
+    env.geo_lat_deg = config.getfloat('Localisation', 'geo_lat_deg',  fallback=env.geo_lat_deg)  # My latitude
+    env.geo_alt     = config.getfloat('Localisation', 'geo_alt',      fallback=env.geo_alt)      # My altitude
     
     env.geo_lon = env.geo_lon_deg * _ac.d2r  # Convert from degrees to radians
     env.geo_lat = env.geo_lat_deg * _ac.d2r
     
     # Section SolarPanels:
-    env.sp_dir = config.get('SolarPanels', 'basedir', fallback=env.sp_dir).replace('~', env.home)  # SP base dir - move towards sp_dir
-    env.sp_dir = config.get('SolarPanels', 'sp_dir',  fallback=env.sp_dir).replace('~', env.home)  # SP base dir - prefer over ambiguous basedir
+    env.sp_dir      = config.get('SolarPanels',      'basedir',      fallback=env.sp_dir).replace('~', env.home)  # SP base dir - move towards sp_dir
+    env.sp_dir      = config.get('SolarPanels',      'sp_dir',       fallback=env.sp_dir).replace('~', env.home)  # SP base dir - prefer over ambiguous basedir
+    
+    env.sp_az_deg   = config.getfloat('SolarPanels', 'sp_az_deg',    fallback=env.sp_az_deg)    # Azimuth of my solar panels (deg)
+    env.sp_tilt_deg = config.getfloat('SolarPanels', 'sp_tilt_deg',  fallback=env.sp_tilt_deg)  # Tilt of my solar panels (deg)
+    
     
     # Section ElectricityMeter:
     env.el_dir = config.get('ElectricityMeter', 'basedir', fallback=env.el_dir).replace('~', env.home)  # EM base dir - move towards el_dir
