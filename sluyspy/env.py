@@ -48,6 +48,7 @@ class Environment:
     knmi_hourly_dir: str = '';       """Directory for hourly KNMI data"""
     knmi_daily_dir:  str = '';       """Directory for daily KNMI data"""
     wpw_dir:         str = '';       """WP weather directory"""
+    om_dir:          str = '';       """OpenMeteo directory"""
     
     thesky_dir:      str = '';       """TheSky main directory"""
     hwc_dir:         str = '';       """HWC main directory"""
@@ -108,6 +109,7 @@ def environment(cfg_file='.python_environment.cfg'):
     env.knmi_hourly_dir = config.get('Weather', 'knmi_hourly_dir', fallback=env.knmi_hourly_dir).replace('~', env.home)  # KNMI hourly dir
     env.knmi_daily_dir  = config.get('Weather', 'knmi_daily_dir',  fallback=env.knmi_daily_dir).replace('~', env.home)   # KNMI daily dir
     env.wpw_dir         = config.get('Weather', 'wpw_dir',         fallback=env.wpw_dir).replace('~', env.home)          # WP weather dir
+    env.om_dir          = config.get('Weather', 'om_dir',          fallback=env.om_dir).replace('~', env.home)           # OpenMeteo dir
     
     # Section HWC:
     env.thesky_dir      = config.get('HWC', 'thesky_dir',          fallback=env.thesky_dir).replace('~', env.home)       # TheSky main dir
