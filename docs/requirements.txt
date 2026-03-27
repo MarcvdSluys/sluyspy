@@ -1,11 +1,11 @@
 sluyspy
 astroconst==0.0.14
 astroquery==0.4.10
-astrotool==0.0.25
+astrotool==0.0.26
 matplotlib
 numpy
 pytz==2025.2
 scipy
 solarenergy==0.1.11
-termcolor==3.2.0
+termcolor==3.3.0
 sphinx-rtd-theme
