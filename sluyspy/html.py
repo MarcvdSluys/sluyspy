@@ -166,11 +166,12 @@ def table_td_tr(indent, td_width, td_extra_width):
     return trtd, tdtd, tdtdw, tdbrtd, tdtr
 
 
-def last_update(fd, indent, size='65%', seconds=False, tz=False):
+def last_update(fd, dtm=None, indent=4, size='65%', seconds=False, tz=False):
     """Add a 'Last update' line to an html file with the current system date and time.
     
     Parameters:
       fd (io):         File descriptor.
+      dtm (float):     Date/time to print (can be e.g. UNIX time or time.time());  Optional, defaults to "now".
       indent (int):    Number of spaces for indentation.
       size (str):      String with font size, e.g. '100%'.
       seconds (bool):  Print seconds in timestamp.
@@ -178,10 +179,12 @@ def last_update(fd, indent, size='65%', seconds=False, tz=False):
     """
     
     import time
+    if dtm is None: dtm = time.time()
+    
     if seconds:
-        time_str = _dt.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+        time_str = _dt.datetime.fromtimestamp(dtm).strftime('%Y-%m-%d %H:%M:%S')
     else:
-        time_str = _dt.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M')
+        time_str = _dt.datetime.fromtimestamp(dtm).strftime('%Y-%m-%d %H:%M')
     
     if tz:
         time_str += ' ' + time.tzname[time.localtime().tm_isdst]  # Add current tz, accounting for DST

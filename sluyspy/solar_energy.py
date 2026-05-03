@@ -19,8 +19,6 @@
 
 import numpy as _np
 import pandas as _pd
-# import pytz as _tz
-# import solarenergy as _se
 
 
 def solar_power_from_true_sky_rain(Pclear, cloud_cover, rain, fittype='means'):
