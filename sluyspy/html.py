@@ -65,7 +65,7 @@ def start_html_file(file_name='index.html', lang='en', title='Page title', icon=
     # Add an author and copyright if desired:
     if author != '':
         current_year = _dt.date.today().year
-        if (copyr_start is None) or (copyr_start == current_year):
+        if (copyr_start is None) or (str(copyr_start) == str(current_year)):
             f.write('    <meta name="author" content="(c) '+str(current_year)+' '+author+'">\n')
         else:
             f.write('    <meta name="author" content="(c) '+str(copyr_start)+'-'+str(current_year)+' '+author+'">\n')
@@ -182,9 +182,9 @@ def last_update(fd, dtm=None, indent=4, size='65%', seconds=False, tz=False):
     if dtm is None: dtm = time.time()
     
     if seconds:
-        time_str = _dt.datetime.fromtimestamp(dtm).strftime('%Y-%m-%d %H:%M:%S')
+        time_str = _dt.datetime.fromtimestamp(dtm).strftime('%a %Y-%m-%d %H:%M:%S')
     else:
-        time_str = _dt.datetime.fromtimestamp(dtm).strftime('%Y-%m-%d %H:%M')
+        time_str = _dt.datetime.fromtimestamp(dtm).strftime('%a %Y-%m-%d %H:%M')
     
     if tz:
         time_str += ' ' + time.tzname[time.localtime().tm_isdst]  # Add current tz, accounting for DST
