@@ -43,6 +43,7 @@ class Environment:
     sp_tilt_deg:     float = 45.0;   """Tilt for solar panels in degrees from horizontal (0=flat, 90=vertical == zenith angle)"""
     
     el_dir:          str = '';       """Electricity-meter directory"""
+    ems_dir:         str = '';       """EMS directory"""
     
     knmi_10min_dir:  str = '';       """Directory for 10-min KNMI data"""
     knmi_hourly_dir: str = '';       """Directory for hourly KNMI data"""
@@ -103,6 +104,9 @@ def environment(cfg_file='.python_environment.cfg'):
     # Section ElectricityMeter:
     env.el_dir = config.get('ElectricityMeter', 'basedir', fallback=env.el_dir).replace('~', env.home)  # EM base dir - move towards el_dir
     env.el_dir = config.get('ElectricityMeter', 'el_dir',  fallback=env.el_dir).replace('~', env.home)  # EM base dir - prefer over ambiguous basedir
+    
+    # Section EMS:
+    env.ems_dir = config.get('EMS', 'ems_dir',  fallback=env.ems_dir).replace('~', env.home)  # EM base dir
     
     # Section Weather:
     env.knmi_10min_dir  = config.get('Weather', 'knmi_10min_dir',  fallback=env.knmi_10min_dir).replace('~',  env.home)  # KNMI 10-min dir
