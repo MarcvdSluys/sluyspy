@@ -18,6 +18,7 @@
 
 import sys as _sys
 from termcolor import colored as _clr
+import sluyspy.system as _ssys
 
 
 def dialog(text):
@@ -48,7 +49,7 @@ def error(message, exit_program=True, exit_code=1):
       exit_code (int):      Exit code to exit the program with, defaults to 1.
     """
     
-    lmessage = 'ERROR: '+str(message)  # Local version
+    lmessage = _ssys.exec_script_name()+': ERROR: '+str(message)  # Local version
     if exit_program: lmessage += ', aborting.'
     
     _sys.stderr.write('\n'+_clr(lmessage, 'white', 'on_red', attrs=['bold'])+'\n\n')
@@ -66,10 +67,10 @@ def warn(message, exit_program=False, exit_code=1):
       exit_code (int):      Exit code to exit the program with, defaults to 1.
     """
     
-    lmessage = 'Warning: '+str(message)  # Local version
+    lmessage = _ssys.exec_script_name()+': Warning: '+str(message)  # Local version
     if exit_program: lmessage += ', aborting.'
     
-    _sys.stderr.write('\n'+_clr(message, 'white', 'on_yellow', attrs=['bold'])+'\n\n')
+    _sys.stderr.write('\n'+_clr(lmessage, 'white', 'on_yellow', attrs=['bold'])+'\n\n')
     
     if exit_program: exit(exit_code)
     return

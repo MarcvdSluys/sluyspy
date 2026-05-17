@@ -18,16 +18,27 @@
 
 
 from pathlib import Path as _Path
+import sys as _sys
 import socket as _socket
 import time as _time
 import subprocess as _subprocess
 
 
 
+def exec_script_name():
+    """Return the name of the currently executed Python script.
+    
+    Returns:
+      (str):  The file name of the currently executed Python script.
+    """
+    
+    return _Path(_sys.argv[0]).name
+
+
 def host():
     """Return the current host name.
     
-    Returns:  
+    Returns:
       (str):  The current host name.
     """
     
@@ -37,7 +48,7 @@ def host():
 def homedir():
     """Return my home directory as a string without trailing slash.
     
-    Returns:  
+    Returns:
       (str):  My home directory as a string without trailing slash.
     """
     
