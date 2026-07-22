@@ -45,6 +45,11 @@ class Environment:
     el_dir:          str = '';       """Electricity-meter directory"""
     ems_dir:         str = '';       """EMS directory"""
     
+    hp_dir:          str = '';       """Heat-pump directory"""
+    hp_url:          str = '';       """Heat-pump URL"""
+    hp_ip:           str = '';       """Heat-pump IP address"""
+    hp_token:        str = '';       """Heat-pump API token"""
+    
     knmi_10min_dir:  str = '';       """Directory for 10-min KNMI data"""
     knmi_hourly_dir: str = '';       """Directory for hourly KNMI data"""
     knmi_daily_dir:  str = '';       """Directory for daily KNMI data"""
@@ -106,7 +111,13 @@ def environment(cfg_file='.python_environment.cfg'):
     env.el_dir = config.get('ElectricityMeter', 'el_dir',  fallback=env.el_dir).replace('~', env.home)  # EM base dir - prefer over ambiguous basedir
     
     # Section EMS:
-    env.ems_dir = config.get('EMS', 'ems_dir',  fallback=env.ems_dir).replace('~', env.home)  # EM base dir
+    env.ems_dir = config.get('EMS', 'ems_dir',  fallback=env.ems_dir).replace('~', env.home)  # EMS base dir
+    
+    # Section HeatPump:
+    env.hp_dir   = config.get('HeatPump',  'hp_dir',   fallback=env.hp_dir).replace('~', env.home)    # Heat-pump base dir
+    env.hp_url   = config.get('HeatPump',  'hp_url',   fallback=env.hp_url).replace('~', env.home)    # Heat-pump URL
+    env.hp_ip    = config.get('HeatPump',  'hp_ip',    fallback=env.hp_ip).replace('~', env.home)     # Heat-pump IP address
+    env.hp_token = config.get('HeatPump',  'hp_token', fallback=env.hp_token).replace('~', env.home)  # Heat-pump API token
     
     # Section Weather:
     env.knmi_10min_dir  = config.get('Weather', 'knmi_10min_dir',  fallback=env.knmi_10min_dir).replace('~',  env.home)  # KNMI 10-min dir
