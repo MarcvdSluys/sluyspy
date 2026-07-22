@@ -5,7 +5,7 @@ astrotool==0.0.26
 matplotlib
 numpy
 pytz==2025.2
-pytz==2026.1.post1
+pytz==2026.2
 scipy
 solarenergy==0.1.13
 termcolor==3.3.0

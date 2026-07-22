@@ -1,10 +1,10 @@
 astroconst==0.0.14
 astroquery==0.4.10
 astrotool==0.0.26
-matplotlib==3.10.9
-numpy==2.4.4
+matplotlib==3.11.1
+numpy==2.5.1
 pytz==2025.2
-pytz==2026.1.post1
-scipy==1.17.1
+pytz==2026.2
+scipy==1.18.0
 solarenergy==0.1.13
 termcolor==3.3.0
