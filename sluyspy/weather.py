@@ -90,24 +90,48 @@ def sky_power_from_rain_medians(rain):
 
 
 def dew_point_from_tempc_rh(temp_c, rh):
-    """Compute the dew point from the temperature and relative humidity.
+    """Compute the dew-point temperature from the air temperature and relative humidity.
+    
+    Uses the Magnus-Tetens approximation with the Alduchov and Eskridge (1996) coefficients, valid over a
+    temperature range of roughly -40-60 degC, with an accuracy of ~0.4%.
     
     Parameters:
-      temp_c (float):  Air temperature (degrees Celsius).
-      rh (float):      Relative humidity (fraction).
+      temp_c (float, array):  Air (dry-bulb) temperature (degrees Celsius).
+      rh (float, array):      Relative humidity (%).
     
     Returns:
-      (float):  Dew point (degrees Celsius).
+      (float, array):  Dew-Point temperature (degrees Celsius).
     
-    See:
-      https://en.wikipedia.org/wiki/Dew_point
+    Reference:
+      Alduchov, O.A. & Eskridge, R.E., 1996, "Improved Magnus' form approximation of saturation vapor
+        pressure", J. Appl. Meteor., 35, 601-609; Eq.21
+    
     """
     
-    temp_c0  = 273.7
-    tempfac  = 17.27
-    gam = tempfac * temp_c/(temp_c0+temp_c) + _np.log(rh)
+    # Tfac = 17.27    # Temperature factor - dimensionless - https://en.wikipedia.org/wiki/Dew_point
+    # T0   = 273.7    # degC
+    Tfac = 17.625   # Temperature factor - dimensionless - see A&E 1996, Eq.21
+    T0   = 243.04   # degC
     
-    return temp_c0 * gam/(tempfac-gam)
+    gamma = _np.log(rh/100)  +  Tfac * temp_c / (T0 + temp_c)
+    td    = T0 * gamma / (Tfac - gamma)
+    
+    # Paper:
+    # E_w  :=  c * exp( a*t / (b + t))  :=  P_vap,sat(t)  =  saturation vapor pressure (hPa);  t in degC
+    # -> log(P) = log(c) + a*T/(b + T)  with log(P) := gamma and c := RH/100
+    # 
+    # Eq.21:  e_w = 6.1094 * _np.exp(Tfac * temp_c / (T0 + temp_c))  # := P_vap,sat(T) (6.1094 hPa = 610.94 Pa)
+    # 
+    # RH/100 := Pvap / Pvap,sat  (i.e. the pressure fraction of saturation - factors 6.1094 cancel)
+    #         = exp(Tfac * Td / (T0 + Td)) / exp(Tfac * T / (T0 + T))
+    # -> log(RH/100) = Tfac * Td / (T0 + Td)  -  Tfac * T / (T0 + T)
+    # 
+    # Define  gamma := log(RH/100)  +  Tfac * T / (T0 + T) = Tfac * Td / (T0 + Td)
+    # -> gamma/Tfac = Td / (T0 + Td) = 1/(T0/Td + 1)
+    # -> Tfac/gamma = T0/Td + 1  ->  1/(Tfac/gamma - 1) = Td/T0
+    # -> Td = T0/(Tfac/gamma - 1) = T0 * gamma / (Tfac - gamma)
+    
+    return td
 
 
 def water_vapor_saturated_density_from_tempc(temp_c):
@@ -147,6 +171,7 @@ def absolute_humidity_from_tempc_rh(temp_c, rh):
     """
     
     return water_vapor_saturated_density_from_tempc(temp_c) * rh
+
 
 
 def knmi_read_hourly_weather(filename, start_date=None, end_date=None, tidy=True):
