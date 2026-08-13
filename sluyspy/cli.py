@@ -95,6 +95,25 @@ def bold(message, dark_bg=True):
     return bold_message
 
 
+def grey(message):
+    """Print a text to the cli in grey.
+    
+    Parameters:
+      message (str):     Message to print.
+      dark_bg (bool):    For a dark background?
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    # if dark_bg:
+    clr_message = '\033[37m'+message+'\033[0m'  # Light grey, not in clr!
+    # else:
+    #     clr_message = _clr(message, 'grey', attrs=[])
+    
+    return clr_message
+
+
 def red(message, dark_bg=True):
     """Print a text to the cli in red.
     
