@@ -116,8 +116,8 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
 
 
 def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=False, legend_loc='best',
-                grid=True, logx=False,logy=False, logx_gfmt=True, logy_gfmt=True, tight=2, save=True,
-                close=True):
+                grid=True, logx=False,logy=False, logx_gfmt=True, logy_gfmt=True, date=0, tight=2,
+                save=True, close=True):
     """Show the current figure on screen or save it to disc and close it.
     
     Parameters:
@@ -139,6 +139,8 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
       logx_gfmt (bool):     Use non-scientific format where possible on the horizontal axis.  Changes 10^0 -> 1, but also 10^40 -> 1e+40
       logy_gfmt (bool):     Use non-scientific format where possible on the vertical axis.  Changes 10^0 -> 1, but also 10^40 -> 1e+40
     
+      date (int):           Add a datetime stamp: 0: no, 1: yes, in the lower-right corner.
+    
       tight (int):          Tightness of the margins: 0: not at all, 1: some, 2: quite (default), 3: very!
     
       save (bool):          Actually save the plot (if not, allow further changes, and don't close!).
@@ -159,6 +161,16 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
         ax.set_yscale('log')                                 # Logarithmic vertical axis
         if logy_gfmt: _plt.gca().yaxis.set_major_formatter(_mpl.ticker.FormatStrFormatter('%0g'))  # Use non-scientific format where possible
     if grid: ax.grid(grid)                                        # Plot a grid
+    
+    # Add timestamp:
+    if date > 0:
+        import datetime as _dt
+        # timestamp = _dt.datetime.now().strftime('%a %Y-%m-%d %H:%M')  # DoW YYYY-mm-dd, HH:MM
+        timestamp = _dt.datetime.now().strftime('%a %d %b, %H:%M')  # DoW DoM Mon, HH:mm
+        if tight > 1:  # 2 or 3
+            fig.text(0.98, 0.03, timestamp, ha='right',va='bottom', fontsize=7)
+        else:
+            fig.text(0.99, 0.01, timestamp, ha='right',va='bottom', fontsize=7)
     
     # Tightness of the margins:
     if tight>0: fig.tight_layout()                                # Use narrow margins
