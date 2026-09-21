@@ -44,6 +44,8 @@ class Environment:
     
     el_dir:          str = '';       """Electricity-meter directory"""
     ems_dir:         str = '';       """EMS directory"""
+    price_dir:       str = '';       """Electricity-price directory"""
+    entsoe_token:    str = '';       """Entso-E API token"""
     
     hp_dir:          str = '';       """Heat-pump directory"""
     hp_url:          str = '';       """Heat-pump URL"""
@@ -111,7 +113,10 @@ def environment(cfg_file='.python_environment.cfg'):
     env.el_dir = config.get('ElectricityMeter', 'el_dir',  fallback=env.el_dir).replace('~', env.home)  # EM base dir - prefer over ambiguous basedir
     
     # Section EMS:
-    env.ems_dir = config.get('EMS', 'ems_dir',  fallback=env.ems_dir).replace('~', env.home)  # EMS base dir
+    env.ems_dir      = config.get('EMS', 'ems_dir',       fallback=env.ems_dir).replace('~', env.home)       # EMS base dir
+    env.price_dir    = config.get('EMS', 'price_dir',     fallback=env.price_dir).replace('~', env.home)     # Electricity-price base dir
+    env.entsoe_token = config.get('EMS',  'entsoe_token', fallback=env.entsoe_token).replace('~', env.home)  # Entso-E API token
+    
     
     # Section HeatPump:
     env.hp_dir   = config.get('HeatPump',  'hp_dir',   fallback=env.hp_dir).replace('~', env.home)    # Heat-pump base dir
