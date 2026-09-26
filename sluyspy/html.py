@@ -30,6 +30,7 @@ def line(fd, indent, code):
     """
     
     fd.write(' '*indent + code +'\n')
+    
     return
 
 
@@ -55,45 +56,44 @@ def start_html_file(file_name='index.html', lang='en', title='Page title', icon=
     """
     
     # Create the HTML file:
-    f = open(file_name, 'w')
-    
-    f.write('<!DOCTYPE HTML>\n')
-    f.write('<html lang="'+lang+'">\n')
+    fd = open(file_name, 'w')
+    line(fd, 0, '<!DOCTYPE HTML>')
+    line(fd, 0, '<html lang="'+lang+'">')
     
     # Write the <head> section:
-    f.write('  <head>\n')
-    f.write('    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">\n')
+    line(fd, 2, '<head>')
+    line(fd, 4, '<meta http-equiv="Content-Type" content="text/html;charset=utf-8">')
     
     # Add refresh data if desired:
     if refresh is not None:
-        f.write('    <meta http-equiv="Refresh" content="'+str(refresh*60)+'">\n')
+        line(fd, 4, '<meta http-equiv="Refresh" content="'+str(refresh*60)+'">')
         
     # Add an icon or css if desired:
-    if icon is not None:    f.write('    <link rel="icon" href="'+icon+'">\n')
-    if css is not None:     f.write('    <link rel="stylesheet" type="text/css" href="'+css+'">\n')
+    if icon is not None:    line(fd, 4, '<link rel="icon" href="'+icon+'">')
+    if css is not None:     line(fd, 4, '<link rel="stylesheet" type="text/css" href="'+css+'">')
     
     # Add a title:
-    f.write('    <title>'+title+'</title>\n')
+    line(fd, 4, '<title>'+title+'</title>')
     
     # Add an author and copyright if desired:
     if author != '':
         current_year = _dt.date.today().year
         if (copyr_start is None) or (str(copyr_start) == str(current_year)):
-            f.write('    <meta name="author" content="(c) '+str(current_year)+' '+author+'">\n')
+            line(fd, 4, '<meta name="author" content="(c) '+str(current_year)+' '+author+'">')
         else:
-            f.write('    <meta name="author" content="(c) '+str(copyr_start)+'-'+str(current_year)+' '+author+'">\n')
+            line(fd, 4, '<meta name="author" content="(c) '+str(copyr_start)+'-'+str(current_year)+' '+author+'">')
     
     # Add meta data if any:
     if meta_prop is not None:
         for key,value in meta_prop.items():
-            f.write('    <meta property="'+key+'" content="'+value+'">\n')
+            line(fd, 4, '<meta property="'+key+'" content="'+value+'">')
     
     # Close the <head> section and start the <body> section:
-    f.write('  </head>\n')
-    f.write('  \n')
-    f.write('  <body>\n')
+    line(fd, 2, '</head>')
+    line(fd, 2, '')
+    line(fd, 2, '<body>')
     
-    return f
+    return fd
 
 
 def close_html_file(fd, sc_id=None, sc_secr=None, sc_name=None):
@@ -107,44 +107,44 @@ def close_html_file(fd, sc_id=None, sc_secr=None, sc_name=None):
     """
     
     # Create some space:
-    fd.write('    \n')
-    fd.write('    \n')
+    line(fd, 4, '')
+    line(fd, 4, '')
     
     
     # Write a StatCounter code block if desired:
     if (sc_id is not None) and (sc_secr is not None):
         if sc_name is not None:
-            fd.write('    <!-- Start of StatCounter Code for '+sc_name+' -->\n')
+            line(fd, 4, '<!-- Start of StatCounter Code for '+sc_name+' -->')
         else:
-            fd.write('    <!-- Start of StatCounter Code -->\n')
+            line(fd, 4, '<!-- Start of StatCounter Code -->')
         
-        fd.write('    <script type="text/javascript">\n')
-        fd.write('    var sc_project='+str(sc_id)+'; \n')
-        fd.write('    var sc_invisible=1; \n')
-        fd.write('    var sc_security="'+str(sc_secr)+'"; \n')
-        fd.write('    var scJsHost = (("https:" == document.location.protocol) ?\n')
-        fd.write('    "https://secure." : "http://www.");\n')
-        fd.write('    document.write("<sc"+"ript type=''text/javascript'' src=''" +\n')
-        fd.write('    scJsHost+\n')
-        fd.write('    "statcounter.com/counter/counter.js''></"+"script>");\n')
-        fd.write('    </script>\n')
-        fd.write('    <noscript><div class="statcounter"><a title="web analytics"\n')
-        fd.write('    href="http://statcounter.com/" target="_blank"><img\n')
-        fd.write('    class="statcounter"\n')
-        fd.write('    src="//c.statcounter.com/'+str(sc_id)+'/0/'+str(sc_secr)+'/1/" alt="web\n')
-        fd.write('    analytics"></a></div></noscript>\n')
+        line(fd, 4, '<script type="text/javascript">')
+        line(fd, 4, 'var sc_project='+str(sc_id)+'; ')
+        line(fd, 4, 'var sc_invisible=1; ')
+        line(fd, 4, 'var sc_security="'+str(sc_secr)+'"; ')
+        line(fd, 4, 'var scJsHost = (("https:" == document.location.protocol) ?')
+        line(fd, 4, '"https://secure." : "http://www.");')
+        line(fd, 4, 'document.write("<sc"+"ript type=''text/javascript'' src=''" +')
+        line(fd, 4, 'scJsHost+')
+        line(fd, 4, '"statcounter.com/counter/counter.js''></"+"script>");')
+        line(fd, 4, '</script>')
+        line(fd, 4, '<noscript><div class="statcounter"><a title="web analytics"')
+        line(fd, 4, 'href="http://statcounter.com/" target="_blank"><img')
+        line(fd, 4, 'class="statcounter"')
+        line(fd, 4, 'src="//c.statcounter.com/'+str(sc_id)+'/0/'+str(sc_secr)+'/1/" alt="web')
+        line(fd, 4, 'analytics"></a></div></noscript>')
         if sc_name is not None:
-            fd.write('    <!-- End of StatCounter Code for '+sc_name+' -->\n')
+            line(fd, 4, '<!-- End of StatCounter Code for '+sc_name+' -->')
         else:
-            fd.write('    <!-- End of StatCounter Code -->\n')
+            line(fd, 4, '<!-- End of StatCounter Code -->')
         
-        fd.write('    \n')
-        fd.write('    \n')
+        line(fd, 4, '')
+        line(fd, 4, '')
     
     
     # Close the <body> and <html> sections:
-    fd.write('  </body>\n')
-    fd.write('</html>\n')
+    line(fd, 2, '</body>')
+    line(fd, 0, '</html>')
     
     # Close the file:
     fd.close()
@@ -202,9 +202,10 @@ def last_update(fd, dtm=None, indent=4, size='65%', seconds=False, tz=False):
     if tz:
         time_str += ' ' + time.tzname[time.localtime().tm_isdst]  # Add current tz, accounting for DST
     
-    fd.write(' '*indent + '<br>\n')
-    fd.write(' '*indent + '<p style="font-size:'+size+'; text-align:center; margin:0;">Last update: '+time_str+'</p>\n')
-    fd.write(' '*indent + '\n')
+    line(fd, indent, '<br>')
+    line(fd, indent, '<p style="font-size:'+size+'; text-align:center; margin:0;">Last update: '+time_str+'</p>')
+    line(fd, indent, '')
+    
     return
 
 
