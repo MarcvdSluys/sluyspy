@@ -20,6 +20,19 @@
 import datetime as _dt
 
 
+def line(fd, indent, code):
+    """Write a line of html code with given indentation to a given file descriptor.
+    
+    Parameters:
+      fd (float):    File descriptor.
+      indent (int):  Indentation (number of spaces).
+      code (float):  HTML code to write.
+    """
+    
+    fd.write(' '*indent + code +'\n')
+    return
+
+
 def start_html_file(file_name='index.html', lang='en', title='Page title', icon=None, css=None,
                     author='Marc van der Sluys', copyr_start=None, refresh=None, meta_prop=None):
     
