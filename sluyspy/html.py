@@ -194,10 +194,12 @@ def last_update(fd, dtm=None, indent=4, size='65%', seconds=False, tz=False):
     import time
     if dtm is None: dtm = time.time()
     
+    if type(dtm) is float: dtm = _dt.datetime.fromtimestamp(dtm)  # Convert from float (UNIX time)
+    
     if seconds:
-        time_str = _dt.datetime.fromtimestamp(dtm).strftime('%a %Y-%m-%d %H:%M:%S')
+        time_str = dtm.strftime('%a %Y-%m-%d %H:%M:%S')
     else:
-        time_str = _dt.datetime.fromtimestamp(dtm).strftime('%a %Y-%m-%d %H:%M')
+        time_str = dtm.strftime('%a %Y-%m-%d %H:%M')
     
     if tz:
         time_str += ' ' + time.tzname[time.localtime().tm_isdst]  # Add current tz, accounting for DST
