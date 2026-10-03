@@ -67,7 +67,7 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
 
 
 def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, bounds=[-_np.inf,_np.inf], method=None, verbosity=0):
-    """Wrapper for SciPy's curve_fit, that returns the fitting coefficients and reduced chi^2.
+    r"""Wrapper for SciPy's curve_fit, that returns the fitting coefficients and reduced chi^2.
        Print details if desired.
     
     Parameters:
@@ -79,9 +79,9 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, bounds=[-_n
       bounds (tuple):      Pass parameter boundaries ([lower],[upper]) to curve_fit(): (optional; defaults to [-infty,infty]).
       method (str):        Pass fit method to curve_fit(): 'lm','trf','dogbox' (optional; defaults to None).
       verbosity (int):     Verbosity:  0: quiet,
-                                       1: print red.chi2 + mean |abs/rel. differences|,
+                                       1: print red.chi2 + mean \|abs/rel. differences\|,
                                        2: + fit coefficients,
-                                       3: + mean abs/rel. differences + max. |diffs| + correlation matrix,
+                                       3: + mean abs/rel. differences + max. \|diffs\| + correlation matrix,
                                        4: + SciPy details + var-covar matrix,
                                        5: + SciPy info dict + df with fit data;
                                        defaults to 0.
