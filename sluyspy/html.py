@@ -194,7 +194,7 @@ def last_update(fd, dtm=None, indent=4, size='65%', seconds=False, tz=False):
     import time
     if dtm is None: dtm = time.time()
     
-    if type(dtm) is float: dtm = _dt.datetime.fromtimestamp(dtm)  # Convert from float (UNIX time)
+    if (type(dtm) is float) or (type(dtm) is int): dtm = _dt.datetime.fromtimestamp(dtm)  # Convert from float/int (UNIX time)
     
     if seconds:
         time_str = dtm.strftime('%a %Y-%m-%d %H:%M:%S')
