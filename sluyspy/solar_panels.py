@@ -33,10 +33,10 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
                       minimal=False, rem_cols=True, no_p0rows=False, no_elec=False, no_cond=True):
     """Read solar-panel detailed-log.csv and select the useful data.
     
-    Parameters:
+    Args:
       file_name (str):      Name of the input file (optional; default=None -> detailed-log.csv).
-      header (int):         Number of lines to consider as header and skip (optional; default: 0).
       last_only (int):      Number of last lines to read.  This tails the last lines into a separate file and reads that.
+      header (int):         Number of lines to consider as header and skip (optional; default: 0).
       sun_position (bool):  Add (compute) Sun position to the data (slow! - optional; default: False).
     
       minimal (bool):       Minimal number of columns, to get date, time and (an accurate) Pac only.
@@ -131,7 +131,7 @@ def read_detailed_log(file_name='Current/detailed-log.csv', last_only=None, head
 def write_day_file(df, subdir='', prefix=specs.name, ext='csv', verbosity=0):
     """Write one day of (e.g.) minutely solar-panel data to daily file named 'subdir/prefix-yyyymmdd.ext'.
     
-    Parameters:
+    Args:
       df (pandas.DataFrame):  Pandas DataFrame with columns datetime, Pac and Etot.
       subdir (str):           Subdirectory to save file in, with trailing slash.
       prefix (str):           File name prefix (defaults to name of the plant, followed by a hyphen).

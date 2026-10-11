@@ -20,7 +20,7 @@
 def stats_from_conf_mat(df):
     """Add common ML statistics to a Pandas DataFrame containing the confusion-matrix elements.
     
-    Parameters:
+    Args:
       df (pd.df):  Pandas DataFrame containing the confusion-matrix elements in the following columns:
     
         - tp:  Number or fraction of true positives.

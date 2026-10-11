@@ -26,7 +26,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
                fz=None,serif=False, lw=None, plot3d=False, man_zorder=True, cblind=True):
     """Start a matplotlib.pyplot plot with a choice of my favourite options.
     
-    Parameters:
+    Args:
       ptype (str):        Plot type: 'screen', 'file', 'both' (a compromise; default), 'square' or 'org'.
       hsize (float):      Horizontal size of the figure (pixels if >50, hectopixels otherwise); can overrule setting by ptype.
       vsize (float):      Vertical size of the figure (pixels if >50, hectopixels otherwise); can overrule setting by ptype.
@@ -40,7 +40,7 @@ def start_plot(ptype='both', hsize=None,vsize=None, dark_bg=False, xkcd=False, t
       lw (int):           Line width (optional, defaults to None -> 1 or 2).
     
       plot3d (bool):      Start a 3D plot (optional, defaults to False -> 2D).
-      map_zorder (bool):  Use manual zorder (defaults to True - opposed to pyplot default: compute).
+      man_zorder (bool):  Use manual zorder (defaults to True - opposed to pyplot default: compute).
       cblind (bool):      Choose a colour-blindness-aware colour palette (optional, defaults to True).
     
     Returns:
@@ -120,7 +120,7 @@ def finish_plot(fig,ax, file_name=None, title=None, xlbl=None,ylbl=None, legend=
                 save=True, close=True):
     """Show the current figure on screen or save it to disc and close it.
     
-    Parameters:
+    Args:
       fig (pyplot.figure):  Current Pyplot figure object.
       ax (pyplot axes):     Current Pyplot axes object.
       file_name (str):      Name for the output file (optional, defaults to None -> screen).
@@ -199,25 +199,27 @@ def hist_norm(obj, x, bins=None, range=None, density=False, weights=None, cumula
               stacked=False, *, data=None, **kwargs):
     """Draw a histogram normalised by total number rather than probability density.
     
-    Parameters:
-      obj (pyplot object):  Pyplot object or axes object to plot to.
-      x (array or sequence of arrays):  Data.
-      bins (int or sequence or str):  Number of bins.  Default: rcParams["hist.bins"] (default: 10).
-      range (tuple or None):  Bin range, default: None.
-      density (bool):  Plot probability density.  Default: False.
-      weights (array-like or None):  Weights.  Default: None.
-      cumulative (bool or -1):  Plot a cumulative histogram.  Default: False.
-      bottom (array-like, scalar, or None):  Location of the bottom of the bins.  Default: None.
-      histtype (str):  Histogram type: {'bar', 'barstacked', 'step', 'stepfilled'}, default: 'bar'.
-      align (str):  Bin alignment: {'left', 'mid', 'right'}, default: 'mid'.
-      orientation (str):  Bin orientation:  {'vertical', 'horizontal'}, default: 'vertical'.
-      rwidth (float or None):  The relative width of the bars as a fraction of the bin width, default: None.
-      log (bool):  Set the histogram axis to a log scale, default: False.
+    Args:
+      obj (pyplot object):                            Pyplot object or axes object to plot to.
+      x (array or sequence of arrays):                Data.
+      bins (int or sequence or str):                  Number of bins.  Default: rcParams["hist.bins"] (default: 10).
+      range (tuple or None):                          Bin range, default: None.
+      density (bool):                                 Plot probability density.  Default: False.
+      weights (array-like or None):                   Weights.  Default: None.
+      cumulative (bool or -1):                        Plot a cumulative histogram.  Default: False.
+      bottom (array-like, scalar, or None):           Location of the bottom of the bins.  Default: None.
+    
+      histtype (str):                                 Histogram type: {'bar', 'barstacked', 'step', 'stepfilled'}, default: 'bar'.
+      align (str):                                    Bin alignment: {'left', 'mid', 'right'}, default: 'mid'.
+      orientation (str):                              Bin orientation:  {'vertical', 'horizontal'}, default: 'vertical'.
+      rwidth (float or None):                         The relative width of the bars as a fraction of the bin width, default: None.
+      log (bool):                                     Set the histogram axis to a log scale, default: False.
       color (color or array-like of colors or None):  Color or sequence of colors for bins, one per dataset, default: None.
-      label (str or None):  Legend label, default: None.
-      stacked (bool):  Stack multiple data on top of each other, rather than side by side, default: False.
-      data (indexable object, optional):  If given, the following parameters also accept a string s, which is interpreted as data[s] (unless this raises an exception): x, weights.
-      kwargs (dict):  Keyword arguments to be passed to pyplot.quiver().
+      label (str or None):                            Legend label, default: None.
+    
+      stacked (bool):                                 Stack multiple data on top of each other, rather than side by side, default: False.
+      data (indexable object, optional):              If given, the following parameters also accept a string s, which is interpreted as data[s] (unless this raises an exception): x, weights.
+      **kwargs (dict):                                Keyword arguments to be passed to pyplot.quiver().
     
     Returns:
       (tuple):  Tuple consisting of (n, bin_edges, patches):
@@ -252,7 +254,7 @@ def show_ctrlc():
 def pause_ctrlc(interval):
     """Call pyplot.pause() and catch Ctrl-C to exit gently.
     
-    Parameters:
+    Args:
       interval (float):  pause time in seconds.
     """
     
@@ -268,14 +270,18 @@ def pause_ctrlc(interval):
 def arrow_head_between_points(ax, xx,yy, dx=0,dy=0, scale=1, **kwargs):
     """Plot an arrow head between two 2D points and try to scale properly.
     
-    Parameters:
-      ax (axes):      Axes object to plot on.
-      xx (float):     Array with two x values, for arrow-head position and direction.
-      yy (float):     Array with two y values, for arrow-head position and direction.
-      dx (float):     Shift arrow head in x direction.
-      dy (float):     Shift arrow head in y direction.
-      scale (float):  Scale arrow head.
-      kwargs (dict):  Keyword arguments to be passed to pyplot.quiver().
+    Args:
+      ax (axes):        Axes object to plot on.
+    
+      xx (float):       Array with two x values, for arrow-head position and direction.
+      yy (float):       Array with two y values, for arrow-head position and direction.
+    
+      dx (float):       Shift arrow head in x direction.
+      dy (float):       Shift arrow head in y direction.
+    
+      scale (float):    Scale arrow head.
+    
+      **kwargs (dict):  Keyword arguments to be passed to pyplot.quiver().
     """
     
     # Local scaling parameter: undo arrow-head scaling with length:
@@ -295,13 +301,16 @@ def arrow_head_between_points(ax, xx,yy, dx=0,dy=0, scale=1, **kwargs):
 def arrow_between_points(ax, xx,yy, scale=1, zorder=2, **kwargs):
     """Plot an arrow between two 2D points and try to scale the shaft and head properly.
     
-    Parameters:
-      ax (axes):      Axes object to plot on.
-      xx (float):     Array with two x values, for tail and head position.
-      yy (float):     Array with two y values, for tail and head position.
-      scale (float):  Scale arrow shaft and head.
-      zorder (int):   Zorder for the arrow.  Zorder<2 places it below the grid.
-      kwargs (dict):  Keyword arguments to be passed to pyplot.quiver().
+    Args:
+      ax (axes):        Axes object to plot on.
+    
+      xx (float):       Array with two x values, for tail and head position.
+      yy (float):       Array with two y values, for tail and head position.
+    
+      scale (float):    Scale arrow shaft and head.
+      zorder (int):     Zorder for the arrow.  Zorder<2 places it below the grid.
+    
+      **kwargs (dict):  Keyword arguments to be passed to pyplot.quiver().
     """
     
     # Local scaling parameter: undo arrow-head scaling with length:

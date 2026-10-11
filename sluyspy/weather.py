@@ -27,7 +27,7 @@ import astroconst as _ac
 def wind_chill_temperature(temp, wind_vel):
     """Compute wind-chill ("real-feel") temperature from the air temperature and wind velocity.
     
-    Parameters:
+    Args:
       temp (float):      Air temperature at 1.5m above ground (°C).
       wind_vel (float):  Wind velocity at 10m above ground (m/s).
     
@@ -63,7 +63,7 @@ def wind_chill_temperature(temp, wind_vel):
 def wind_dir_str_from_az(az):
     """Convert a wind direction (azimuth) in degrees to a three-character English abbreviation string.
     
-    Parameters:
+    Args:
       az (float):  Azimuth (degrees; 0=North, 90=East).
     
     Returns:
@@ -77,25 +77,13 @@ def wind_dir_str_from_az(az):
 
 
 
-def sky_power_from_rain_means(rain):
-    print('Sorry, this function moved to sluyspy.solar_energy._cloud_power_from_rain(), called from solar_power_from_true_sky_rain()')
-    exit(1)
-    return
-
-
-def sky_power_from_rain_medians(rain):
-    print('Sorry, this function moved to sluyspy.solar_energy._cloud_power_from_rain(), called from solar_power_from_true_sky_rain()')
-    exit(1)
-    return
-
-
 def dew_point_from_tempc_rh(temp_c, rh):
     """Compute the dew-point temperature from the air temperature and relative humidity.
     
     Uses the Magnus-Tetens approximation with the Alduchov and Eskridge (1996) coefficients, valid over a
     temperature range of roughly -40-60 degC, with an accuracy of ~0.4%.
     
-    Parameters:
+    Args:
       temp_c (float, array):  Air (dry-bulb) temperature (degrees Celsius).
       rh (float, array):      Relative humidity (%).
     
@@ -137,7 +125,7 @@ def dew_point_from_tempc_rh(temp_c, rh):
 def water_vapor_saturated_density_from_tempc(temp_c):
     """Compute the saturated water-vapor density in air for a given temperature.
     
-    Parameters:
+    Args:
       temp_c (float):  Air temperature (degrees Celsius).
     
     Returns:
@@ -163,7 +151,7 @@ def water_vapor_saturated_density_from_tempc(temp_c):
 def absolute_humidity_from_tempc_rh(temp_c, rh):
     """Compute the absolute humidity (water-vapor density) from the temperature and relative humidity.
     
-    Parameters:
+    Args:
       temp_c (float):  Air temperature (degrees Celsius).
       rh (float):      Relative humidity (fraction).
     
@@ -182,7 +170,7 @@ def knmi_read_hourly_weather(filename, start_date=None, end_date=None, tidy=True
     station. This function reads the weather data from a chosen start date to the chosen end date, which is
     NOT included.  For example, for the whole of the year 2020, specify 2020,1,1, 2021,1,1.
     
-    Parameters:
+    Args:
       filename (str): filename to select the specific station, this is "uurgeg_260_2011-2020_Bilt.csv" for De Bilt
     
       start_date (datetime):  start date:  date of the first data entry to be returned (timezone aware; optional).
@@ -237,7 +225,7 @@ def knmi_datetime_from_datehour(knmi_data):
     The KNMI date is expressed as an integer formatted as YYYYMMDD, while the hours run from 1-24 rather than
     from 0-23.  This causes problems when converting to Python or Pandas datetime objects.
     
-    Parameters:
+    Args:
       knmi_data (Pandas df):  KNMI weather dataframe.
     
     Returns:
@@ -276,7 +264,7 @@ def knmi_datetime_from_datehour(knmi_data):
 def knmi_station_data(remove_nans=False):
     """Return a Pandas DataFrame containing the data of Dutch KNMI weather stations.
     
-    Parameters:
+    Args:
       remove_nans (bool):  Remove entries containing a NaN.  Optional; defaults to False.
     
     Returns:

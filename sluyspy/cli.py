@@ -24,7 +24,7 @@ import sluyspy.system as _ssys
 def dialog(text):
     """Present a dialog text and wait for a single-key answer.
     
-    Parameters:
+    Args:
       text (str):  The text to print.
     
     Returns:
@@ -43,7 +43,7 @@ def dialog(text):
 def error(message, exit_program=True, exit_code=1):
     """Print a coloured error message to stderr and exit.
     
-    Parameters:
+    Args:
       message (str):        Message to print.
       exit_program (bool):  Exit the program or not, defaults to True.
       exit_code (int):      Exit code to exit the program with, defaults to 1.
@@ -61,7 +61,7 @@ def error(message, exit_program=True, exit_code=1):
 def warn(message, exit_program=False, exit_code=1):
     """Print a coloured warn message to stderr and exit.
     
-    Parameters:
+    Args:
       message (str):        Message to print.
       exit_program (bool):  Exit the program or not, defaults to False.
       exit_code (int):      Exit code to exit the program with, defaults to 1.
@@ -79,7 +79,7 @@ def warn(message, exit_program=False, exit_code=1):
 def bold(message, dark_bg=True):
     """Print a text to the cli in bold white or black.
     
-    Parameters:
+    Args:
       message (str):     Message to print.
       dark_bg (bool):    For a dark background?
     
@@ -98,13 +98,13 @@ def bold(message, dark_bg=True):
 def grey(message):
     """Print a text to the cli in grey.
     
-    Parameters:
+    Args:
       message (str):     Message to print.
-      dark_bg (bool):    For a dark background?
     
     Returns:
       (str):             Message in colour.
     """
+    # dark_bg (bool):    For a dark background?
     
     # if dark_bg:
     clr_message = '\033[37m'+message+'\033[0m'  # Light grey, not in clr!
@@ -117,7 +117,7 @@ def grey(message):
 def red(message, dark_bg=True):
     """Print a text to the cli in red.
     
-    Parameters:
+    Args:
       message (str):     Message to print.
       dark_bg (bool):    For a dark background?
     
@@ -136,7 +136,7 @@ def red(message, dark_bg=True):
 def green(message, dark_bg=True):
     """Print a text to the cli in green.
     
-    Parameters:
+    Args:
       message (str):     Message to print.
       dark_bg (bool):    For a dark background?
     
@@ -155,7 +155,7 @@ def green(message, dark_bg=True):
 def blue(message, dark_bg=True):
     """Print a text to the cli in blue.
     
-    Parameters:
+    Args:
       message (str):     Message to print.
       dark_bg (bool):    For a dark background?
     
@@ -174,7 +174,7 @@ def blue(message, dark_bg=True):
 def yellow(message, dark_bg=True):
     """Print a text to the cli in yellow.
     
-    Parameters:
+    Args:
       message (str):     Message to print.
       dark_bg (bool):    For a dark background?
     
@@ -193,7 +193,7 @@ def yellow(message, dark_bg=True):
 def magenta(message, dark_bg=True):
     """Print a text to the cli in magenta.
     
-    Parameters:
+    Args:
       message (str):     Message to print.
       dark_bg (bool):    For a dark background?
     
@@ -212,7 +212,7 @@ def magenta(message, dark_bg=True):
 def cyan(message, dark_bg=True):
     """Print a text to the cli in cyan.
     
-    Parameters:
+    Args:
       message (str):     Message to print.
       dark_bg (bool):    For a dark background?
     

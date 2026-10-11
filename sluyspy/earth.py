@@ -25,7 +25,7 @@ import sluyspy.numerics as _snum
 def distance(lon1,lat1, lon2,lat2, miles=False):
     """Compute the distance between two points over the Earth's surface.
     
-    Parameters:
+    Args:
       lon1 (float):  Longitude of first location (rad).
       lat1 (float):  Latitude of first location (rad).
       lon2 (float):  Longitude of second location (rad).
@@ -62,7 +62,7 @@ def distance(lon1,lat1, lon2,lat2, miles=False):
 def effective_radius_from_latitude(lat):
     """Compute the effective radius of the Earth from the latitude.
     
-    Parameters:
+    Args:
       lat (float):  geographical latitude (radians).
     
     Returns:
@@ -82,7 +82,7 @@ def distance_direction_from_longitude_latitude(lon, lat):
     
     The distance is in kilometres, the direction angle in radians, where 0=N, pi/2=E, +/-pi=S and -pi/2=W.
     
-    Parameters:
+    Args:
       lon (float):  array of (at least two) longitude coordinates (radians).
       lat (float):  array of (at least two) latitude coordinates (radians).
     

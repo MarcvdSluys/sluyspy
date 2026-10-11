@@ -28,7 +28,7 @@ def np_polyfit_chi2(xvals, yvals, order, ysigmas=None, verbosity=0):
     
     Note: does not compute the uncertainties in the coefficients; use scipy_curvefit_chi2() for that.
     
-    Parameters:
+    Args:
       xvals (float):    X values.
       yvals (float):    Y values.
       order (int):      Polynomial order for fit.
@@ -70,7 +70,7 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, bounds=[-_n
     r"""Wrapper for SciPy's curve_fit, that returns the fitting coefficients and reduced chi^2.
        Print details if desired.
     
-    Parameters:
+    Args:
       fit_fun (function):  Fitting function, should look like  def fit_fun(x, a,b,c):  and return y=f(x, a,b,c).
       xvals (float):       Array containing x values to fit.
       yvals (float):       Array containing y values to fit.
@@ -142,7 +142,6 @@ def scipy_curvefit_chi2(fit_fun, xvals, yvals, coefs0, ysigmas=None, bounds=[-_n
 def print_fit_details(xvals,yvals, ysigmas=None, fittype=None, coefs=None,dcoefs=None, var_cov=None,
                       fit_fun=None, yfit=None, verbosity=2, abs_diff=True,rel_diff=True, sigdig=6,
                       coef_names=None, coef_facs=None, rev_coefs=None, yprintfac=1, rel_as_pct=False):
-    
     """Compute and return the reduced chi^2, and print other fit details if desired.
     
     Calculations are done without fitting, so that this function can be called after a fit.  The fit values
@@ -151,7 +150,7 @@ def print_fit_details(xvals,yvals, ysigmas=None, fittype=None, coefs=None,dcoefs
     This will print statistics on the comparison of the two data sets, similar to those after a fit.  If xvals
     is specified, a bit more detail can be printed.
     
-    Parameters:
+    Args:
       xvals (float):      Array with x values.
       yvals (float):      Array with y values.
     
@@ -170,7 +169,7 @@ def print_fit_details(xvals,yvals, ysigmas=None, fittype=None, coefs=None,dcoefs
       rel_diff (bool):    Print relative differences (optional; defaults to True).
       sigdig (int):       Number of significant digits to print (optional, defaults to 6).
     
-      coef_names (str):   Array of coefficient names for printing (optional, defaults to None).
+      coef_names (list):  Array of coefficient names (str) for printing (optional, defaults to None).
       coef_facs (float):  Array of coefficient multiplication factors for printing (optional; defaults to None,
                           in which case 1 is used).  Useful for e.g. printing degrees when radians are fitted.
       rev_coefs (bool):   Reverse printing order in coefficient table: last coefficient at top.
@@ -394,7 +393,7 @@ def print_fit_details(xvals,yvals, ysigmas=None, fittype=None, coefs=None,dcoefs
 def correlation_matrix_from_variance_covariance_matrix(var_cov):
     """Compute the normalised correlation matrix from a variance-covariance matrix.
     
-    Parameters:
+    Args:
       var_cov (float):  2D NumPy array containing the variance-covariance matrix.
     
     Returns:
@@ -414,10 +413,10 @@ def correlation_matrix_from_variance_covariance_matrix(var_cov):
 def polynomial(x, *coefs):
     """Return a polynomial y = Sum_i=0^N-1 coef_i x^i.
     
-    Parameters:
-      x (float):      X value(s).
-      coefs (float):  Array of polynomial coefficients.
-                      The polynomial order is defined by the number of coefficients in the array.
+    Args:
+      x (float):       X value(s).
+      *coefs (float):  Array of polynomial coefficients.
+                       The polynomial order is defined by the number of coefficients in the array.
     
     Returns:
       (float):  Polynomial value.
@@ -435,8 +434,10 @@ def polynomial(x, *coefs):
 def _print_matrix(mat, mat_type, coef_names=None):
     """Print the contents of a 2D (correlation or covariance) matrix.
     
-    Parameters:
-      mat (float):  2D NumPy array containing the variance-covariance matrix.
+    Args:
+      mat (float):        2D NumPy array containing the matrix.
+      mat_type (str):     Matrix type: 'corr' for correlation or 'var_cov' for variance-covariance.
+      coef_names (list):  List of coefficient names (str) for printing (optional, defaults to None).
     """
     
     # Matrix size:

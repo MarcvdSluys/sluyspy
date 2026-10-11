@@ -26,46 +26,85 @@ import astroconst as _ac
 
 @_dataclass
 class Environment:
-    tz:              str  = '';      """Time zone"""
-    geo_lon_deg:     float = 0.0;    """Geographical longitude in degrees east of Greenwich"""
-    geo_lat_deg:     float = 0.0;    """Geographical latitude in degrees north of the equator"""
-    geo_alt:         float = 0.0;    """Geographical altitude in metres above sea level"""
+    """Class containing environment settings.
     
-    host:            str  = '';      """Host name"""
-    home:            str  = '';      """Home directory"""
+    Attributes:
+      tz (str):  Time zone
+      geo_lon_deg (float):  Geographical longitude in degrees east of Greenwich
+      geo_lat_deg (float):  Geographical latitude in degrees north of the equator
+      geo_alt (float):  Geographical altitude in metres above sea level
+      
+      host (str):  Host name
+      home (str):  Home directory
+      
+      on_think (bool):  Am I on Think?
+      on_zotac (bool):  Am I on Zotac?
+      on_hwc (bool):  Am I on HWC?
+      
+      sp_dir (str):  Solar-panel directory
+      sp_az_deg (float):  Azimuth for solar panels in degrees from north (0=north, 90=east, 180=south, 270=west)
+      sp_tilt_deg (float):  Tilt for solar panels in degrees from horizontal (0=flat, 90=vertical == zenith angle)
+      
+      el_dir (str):  Electricity-meter directory
+      ems_dir (str):  EMS directory
+      price_dir (str):  Electricity-price directory
+      entsoe_token (str):  Entso-E API token
+      
+      hp_dir (str):  Heat-pump directory
+      hp_url (str):  Heat-pump URL
+      hp_ip (str):  Heat-pump IP address
+      hp_token (str):  Heat-pump API token
+      
+      knmi_10min_dir (str):  Directory for 10-min KNMI data
+      knmi_hourly_dir (str):  Directory for hourly KNMI data
+      knmi_daily_dir (str):  Directory for daily KNMI data
+      wpw_dir (str):  WP weather directory
+      om_dir (str):  OpenMeteo directory
+      
+      thesky_dir (str):  TheSky main directory
+      hwc_dir (str):  HWC main directory
+    """
     
-    on_think:        bool = False;   """Am I on Think?"""
-    on_zotac:        bool = False;   """Am I on Zotac?"""
-    on_hwc:          bool = False;   """Am I on HWC?"""
+    tz:              str  = ''      # Time zone
+    geo_lon_deg:     float = 0.0    # Geographical longitude in degrees east of Greenwich
+    geo_lat_deg:     float = 0.0    # Geographical latitude in degrees north of the equator
+    geo_alt:         float = 0.0    # Geographical altitude in metres above sea level
     
-    sp_dir:          str = '';       """Solar-panel directory"""
-    sp_az_deg:       float = 180.0;  """Azimuth for solar panels in degrees from north (0=north, 90=east, 180=south, 270=west)"""
-    sp_tilt_deg:     float = 45.0;   """Tilt for solar panels in degrees from horizontal (0=flat, 90=vertical == zenith angle)"""
+    host:            str  = ''      # Host name
+    home:            str  = ''      # Home directory
     
-    el_dir:          str = '';       """Electricity-meter directory"""
-    ems_dir:         str = '';       """EMS directory"""
-    price_dir:       str = '';       """Electricity-price directory"""
-    entsoe_token:    str = '';       """Entso-E API token"""
+    on_think:        bool = False   # Am I on Think?
+    on_zotac:        bool = False   # Am I on Zotac?
+    on_hwc:          bool = False   # Am I on HWC?
     
-    hp_dir:          str = '';       """Heat-pump directory"""
-    hp_url:          str = '';       """Heat-pump URL"""
-    hp_ip:           str = '';       """Heat-pump IP address"""
-    hp_token:        str = '';       """Heat-pump API token"""
+    sp_dir:          str = ''       # Solar-panel directory
+    sp_az_deg:       float = 180.0  # Azimuth for solar panels in degrees from north (0=north, 90=east, 180=south, 270=west)
+    sp_tilt_deg:     float = 45.0   # Tilt for solar panels in degrees from horizontal (0=flat, 90=vertical == zenith angle)
     
-    knmi_10min_dir:  str = '';       """Directory for 10-min KNMI data"""
-    knmi_hourly_dir: str = '';       """Directory for hourly KNMI data"""
-    knmi_daily_dir:  str = '';       """Directory for daily KNMI data"""
-    wpw_dir:         str = '';       """WP weather directory"""
-    om_dir:          str = '';       """OpenMeteo directory"""
+    el_dir:          str = ''       # Electricity-meter directory
+    ems_dir:         str = ''       # EMS directory
+    price_dir:       str = ''       # Electricity-price directory
+    entsoe_token:    str = ''       # Entso-E API token
     
-    thesky_dir:      str = '';       """TheSky main directory"""
-    hwc_dir:         str = '';       """HWC main directory"""
+    hp_dir:          str = ''       # Heat-pump directory
+    hp_url:          str = ''       # Heat-pump URL
+    hp_ip:           str = ''       # Heat-pump IP address
+    hp_token:        str = ''       # Heat-pump API token
+    
+    knmi_10min_dir:  str = ''       # Directory for 10-min KNMI data
+    knmi_hourly_dir: str = ''       # Directory for hourly KNMI data
+    knmi_daily_dir:  str = ''       # Directory for daily KNMI data
+    wpw_dir:         str = ''       # WP weather directory
+    om_dir:          str = ''       # OpenMeteo directory
+    
+    thesky_dir:      str = ''       # TheSky main directory
+    hwc_dir:         str = ''       # HWC main directory
     
     
 def environment(cfg_file='.python_environment.cfg'):
     """Return my computing environment.
     
-    Parameters:
+    Args:
       cfg_file (str):  Configuration file to read system environment from (relative to home directory).
     
     Returns:

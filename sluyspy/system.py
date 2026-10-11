@@ -112,7 +112,7 @@ def where_am_i():
 def temp_file_name(dir_name=None, base_name='.tmpfile', ext='tmp'):
     """Return a temporary file name, using the system clock, like "dir/file_YYYYMMDD-HHMMSS.mmmmmm.ext".
     
-    Parameters:
+    Args:
       dir_name (str):   Name of the directory for the file to be in.  Use homedir if None.
       base_name (str):  Base name of the file.
       ext (str):        File extension.
@@ -134,7 +134,7 @@ def temp_file_name(dir_name=None, base_name='.tmpfile', ext='tmp'):
 def tail_file(in_file, out_file, num_lines):
     """Use the tail command in a shell to quickly save the last N lines of a file in a new file.
     
-    Parameters:
+    Args:
       in_file (str):    Name of the input file.
       out_file (str):   Name of the output file.
       num_lines (int):  Number of lines to save.
@@ -149,7 +149,7 @@ def tail_file(in_file, out_file, num_lines):
 def string_in_file(infile, string):
     """Check whether a file contains a string.
     
-    Parameters:
+    Args:
       infile (str):  Name of the file.
       string (str):  Match string.
     
@@ -172,7 +172,7 @@ def string_in_file(infile, string):
 def string_in_file_grep(infile, string):
     """Use the grep command in a shell to quickly check whether a file contains a string.
     
-    Parameters:
+    Args:
       infile (str):  Name of the file.
       string (str):  Match string.
     
@@ -205,8 +205,9 @@ def string_in_file_grep(infile, string):
 def sleep(time, verbosity=0):
     """Call time.sleep and exit graciously upon keyboard interrupt (Ctrl-C).
     
-    Parameters:
-      time (float):  Sleep time in seconds.
+    Args:
+      time (float):     Sleep time in seconds.
+      verbosity (int):  Output verbosity (optional; defaults to 0).
     
     Returns:
       (int):  status: 0: uninterrupted, 1: interrupted.
@@ -225,7 +226,7 @@ def sleep(time, verbosity=0):
 def run_status(command):
     """Run a command and return the status/exit code.
     
-    Parameters:
+    Args:
       command (str):  command to run.
     
     Returns:
@@ -240,7 +241,7 @@ def run_status(command):
 def run_output(command):
     """Run a command and return the standard output.
     
-    Parameters:
+    Args:
       command (str):  command to run.
     
     Returns:

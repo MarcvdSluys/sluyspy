@@ -24,7 +24,7 @@ import sluyspy.weather as _swtr
 def read_36h_forecast_data(wp_dir, loc, verbosity=1):
     """Read WP 36h forecast files (full day today + latest) and combine them.
     
-    Parameters:
+    Args:
       wp_dir (str):     Directory containing the WP data files.
       loc (str):        Name of the town to read data for.
       verbosity (int):  Verbosity (0-4 for silent to loud).
@@ -65,7 +65,7 @@ def read_36h_forecast_data(wp_dir, loc, verbosity=1):
 def read_36h_forecast_file(file_name, loc, verbosity=1):
     """Read the forecast for the given location from a single WP 36h data file.
     
-    Parameters:
+    Args:
       file_name (str):  Name of the input file.
       loc (str):        Location to read data for.
       verbosity (int):  Verbosity (0-4 for silent to loud).
@@ -120,7 +120,7 @@ def read_36h_forecast_file(file_name, loc, verbosity=1):
 def smoothen_36h_forecast_data(wpfc, verbosity=1):
     """Smoothen WP 36h forecast data.
     
-    Parameters:
+    Args:
       wpfc (pd.df):     pandas.DataFrame containing WP forecast data.
       verbosity (int):  Verbosity (0-4 for silent to loud).
     

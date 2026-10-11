@@ -23,7 +23,7 @@ import datetime as _dt
 def line(fd, indent, code):
     """Write a line of html code with given indentation to a given file descriptor.
     
-    Parameters:
+    Args:
       fd (float):    File descriptor.
       indent (int):  Indentation (number of spaces).
       code (float):  HTML code to write.
@@ -36,10 +36,9 @@ def line(fd, indent, code):
 
 def start_html_file(file_name='index.html', lang='en', title='Page title', icon=None, css=None,
                     author='Marc van der Sluys', copyr_start=None, refresh=None, meta_prop=None):
-    
     """Create an html file, write the head section and start the body.
     
-    Parameters:
+    Args:
       file_name (str):    Name/path of the html file.
       lang (str):         Language.
       title (str):        Page title.
@@ -99,7 +98,7 @@ def start_html_file(file_name='index.html', lang='en', title='Page title', icon=
 def close_html_file(fd, sc_id=None, sc_secr=None, sc_name=None):
     """Close an html file by writing StatCounter code if desired, and closing <body>, <html> and the file.
     
-    Parameters:
+    Args:
       fd (io):        File descriptor.
       sc_id (int):    StatCounter project ID.
       sc_secr (str):  StatCounter security secret.
@@ -155,7 +154,7 @@ def close_html_file(fd, sc_id=None, sc_secr=None, sc_name=None):
 def table_td_tr(indent, td_width, td_extra_width):
     """Define trtd, tdtd and tdtr elements for an html table.
     
-    Parameters:
+    Args:
       indent (int):          Number of spaces for indentation.
       td_width (str):        Width of empty column between columns (e.g. '1%').
       td_extra_width (str):  Width of extra-wide empty column between columns (e.g. '10%').
@@ -182,7 +181,7 @@ def table_td_tr(indent, td_width, td_extra_width):
 def last_update(fd, dtm=None, indent=4, size='65%', seconds=False, tz=False):
     """Add a 'Last update' line to an html file with the current system date and time.
     
-    Parameters:
+    Args:
       fd (io):         File descriptor.
       dtm (float):     Date/time to print (can be e.g. UNIX time or time.time());  Optional, defaults to "now".
       indent (int):    Number of spaces for indentation.

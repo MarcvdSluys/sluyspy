@@ -29,7 +29,7 @@ tiny = _np.nextafter(0, 1);         """Smallest value larger than 0: 4.940656458
 def sigdig(num, dig=14):
     """Return a string with a given number using (at most) the specified number of significant digits.
     
-    Parameters:
+    Args:
       num (float):  Number to print.
       dig (int):    Number of significant digits to use (optional; defaults to 14 to avoid machine rounding).
     
@@ -57,7 +57,7 @@ def sigdig(num, dig=14):
 def map_pi_pi(ang):
     """Map an (array of) angle(s) to lie between -PI and +PI.
 
-    Parameters:
+    Args:
       ang (float):  (Array of) angle(s).
     
     Returns:
@@ -70,7 +70,7 @@ def map_pi_pi(ang):
 def nint(val):
     """Convert a float to the nearest integer with proper rounding.
     
-    Parameters:
+    Args:
       val (float):  Value to convert.
     
     Returns:

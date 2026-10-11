@@ -24,7 +24,7 @@ def horizons_ephem(obj, epochs, loc='500@399'):
     """Return a Pandas DataFrame with ephemerides from the NASA JPL Horizons system, with my selection of
     variables and column names.
     
-    Parameters:
+    Args:
       obj (str):            Object using Horizons definitions e.g. 199-899 for the centres of the planets 1-8.
       epochs (float/dict):  List of JDs (<~50!) or start/stop/step dict for ephemeride epochs, e.g. Julian days:
                             start/stop/step dict: e.g. {'start':'2010-01-01', 'stop':'2010-01-10', 'step':'1d'}

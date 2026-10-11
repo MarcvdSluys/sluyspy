@@ -24,7 +24,7 @@ import pandas as _pd
 def solar_power_from_true_sky_rain(Pclear, cloud_cover, rain, fittype='means'):
     """Compute solar power coming from a realistic (non-clear) sky, as a function of the power from the clear sky, the cloud cover and rain.
     
-    Parameters:
+    Args:
       Pclear (float):       (Electrical) solar power from clear sky (e.g. W or kW).
       cloud_cover (float):  Cloud cover (%).
       rain (float):         Rain (mm/h).
@@ -55,7 +55,7 @@ def solar_power_from_true_sky_rain(Pclear, cloud_cover, rain, fittype='means'):
 def _cloud_power_from_rain(rain, fittype='means'):
     """Guestimate the fraction of light power coming from an overcast sky, from the amount of rain.
     
-    Parameters:
+    Args:
       rain (float):   Rain value(s), in mm/hr.
       fittype (str):  Type of fit: 'means' (best?; default) or 'medians'.
     
@@ -93,7 +93,7 @@ def solar_power_from_true_sky_rh(Pclrsky, cloud_cover, rh, fittype='means'):
     """Compute solar power coming from a realistic (non-clear) sky, as a function of the power from
        the clear sky, the cloud cover and relative humidity.
     
-    Parameters:
+    Args:
       Pclrsky (float):      (Electrical) solar power from clear sky (e.g. W or kW).
       cloud_cover (float):  Cloud cover (%).
       rh (float):           Relative humidity (%).
@@ -116,7 +116,7 @@ def solar_power_from_true_sky_rh(Pclrsky, cloud_cover, rh, fittype='means'):
 def _cloud_power_from_rh_means(rh, fittype='means'):
     """Guestimate the fraction of light power coming from an overcast sky, from the relative humidity.
     
-    Parameters:
+    Args:
       rh (float):     Relative humidity (%).
       fittype (str):  Type of fit: 'orig_data' (worst), 'means' (best) or 'medians'.
     

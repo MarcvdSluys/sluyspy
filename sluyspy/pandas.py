@@ -22,7 +22,7 @@ import re as _re
 def csv_formatted_from_df(df, file_name, fmt):
     """Write a Pandas DataFrame as a formatted csv file.
     
-    Parameters:
+    Args:
       df (pd.df):       Pandas DataFrame to write to csv file.
       file_name (str):  Path to the output csv file (may be a Path).
       fmt (str):        C-style formatting string for values w/o newline; the header string will be adapted from this.

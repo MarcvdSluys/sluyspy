@@ -22,7 +22,7 @@ def wrap_line(line, wlen, indent=2):
     
     NOTE: this goes WRONG for if words longer than wlen are present.
     
-    Parameters:
+    Args:
       line (str):    Line to wrap.
       wlen (int):    Maximum line length to wrap at.
       indent (int):  Indentation of the continuation line

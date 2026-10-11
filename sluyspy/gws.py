@@ -25,15 +25,15 @@ import astroconst as _ac
 def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts, risco_fac=1.5, Fplcr=2/5, verbosity=0):
     """Compute a simple, Newtonian(!) compact-binary-coalescence waveform.
     
-    Parameters:
+    Args:
       m1 (float):         Mass of binary component 1 (kg).
       m2 (float):         Mass of binary component 2 (kg).
       dist (float):       Distance of binary (m).
       cosi (float):       Cosine of the inclination angle: +/-1 = face on, 0 = edge-on.
       tlen (float):       Length of time of array (s).
       tcoal (float):      Coalescence time (s).
-      risco_fac (float):  R_isco = R_star * risco_fac (-, defaults to 1.5); used to compute f_max.
       Npts (float):       Number of data points (-).
+      risco_fac (float):  R_isco = R_star * risco_fac (-, defaults to 1.5); used to compute f_max.
     
       Fplcr (float):      The mean value of F_+ and F_x: <F> ~ sqrt(<F_+^2 + F_x^2>),
                           which includes the inclination.  Defaults to 2/5.
@@ -47,8 +47,8 @@ def cbc_waveform(m1,m2, dist,cosi, tlen,tcoal, Npts, risco_fac=1.5, Fplcr=2/5, v
     mu = m1*m2/mt
     Mc = (m1*m2/mt**(1/3))**(3/5)
     
-    R1 = radius_BH_NS_from_mass(m1)  # Get the BH/NS radius for this mass (m)
-    R2 = radius_BH_NS_from_mass(m2)
+    R1 = radius_bh_ns_from_mass(m1)  # Get the BH/NS radius for this mass (m)
+    R2 = radius_bh_ns_from_mass(m2)
     a_min = R1 + R2                  # (m)
     
     f_isco = _ac.c**3 / (6**(3/2) * _ac.pi * _ac.g * mt)
@@ -93,7 +93,7 @@ def cbc_waveform_frequency(m1,m2, dist,cosi, f_low,f_high, Npts, risco_fac=1.5, 
     """Compute a simple, Newtonian(!) compact-binary-coalescence waveform in the frequency domain for a given
     range of frequencies.
     
-    Parameters:
+    Args:
       m1 (float):         Mass of binary component 1 (kg).
       m2 (float):         Mass of binary component 2 (kg).
       dist (float):       Distance of binary (m).
@@ -125,7 +125,7 @@ def cbc_waveform_frequency_array(df, m1,m2, dist,cosi, risco_fac=1.5, Fplcr=2/5,
     """Compute a simple, Newtonian(!) compact-binary-coalescence waveform in the frequency domain for a given
     range of frequencies.
     
-    Parameters:
+    Args:
       df (pd.df):         Pandas DataFrame containing frequency array (Hz) in column 'fgw'.
       m1 (float):         Mass of binary component 1 (kg).
       m2 (float):         Mass of binary component 2 (kg).
@@ -146,8 +146,8 @@ def cbc_waveform_frequency_array(df, m1,m2, dist,cosi, risco_fac=1.5, Fplcr=2/5,
     mt = m1+m2
     Mc = (m1*m2/mt**(1/3))**(3/5)
     
-    R1 = radius_BH_NS_from_mass(m1)  # Estimate/compute the BH/NS radius from the object mass
-    R2 = radius_BH_NS_from_mass(m2)
+    R1 = radius_bh_ns_from_mass(m1)  # Estimate/compute the BH/NS radius from the object mass
+    R2 = radius_bh_ns_from_mass(m2)
     a_min = R1+R2
     
     f_isco  = _ac.c**3 / (6**(3/2) * _ac.pi * _ac.g * mt)
@@ -187,10 +187,9 @@ def cbc_waveform_frequency_array(df, m1,m2, dist,cosi, risco_fac=1.5, Fplcr=2/5,
 
 def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, PRfac, no_FP=False,
                 adhoc_lowf=False, verbosity=0):
-    
     """Compute a simplified noise curve for a gravitational-wave interferometer.
     
-    Parameters:
+    Args:
       Npts (float):     Number of data points (-).
       f_low (float):    Lower frequency cut off (Hz).
       f_high (float):   Higher frequency cut off (Hz).
@@ -284,7 +283,7 @@ def noise_curve(Npts, f_low,f_high, Len, P_L,lam_L, eta_pd, M_mir, R_in,R_end, P
 def isco_radius_from_mass(mass, spin=0, as_km=False):
     """Compute the black-hole ISCO GW radius from its mass and spin.
     
-    Parameters:
+    Args:
       mass (float):  mass of the black hole (Mo).
       spin (float):  spin of the black hole (-1 - +1, defaults to 0).
       as_km (bool):  the result is expressed in km, else in terms of the BH mass M (defaults to False).
@@ -326,7 +325,7 @@ def isco_radius_from_mass(mass, spin=0, as_km=False):
 def isco_frequency_from_isco_radius(mass, r_isco, as_km=False):
     """Compute the ISCO GW frequency from the mass and ISCO radius expressed in M.
     
-    Parameters:
+    Args:
       mass (float):    mass of the object (Mo).
       r_isco (float):  ISCO radius of the object (in units of M, the BH mass).
       as_km (bool):    the ISCO radius is expressed in km, else in terms of the BH mass M (defaults to False).
@@ -345,7 +344,7 @@ def isco_frequency_from_isco_radius(mass, r_isco, as_km=False):
 def isco_frequency_from_mass(mass, spin=0):
     """Compute the ISCO GW frequency from the mass and ISCO radius expressed in M.
     
-    Parameters:
+    Args:
       mass (float):    mass of the object (Mo).
       spin (float):    spin of the black hole (-1 - +1, defaults to 0).
     
@@ -359,10 +358,10 @@ def isco_frequency_from_mass(mass, spin=0):
     return f_isco_gw
 
 
-def radius_BH_NS_from_mass(mass):
+def radius_bh_ns_from_mass(mass):
     """Estimate the radius of a (non-spinning) black hole or neutron star from its mass.
     
-    Parameters:
+    Args:
       mass (float):  mass of the object (kg).
     
     Returns:
