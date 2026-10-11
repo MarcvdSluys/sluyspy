@@ -7,7 +7,6 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   sluyspy.air_visual
    sluyspy.cli
    sluyspy.earth
    sluyspy.env
