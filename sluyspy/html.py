@@ -152,6 +152,80 @@ def close_html_file(fd, sc_id=None, sc_secr=None, sc_name=None):
     return
 
 
+def clr(color, text):
+    """Return the HTML code for the text provided in the colour specified using <span>.
+    
+    Args:
+      color (str):   HTML named colour (e.g. 'red') or colour code (e.g. '#FF0000').
+      text (str):    Text string to colourise.
+    
+    Returns:
+      (str):         The HTML code for the colorised text.
+    """
+    return f'<span style="color: {color};"><b>{text}</b></span>'
+
+
+def red(text):
+    """Return the HTML code for the text provided in a red font.
+    
+    Args:
+      text (str):    Text string to colourise.
+    
+    Returns:
+      (float):       The HTML code for the colorised text.
+    """
+    return clr('red', text)
+
+
+def green(text):
+    """Return the HTML code for the text provided in a green font.
+    
+    Args:
+      text (str):    Text string to colourise.
+    
+    Returns:
+      (float):       The HTML code for the colorised text.
+    """
+    return clr('green', text)
+
+
+def blue(text):
+    """Return the HTML code for the text provided in a blue font.
+    
+    Args:
+      text (str):    Text string to colourise.
+    
+    Returns:
+      (float):       The HTML code for the colorised text.
+    """
+    return clr('blue', text)
+
+
+def orange(text):
+    """Return the HTML code for the text provided in a orange font.
+    
+    Args:
+      text (str):    Text string to colourise.
+    
+    Returns:
+      (float):       The HTML code for the colorised text.
+    """
+    return clr('orange', text)
+
+
+def purple(text):
+    """Return the HTML code for the text provided in a purple font.
+    
+    Args:
+      text (str):    Text string to colourise.
+    
+    Returns:
+      (float):       The HTML code for the colorised text.
+    """
+    return clr('purple', text)
+
+
+
 def table_td_tr(indent, td_width, td_extra_width):
     """Define trtd, tdtd and tdtr elements for an html table.
     
