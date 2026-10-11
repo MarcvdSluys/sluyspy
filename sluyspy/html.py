@@ -20,16 +20,17 @@
 import datetime as _dt
 
 
-def line(fd, indent, code):
-    """Write a line of html code with given indentation to a given file descriptor.
+def line(fd, indent, code, end='\n'):
+    r"""Write a line of html code with given indentation to a given file descriptor.
     
     Args:
       fd (float):    File descriptor.
       indent (int):  Indentation (number of spaces).
       code (float):  HTML code to write.
+      end (str):     Line ending (optional; defaults to '\n').
     """
     
-    fd.write(' '*indent + code +'\n')
+    fd.write(' '*indent + code + end)
     
     return
 
