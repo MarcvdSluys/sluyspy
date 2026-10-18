@@ -228,6 +228,113 @@ def cyan(message, dark_bg=True):
     return clr_message
 
 
+def grey_bg(message):
+    """Print a text to the cli in bold white on a grey background.
+    
+    Args:
+      message (str):     Message to print.
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    clr_message = _clr(message, 'white', 'on_grey', attrs=['bold'])
+    
+    return clr_message
+
+
+def red_bg(message):
+    """Print a text to the cli in bold white on a red background.
+    
+    Args:
+      message (str):     Message to print.
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    clr_message = _clr(message, 'white', 'on_red', attrs=['bold'])
+    
+    return clr_message
+
+
+def green_bg(message):
+    """Print a text to the cli in bold white on a green background.
+    
+    Args:
+      message (str):     Message to print.
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    clr_message = _clr(message, 'white', 'on_green', attrs=['bold'])
+    
+    return clr_message
+
+
+def blue_bg(message):
+    """Print a text to the cli in bold white on a blue background.
+    
+    Args:
+      message (str):     Message to print.
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    clr_message = _clr(message, 'white', 'on_blue', attrs=['bold'])
+    
+    return clr_message
+
+
+def yellow_bg(message):
+    """Print a text to the cli in bold white on a yellow background.
+    
+    Args:
+      message (str):     Message to print.
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    clr_message = _clr(message, 'white', 'on_yellow', attrs=['bold'])
+    
+    return clr_message
+
+
+def magenta_bg(message):
+    """Print a text to the cli in bold white on a magenta background.
+    
+    Args:
+      message (str):     Message to print.
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    clr_message = _clr(message, 'white', 'on_magenta', attrs=['bold'])
+    
+    return clr_message
+
+
+def cyan_bg(message):
+    """Print a text to the cli in bold white on a cyan background.
+    
+    Args:
+      message (str):     Message to print.
+    
+    Returns:
+      (str):             Message in colour.
+    """
+    
+    clr_message = _clr(message, 'white', 'on_cyan', attrs=['bold'])
+    
+    return clr_message
+
+
+
+
 def cls():
     """Clear the terminal screen.
     
