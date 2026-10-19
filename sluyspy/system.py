@@ -146,6 +146,25 @@ def tail_file(in_file, out_file, num_lines):
     return
 
 
+def head_tail_file(in_file, out_file, num_lines, num_head=1):
+    """Use the tail command in a shell to quickly save the last N lines of a file in a new file.
+    
+    Args:
+      in_file (str):    Name of the input file.
+      out_file (str):   Name of the output file.
+      num_lines (int):  Number of (data) lines to save after the header.
+      num_head (int):   Number of header lines to save (optional; defaults to 1).
+    """
+    
+    _subprocess.run(['head -'+str(num_lines)+' '+in_file+' > '+out_file], stdout=_subprocess.PIPE,
+                    shell=True, check=True).stdout.decode('utf-8')
+    
+    _subprocess.run(['tail -'+str(num_lines)+' '+in_file+' >> '+out_file], stdout=_subprocess.PIPE,
+                    shell=True, check=True).stdout.decode('utf-8')
+    
+    return
+
+
 def string_in_file(infile, string):
     """Check whether a file contains a string.
     
