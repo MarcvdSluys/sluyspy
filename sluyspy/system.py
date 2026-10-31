@@ -305,7 +305,7 @@ def at_schedule(command, when, queue='a', verbosity=0):
 
 
 def at_queue(verbosity=0):
-    """List the jobs in the at(1) queue.
+    r"""List the jobs in the at(1) queue.
     
     Args:
       verbosity (int):  Output verbosity (optional; defaults to 0 = silent).
@@ -317,6 +317,8 @@ def at_queue(verbosity=0):
       - dtm (datetime):  Date and time at which the job will run.
       - queue (str):     Queue letter.
       - user (str):      User who submitted the job.
+      - cwd (str):       Working directory in which the job will run.
+      - command (str):   Scheduled command(s); multiple lines are joined by '\\n'.
     
       Returns an empty DataFrame when the queue is empty, None on error.
     """
@@ -344,7 +346,61 @@ def at_queue(verbosity=0):
         df['dtm'] = _pd.to_datetime(df['dtm'])
         df = df.sort_values('job').reset_index(drop=True)  # Sort by job number; reset index to 0..n-1
     
+    df = _at_queue_add_details(df, verbosity=verbosity)  # Add cwd and command columns
+    
     if verbosity > 0: print(df)
+    
+    return df
+
+
+def _at_queue_add_details(df, verbosity=0):
+    r"""Add the working directory and scheduled command(s) of each job in an at(1) queue DataFrame.
+    
+    Uses at -c <job> to read each job's spool file: the working directory comes from the "cd <dir> || {"
+    line, and the command(s) are the lines following the closing "}" of that block.
+    
+    Args:
+      df (pd.DataFrame):  at queue DataFrame as returned by at_queue(), with at least a 'job' column.
+      verbosity (int):    Output verbosity (optional; defaults to 0 = silent).
+    
+    Returns:
+      (pd.DataFrame):  The input DataFrame with two extra columns:
+    
+      - cwd (str):      Working directory in which the job will run.
+      - command (str):  Scheduled command(s); multiple lines are joined by '\\n'.
+    """
+    
+    cwds = []
+    commands = []
+    for job in df.job:
+        result = _subprocess.run(['at', '-c', str(job)], stdout=_subprocess.PIPE, stderr=_subprocess.PIPE)
+        if result.returncode != 0:
+            import sluyspy.cli as scli
+            scli.warn('_at_queue_add_details(): at -c '+str(job)+' returned exit code '+str(result.returncode))
+            cwds.append(None)
+            commands.append(None)
+            continue
+        
+        lines = result.stdout.decode('utf-8').splitlines()
+        cwd = None
+        cmd_lines = []
+        for i, line in enumerate(lines):
+            match = _re.match(r'^cd (.*) \|\| \{$', line)
+            if match:
+                cwd = match.group(1).replace('\\ ', ' ')  # Unescape escaped spaces in the path
+                for j in range(i+1, len(lines)):
+                    if lines[j] == '}':  # End of the "cd ... || { ... }" block; the commands follow
+                        cmd_lines = lines[j+1:]
+                        break
+                break
+        
+        cwds.append(cwd)
+        commands.append('\n'.join(cmd_lines) if cmd_lines else None)
+        
+        if verbosity > 1: print('Job', job, '- cwd:', cwd, '- command:', commands[-1])
+    
+    df['cwd'] = cwds
+    df['command'] = commands
     
     return df
 
