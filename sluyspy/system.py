@@ -308,10 +308,10 @@ def at_queue(verbosity=0):
     r"""List the jobs in the at(1) queue.
     
     Args:
-      verbosity (int):  Output verbosity (optional; defaults to 0 = silent).
+      verbosity (int):   Output verbosity (optional; defaults to 0 = silent).
     
     Returns:
-      (pd.DataFrame):  DataFrame with one row per queued job and columns:
+      (pd.DataFrame):    DataFrame with one row per queued job and columns:
     
       - job (int):       Job number, to be used with atrm(1) or at -c.
       - dtm (datetime):  Date and time at which the job will run.
@@ -364,7 +364,7 @@ def _at_queue_add_details(df, verbosity=0):
       verbosity (int):    Output verbosity (optional; defaults to 0 = silent).
     
     Returns:
-      (pd.DataFrame):  The input DataFrame with two extra columns:
+      (pd.DataFrame):   The input DataFrame with two extra columns:
     
       - cwd (str):      Working directory in which the job will run.
       - command (str):  Scheduled command(s); multiple lines are joined by '\\n'.
@@ -411,7 +411,7 @@ def at_remove(jobs, verbosity=0):
     Args:
       jobs (int, list, pd.Series):  Job number(s) to remove, as returned by at_schedule() or listed in
                                     at_queue() (e.g. the at_queue().job column).
-      verbosity (int):   Output verbosity (optional; defaults to 0 = silent).
+      verbosity (int):              Output verbosity (optional; defaults to 0 = silent).
     
     Returns:
       (int):  Exit code of atrm: 0 when all jobs were removed, non-zero otherwise.
