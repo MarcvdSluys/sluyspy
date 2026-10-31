@@ -18,6 +18,7 @@
 
 
 from pathlib import Path as _Path
+import re as _re
 import sys as _sys
 import socket as _socket
 import time as _time
@@ -272,3 +273,125 @@ def run_output(command):
     return result.strip()
 
 
+def at_schedule(command, when, queue='a', verbosity=0):
+    """Schedule a command to be executed by at(1) at the specified time.
+    
+    Args:
+      command (str):    Command line to schedule; passed to at via stdin, so no shell is involved.
+      when (str):       Time specification as accepted by at(1), e.g. 'now + 5 minutes', '14:30', 'tomorrow'.
+      queue (str):      at queue to submit the job to (optional; defaults to 'a').
+      verbosity (int):  Output verbosity (optional; defaults to 0 = silent).
+    
+    Returns:
+      (int):  Job number assigned by at, to be used with atrm(1) or at -c; None when scheduling failed.
+    """
+    
+    result = _subprocess.run(['at', '-q', queue, when], input=command.encode('utf-8'),
+                             stdout=_subprocess.PIPE, stderr=_subprocess.PIPE)
+    
+    if result.returncode != 0:
+        import sluyspy.cli as scli
+        scli.warn('at_schedule(): at returned exit code '+str(result.returncode)+': '
+                  +result.stderr.decode('utf-8').strip())
+        return None
+    
+    # at writes "job <N> at <date>" to stderr:
+    match = _re.search(r'job (\d+) at', result.stderr.decode('utf-8'))
+    job = int(match.group(1)) if match else None
+    
+    if verbosity > 0: print('Scheduled job', job, 'for', when, ':', command)
+    
+    return job
+
+
+def at_queue(verbosity=0):
+    """List the jobs in the at(1) queue.
+    
+    Args:
+      verbosity (int):  Output verbosity (optional; defaults to 0 = silent).
+    
+    Returns:
+      (pd.DataFrame):  DataFrame with one row per queued job and columns:
+    
+      - job (int):       Job number, to be used with atrm(1) or at -c.
+      - dtm (datetime):  Date and time at which the job will run.
+      - queue (str):     Queue letter.
+      - user (str):      User who submitted the job.
+    
+      Returns an empty DataFrame when the queue is empty, None on error.
+    """
+    
+    import pandas as _pd
+    
+    result = _subprocess.run(['atq'], stdout=_subprocess.PIPE, stderr=_subprocess.PIPE)
+    
+    if result.returncode != 0:
+        import sluyspy.cli as scli
+        scli.warn('at_queue(): atq returned exit code '+str(result.returncode)+': '
+                  +result.stderr.decode('utf-8').strip())
+        return None
+    
+    # atq output per line: "<job>\t<asctime date> <queue> <user>", e.g. "15\tSat Oct 31 16:05:00 2026 a sluys":
+    jobs = []
+    for line in result.stdout.decode('utf-8').strip().splitlines():
+        if line:
+            job, rest = line.split('\t', 1)
+            dtm, queue, user = rest.rsplit(maxsplit=2)
+            jobs.append((int(job), dtm, queue, user))
+    
+    df = _pd.DataFrame(jobs, columns=['job', 'dtm', 'queue', 'user'])
+    if len(df) > 0:
+        df['dtm'] = _pd.to_datetime(df['dtm'])
+        df = df.sort_values('job').reset_index(drop=True)  # Sort by job number; reset index to 0..n-1
+    
+    if verbosity > 0: print(df)
+    
+    return df
+
+
+def at_remove(jobs, verbosity=0):
+    """Remove job(s) from the at(1) queue using atrm(1).
+    
+    Args:
+      jobs (int, list, pd.Series):  Job number(s) to remove, as returned by at_schedule() or listed in
+                                    at_queue() (e.g. the at_queue().job column).
+      verbosity (int):   Output verbosity (optional; defaults to 0 = silent).
+    
+    Returns:
+      (int):  Exit code of atrm: 0 when all jobs were removed, non-zero otherwise.
+    """
+    
+    if isinstance(jobs, int): jobs = [jobs]
+    
+    result = _subprocess.run(['atrm'] + [str(job) for job in jobs],
+                             stdout=_subprocess.PIPE, stderr=_subprocess.PIPE)
+    
+    if result.returncode != 0:
+        import sluyspy.cli as scli
+        scli.warn('at_remove(): atrm returned exit code '+str(result.returncode)+': '
+                  +result.stderr.decode('utf-8').strip())
+    elif verbosity > 0: print('Removed at job(s):', ', '.join(str(job) for job in jobs))
+    
+    return result.returncode
+
+
+def at_remove_all_jobs(verbosity=0):
+    """Remove all/any job(s) from the at(1) queue using atrm(1).
+    
+    Args:
+      verbosity (int):   Output verbosity (optional; defaults to 0 = silent).
+    
+    Returns:
+      (int):  Exit code of atrm: 0 when all jobs were removed, non-zero otherwise.
+    """
+    
+    df = at_queue()
+    if df is None: return 1  # atq failed; at_queue() has already warned
+    
+    rc = 0
+    if len(df) > 0:
+        rc = at_remove(df.job, verbosity=verbosity)
+    elif verbosity > 0:
+        print('at_remove_all_jobs(): No jobs found, nothing to remove')
+    
+    return rc
