@@ -304,11 +304,12 @@ def at_schedule(command, when, queue='a', verbosity=0):
     return job
 
 
-def at_queue(verbosity=0):
-    r"""List the jobs in the at(1) queue.
+def at_queue(verbosity=0, queue='a'):
+    r"""List the jobs in the at(1) queue, optionally restricted to one queue.
     
     Args:
       verbosity (int):   Output verbosity (optional; defaults to 0 = silent).
+      queue (str):       Optional queue (single letter;  None = all queues.); Optional, defaults to 'a'.
     
     Returns:
       (pd.DataFrame):    DataFrame with one row per queued job and columns:
@@ -325,7 +326,8 @@ def at_queue(verbosity=0):
     
     import pandas as _pd
     
-    result = _subprocess.run(['atq'], stdout=_subprocess.PIPE, stderr=_subprocess.PIPE)
+    cmd = ['atq'] + (['-q', queue] if queue else [])
+    result = _subprocess.run(cmd, stdout=_subprocess.PIPE, stderr=_subprocess.PIPE)
     
     if result.returncode != 0:
         import sluyspy.cli as scli
