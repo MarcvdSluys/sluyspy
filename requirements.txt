@@ -2,8 +2,7 @@ astroconst==0.0.14
 astroquery==0.4.11
 astrotool==0.0.26
 matplotlib==3.11.2
-numpy==2.5.4
-pytz==2026.4
+numpy==2.5.5
 pytz==2026.5
 scipy==1.18.1
 solarenergy==0.1.13
