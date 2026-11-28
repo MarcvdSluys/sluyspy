@@ -9,6 +9,7 @@ Submodules
 
    sluyspy.cli
    sluyspy.earth
+   sluyspy.ems
    sluyspy.env
    sluyspy.ephem
    sluyspy.fit
